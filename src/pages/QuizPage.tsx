@@ -98,7 +98,8 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const [results, setResults] = useState<QuestionResult[]>([]);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const saved = useRef(false);
-  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: string | null; xp: number } | null>(null);
+  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: string | null; xp: number; attempts: number } | null>(null);
+  const [skippedNow, setSkippedNow] = useState(false);
 
   const q = questions[index];
   const finished = index >= questions.length;
@@ -136,6 +137,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     }
     let passed = ratio >= PASS_RATIO;
     let newlyUnlocked: string | null = null;
+    let attempts = 0;
     let xp = correctCount * XP_PER_CORRECT_ANSWER;
     if (scope.graded) {
       const old = progress.tests.get(scope.id);
@@ -152,6 +154,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       const wasUnlocked = (i: number) => (units[i] ? unitUnlocked(units[i]!.id, progress.tests) : false);
       const idx = units.findIndex((u) => u.id === scope.id);
       const before = scope.unlocks && wasUnlocked(idx + 1);
+      attempts = result.attempts;
       progress.tests.set(scope.id, result);
       void saveTest(result);
       if (scope.unlocks && !before && wasUnlocked(idx + 1)) newlyUnlocked = units[idx + 1]!.title;
@@ -162,8 +165,20 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     void saveDay(award.day);
     if (award.goalJustReached) toast({ emoji: '🎯', title: 'Denní cíl splněn!', text: `Bonus +${XP_GOAL_BONUS} XP` });
     notifyProgress();
-    setOutcome({ passed, newlyUnlocked, xp: award.gained });
+    setOutcome({ passed, newlyUnlocked, xp: award.gained, attempts });
   }, [finished]);
+
+  const nextUnit = scope.unlocks ? units[units.findIndex((u) => u.id === scope.id) + 1] : undefined;
+  // po třech neúspěších nabídneme pokračovat dál (test jde zopakovat později)
+  const offerSkip = !!outcome && !outcome.passed && outcome.attempts >= 3 && !!nextUnit && !skippedNow && !unitUnlocked(nextUnit.id, progress.tests);
+  const skipTest = () => {
+    const old = progress.tests.get(scope.id);
+    const result: TestResult = { id: scope.id, best: old?.best ?? 0, passed: true, attempts: old?.attempts ?? 0, last: Date.now(), skipped: true };
+    progress.tests.set(scope.id, result);
+    void saveTest(result);
+    notifyProgress();
+    setSkippedNow(true);
+  };
 
   const retry = () => {
     saved.current = false;
@@ -233,6 +248,14 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             ) : (
               <p class="mt-3 text-sm text-muted">{ratio >= PASS_RATIO ? 'Skvělé!' : 'Chybná slovíčka se vrátí do opakování.'}</p>
             )}
+            {offerSkip && nextUnit && (
+              <div class="mt-4 rounded-2xl border border-line bg-surface-2 p-4 text-left text-sm">
+                <p class="font-semibold">Zasekl ses? To se stává.</p>
+                <p class="mt-1 text-ink-soft">Můžeš jednotku „{nextUnit.title}“ odemknout i bez splněného testu a k tomuto se vrátit později. Chybná slovíčka se vracejí do opakování.</p>
+                <button type="button" onClick={skipTest} class="mt-3 rounded-xl border border-line-strong px-4 py-2 font-semibold hover:border-brand-500">Odemknout další jednotku</button>
+              </div>
+            )}
+            {skippedNow && nextUnit && <p class="mt-3 text-sm font-semibold text-green-700 dark:text-green-400">Odemčena jednotka „{nextUnit.title}“ 🔓</p>}
             {outcome && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{outcome.xp} XP ⭐</p>}
             <div class="mt-5 flex flex-wrap justify-center gap-3">
               <button type="button" onClick={retry} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Nový pokus</button>

@@ -14,7 +14,9 @@ Stav k 16. 11. 2026. Doplňuje `docs/IMPROVEMENTS.md` (ten je široký katalog n
 
 **Také hotovo (mince, obchod, avatar – kap. 6, M1–M3):** zůstatek mincí se odvozuje z pokroku (`src/lib/coins.ts`), obchod `/shop` (Pokrok → Obchod) prodává pozadí, oblečení, pokrývky hlavy, doplňky, barevné motivy a zmrazení série; avatar je SVG z vrstev (`src/components/Avatar.tsx`, 24 položek, 5 odměn za odznak/úroveň zdarma, základní vzhled postavy zdarma). Stav je v `localStorage` (`ap:shop`) a je součástí zálohy. Rozhodnutí: mince nejsou za kliknutí, takže strop nebyl potřeba; zůstatek se nikdy nezobrazí záporný; zmrazení se použije samo, jen když běžné odpuštění nestačí.
 
-**Zbývá:** M4 (sbírka, bonusové kapitoly, nápovědy v testech – podle zkušeností s mincemi), T1 (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
+**Také hotovo:** T1 (po třech neúspěšných pokusech o test jednotky nabídka odemknout další jednotku, test zůstává k opakování), P1 dokončeno (Pokrok už jen odkazuje na Nastavení; na stránce Karty zůstala zkratka „nových karet denně“). K2 (lazy-load obsahu) jsem neřešil: celá aplikace má po sestavení asi 480 KB, takže přínos by byl malý.
+
+**Zbývá:** M4 (sbírka, bonusové kapitoly, nápovědy v testech – podle zkušeností s mincemi) (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
 
 ## 0. Shrnutí v jedné stránce
 

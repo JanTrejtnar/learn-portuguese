@@ -10,7 +10,7 @@ import { Coin } from '../components/Coin';
 import { coinsEarned } from '../lib/coins';
 import { balance, loadShop } from '../lib/shop';
 import { streakOf } from '../lib/stats';
-import { GOAL_OPTIONS, levelInfo, totalXp, xpToday } from '../lib/xp';
+import { levelInfo, totalXp, xpToday } from '../lib/xp';
 
 const Tile = ({ label, value, hint }: { label: string; value: string | number; hint?: string }) => (
   <div class="rounded-2xl border border-line bg-surface p-4">
@@ -25,7 +25,7 @@ const bar: Record<Maturity, string> = { new: 'bg-line-strong', learning: 'bg-gol
 
 export const StatsPage = () => {
   const progress = useProgress();
-  const [settings, update] = useStudySettings();
+  const [settings] = useStudySettings();
   if (!progress) return <Loading />;
 
   const now = Date.now();
@@ -84,14 +84,7 @@ export const StatsPage = () => {
 
       <div class="mt-4 rounded-2xl border border-line bg-surface p-4">
         <div class="font-semibold">Denní cíl: {xpToday(progress.days, now)} / {settings.dailyGoal} XP</div>
-        <div class="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Denní cíl">
-          {GOAL_OPTIONS.map((g) => (
-            <button key={g.xp} type="button" role="radio" aria-checked={settings.dailyGoal === g.xp} onClick={() => update({ dailyGoal: g.xp })}
-              class={`rounded-xl border-2 px-3 py-2 text-left text-sm ${settings.dailyGoal === g.xp ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-line'}`}>
-              <b>{g.label}</b> · {g.xp} XP<span class="block text-xs text-muted">{g.hint}</span>
-            </button>
-          ))}
-        </div>
+        <a href="#/settings" class="mt-1 inline-block text-sm font-semibold text-brand-700 hover:underline dark:text-brand-200">Změnit v Nastavení →</a>
       </div>
 
       <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
