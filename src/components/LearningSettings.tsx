@@ -25,13 +25,6 @@ export const LearningSettings = () => {
         </select>
       </label>
       <div>
-        <div class="mb-2 font-semibold">Hodnocení karet</div>
-        <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Hodnocení karet">
-          <button type="button" role="radio" aria-checked={s.simpleRating} onClick={() => update({ simpleRating: true })} class={chip(s.simpleRating)}><b>Jednoduché</b><span class="block text-xs text-muted">Neznal jsem / Znal jsem</span></button>
-          <button type="button" role="radio" aria-checked={!s.simpleRating} onClick={() => update({ simpleRating: false })} class={chip(!s.simpleRating)}><b>Podrobné</b><span class="block text-xs text-muted">4 tlačítka</span></button>
-        </div>
-      </div>
-      <div>
         <div class="mb-2 font-semibold">Psaní při opakování</div>
         <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Psaní při opakování">
           {([['off', 'Vypnuto', 'Jen otáčení karet'], ['sometimes', 'Někdy', 'Občas napíšeš slovo'], ['often', 'Často', 'Většinu známých slov napíšeš']] as const).map(([id, label, hint]) => (
@@ -47,7 +40,7 @@ export const LearningSettings = () => {
           <button type="button" role="radio" aria-checked={s.direction === 'cs-pt'} onClick={() => update({ direction: 'cs-pt' })} class={chip(s.direction === 'cs-pt')}>Česky → portugalsky</button>
         </div>
       </div>
-      <label class="flex items-center gap-2"><input type="checkbox" checked={s.autoplay} onChange={(e) => update({ autoplay: e.currentTarget.checked })} class="h-4 w-4 accent-teal-700" /> Automaticky přehrát výslovnost</label>
+      <label class="flex items-center gap-2"><input type="checkbox" checked={s.sounds} onChange={(e) => update({ sounds: e.currentTarget.checked })} class="h-4 w-4 accent-teal-700" /> Zvuk a oslava po dokončení</label>
       <label class="flex items-center gap-2"><input type="checkbox" checked={s.shuffle} onChange={(e) => update({ shuffle: e.currentTarget.checked })} class="h-4 w-4 accent-teal-700" /> Zamíchat pořadí karet</label>
       <label class="flex items-center gap-2"><input type="checkbox" checked={s.showTranslations} onChange={(e) => update({ showTranslations: e.currentTarget.checked })} class="h-4 w-4 accent-teal-700" /> Ukazovat české překlady ve scénářích</label>
     </div>

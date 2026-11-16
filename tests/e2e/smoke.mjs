@@ -96,11 +96,11 @@ await test('hledání v kartách najde slovo bez diakritiky', async () => {
   await ctx.close();
 });
 
-await test('přepínač Seznam / Mapa a pět záložek', async () => {
+await test('přepínač Seznam / Mapa a záložky', async () => {
   const { page, ctx } = await newPage(true);
   await page.goto(base + '#/map');
   await page.getByRole('heading', { name: 'Cesta Portugalskem' }).waitFor();
-  assert.equal(await page.getByRole('navigation').locator('a').count() >= 5, true);
+  assert.equal(await page.getByRole('navigation').locator('a').count() >= 3, true);
   await page.getByRole('link', { name: /Seznam/ }).click();
   await page.waitForURL(/#\/$/);
   await page.getByRole('link', { name: /Mapa/ }).click();

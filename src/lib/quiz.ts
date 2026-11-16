@@ -44,6 +44,9 @@ export interface MatchQ extends Base {
   pairs: { id: string; pt: string; cs: string }[];
 }
 
+/** Slovo bez interpunkce a velikosti písmen: rozdíl jen v čárce či vykřičníku není chyba. */
+export const tokenKey = (t: string): string => t.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+
 export interface BuildQ extends Base {
   kind: 'build';
   prompt: string;
@@ -153,12 +156,12 @@ const key = (s: string): string => s.toLowerCase().replace(/\s*\(.*?\)\s*/g, '')
 const pickDistractors = (word: Word, text: (w: Word) => string, scope: Word[], pool: Word[], rng: Rng, toPt: boolean): string[] => {
   const correct = text(word);
   // Špatná možnost nesmí být také správná: stejný význam (cs) u PT možností, stejné slovo (pt) u CZ možností.
-  const ok = (w: Word) => w.id !== word.id && text(w) !== correct && (toPt ? key(w.cs) !== key(word.cs) : key(w.pt) !== key(word.pt));
+  const ok = (w: Word) => w.id !== word.id && normalize(text(w)) !== normalize(correct) && (toPt ? key(w.cs) !== key(word.cs) : key(w.pt) !== key(word.pt));
   const rank = (list: Word[]) => shuffle(list.filter(ok), rng).sort((a, b) => Number(b.pos === word.pos) - Number(a.pos === word.pos));
   const out: string[] = [];
   for (const w of [...rank(scope), ...rank(pool)]) {
     const t = text(w);
-    if (!out.includes(t)) out.push(t);
+    if (!out.some((o) => normalize(o) === normalize(t))) out.push(t);
     if (out.length === 3) break;
   }
   return out;
@@ -224,7 +227,16 @@ export const generateQuiz = (opts: GenerateOptions): Question[] => {
   for (const s of shuffle(sentences, rng).slice(0, nBuild)) {
     const tokens = s.pt.split(/\s+/);
     const others = sentences.filter((o) => o.pt !== s.pt).flatMap((o) => o.pt.split(/\s+/));
-    const extras = shuffle([...new Set(others)].filter((t) => !tokens.includes(t)), rng).slice(0, 2);
+    const used = new Set(tokens.map(tokenKey));
+    const seenKeys = new Set<string>();
+    const extras = shuffle([...new Set(others)], rng)
+      .filter((t) => {
+        const k = tokenKey(t);
+        if (!k || used.has(k) || seenKeys.has(k)) return false; // „Olá!“ × „Olá,“ nesmí být past
+        seenKeys.add(k);
+        return true;
+      })
+      .slice(0, 2);
     questions.push({ id: nextId(), kind: 'build', wordIds: s.wordId ? [s.wordId] : [], prompt: s.cs, tokens, bank: shuffle([...tokens, ...extras], rng) });
   }
 

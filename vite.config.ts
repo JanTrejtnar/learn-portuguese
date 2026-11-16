@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Aprender Português — evropská portugalština',
-        short_name: 'Aprender',
+        name: 'Portuglove — evropská portugalština',
+        short_name: 'Portuglove',
         description: 'Učení evropské portugalštiny (PT-PT) pro úrovně A1 a A2.',
         lang: 'cs',
         theme_color: '#046a38',

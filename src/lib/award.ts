@@ -7,7 +7,7 @@ export const grantXp = (days: Map<string, DayStats>, amount: number, goal: numbe
   const award = awardXp(days, Date.now(), amount, goal);
   days.set(award.day.date, award.day);
   void saveDay(award.day);
-  if (award.goalJustReached) toast({ emoji: '🎯', title: 'Denní cíl splněn!', text: `Bonus +${XP_GOAL_BONUS} XP` });
+  if (award.goalJustReached) toast({ emoji: '🎯', title: `Denní cíl splněn! +${XP_GOAL_BONUS} XP` });
   notifyProgress();
   return award.gained;
 };

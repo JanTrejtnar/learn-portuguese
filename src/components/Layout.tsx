@@ -2,7 +2,6 @@ import type { ComponentChildren } from 'preact';
 import { href } from '../router';
 import { Icon } from './Icon';
 import { Logo } from './Logo';
-import { ThemeToggle } from './ThemeToggle';
 import { ToastHost } from './ToastHost';
 
 interface NavItem {
@@ -14,9 +13,7 @@ interface NavItem {
 
 const nav: NavItem[] = [
   { label: 'Lekce', icon: 'book', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') || p.startsWith('/map') },
-  { label: 'Karty', icon: 'cards', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') || p.startsWith('/grammar') },
-  { label: 'Testy', icon: 'check', to: '/quiz', active: (p) => p.startsWith('/quiz') },
-  { label: 'Praxe', icon: 'chat', to: '/practice', active: (p) => ['/practice', '/roleplay', '/pairs', '/speak', '/gramatika'].some((x) => p.startsWith(x)) },
+  { label: 'Procvičit', icon: 'cards', to: '/practice', active: (p) => ['/practice', '/cards', '/free', '/grammar', '/quiz', '/roleplay', '/pairs', '/speak', '/gramatika'].some((x) => p.startsWith(x)) },
   { label: 'Pokrok', icon: 'chart', to: '/stats', active: (p) => p.startsWith('/stats') || p.startsWith('/shop') },
 ];
 
@@ -58,15 +55,14 @@ export const Layout = ({ path, children }: { path: string; children: ComponentCh
           <a href={href('/')} class="mb-8 flex items-center gap-3">
             <Logo class="h-10 w-10 shrink-0" />
             <span>
-              <span class="block text-lg font-extrabold leading-tight">Aprender</span>
-              <span class="block text-xs text-muted">Português europeu · A1/A2</span>
+              <span class="block text-lg font-extrabold leading-tight">Portuglove</span>
+              <span class="block text-xs text-muted">Evropská portugalština</span>
             </span>
           </a>
           <nav class="flex flex-col gap-1" aria-label="Hlavní navigace">
             {nav.map((item) => <SideLink key={item.to} item={item} path={path} />)}
           </nav>
           <div class="mt-auto flex items-center gap-1">
-            <ThemeToggle />
             <a href={href('/settings')} aria-label="Nastavení" aria-current={path === '/settings' ? 'page' : undefined}
               class={`flex h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold ${path === '/settings' ? 'bg-brand-700 text-white' : 'text-ink-soft hover:bg-surface-2'}`}>
               <Icon name="sliders" class="h-5 w-5" />Nastavení
@@ -80,10 +76,9 @@ export const Layout = ({ path, children }: { path: string; children: ComponentCh
         <header class="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-app/85 px-4 pt-1 backdrop-blur-md md:hidden">
           <a href={href('/')} class="flex min-h-12 items-center gap-2.5">
             <Logo class="h-8 w-8" />
-            <span class="text-lg font-extrabold">Aprender</span>
+            <span class="text-lg font-extrabold">Portuglove</span>
           </a>
           <div class="flex items-center">
-            <ThemeToggle />
             <a href={href('/settings')} aria-label="Nastavení" class="flex h-11 w-11 items-center justify-center rounded-full text-ink-soft hover:bg-surface-2">
               <Icon name="sliders" class="h-5 w-5" />
             </a>

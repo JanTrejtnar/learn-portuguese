@@ -1,6 +1,6 @@
 /** Značka aplikace: vlajka (zelená 2/5, červená 3/5) se žlutým kruhem (armilární sféra). */
 export const Logo = ({ class: cls = 'h-8 w-8' }: { class?: string }) => (
-  <svg viewBox="0 0 32 32" class={cls} role="img" aria-label="Aprender Português">
+  <svg viewBox="0 0 32 32" class={cls} role="img" aria-label="Portuglove">
     <defs>
       <clipPath id="logo-clip"><rect width="32" height="32" rx="8" /></clipPath>
     </defs>

@@ -1,17 +1,19 @@
 import { href } from '../router';
+import { Icon } from './Icon';
 
 export interface Crumb {
   label: string;
   to?: string;
 }
 
-export const Breadcrumb = ({ items }: { items: Crumb[] }) => (
-  <nav aria-label="Drobečková navigace" class="mb-4 flex flex-wrap items-center gap-1 text-sm text-muted">
-    {items.map((c, i) => (
-      <span key={i} class="flex items-center gap-1">
-        {i > 0 && <span aria-hidden="true">›</span>}
-        {c.to ? <a href={href(c.to)} class="hover:text-brand-700 hover:underline">{c.label}</a> : <span class="text-ink">{c.label}</span>}
-      </span>
-    ))}
-  </nav>
-);
+/** Jednoduchá šipka zpět na nadřazenou stránku (poslední odkaz v cestě). */
+export const Breadcrumb = ({ items }: { items: Crumb[] }) => {
+  const parent = [...items].reverse().find((c) => c.to);
+  if (!parent?.to) return null;
+  return (
+    <a href={href(parent.to)} class="mb-3 -ml-2 inline-flex min-h-10 items-center gap-1 rounded-full px-2 text-sm font-semibold text-ink-soft hover:bg-surface-2 hover:text-brand-700">
+      <Icon name="arrow" class="h-4 w-4 rotate-180" />
+      {parent.label}
+    </a>
+  );
+};

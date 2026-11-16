@@ -1,4 +1,4 @@
-# Aprender Português 🇵🇹
+# Portuglove 🇵🇹
 
 Webová aplikace (PWA) pro učení **evropské portugalštiny (PT-PT)**, úroveň A1–A2. Rozhraní je v češtině.
 

@@ -12,7 +12,7 @@ export const RoleplayHubPage = () => {
 
   return (
     <div>
-      <Breadcrumb items={[{ label: 'Praxe', to: '/practice' }, { label: 'Scénáře' }]} />
+      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Scénáře' }]} />
       <h1 class="text-2xl font-bold">Scénáře 🎭</h1>
       <p class="mt-1 text-ink-soft">Rozhovory se rozvětvují podle tvých odpovědí. Za každý tah dostaneš zpětnou vazbu.</p>
       <ul class="mt-6 space-y-3">

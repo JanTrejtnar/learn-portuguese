@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { speak } from '../lib/audio';
 import { useKeydown } from '../lib/useKeydown';
-import { checkTyped, type BuildQ, type ChoiceQ, type MatchQ, type QuestionResult, type TypingQ } from '../lib/quiz';
+import { checkTyped, tokenKey, type BuildQ, type ChoiceQ, type MatchQ, type QuestionResult, type TypingQ } from '../lib/quiz';
 import { AudioButton } from './AudioButton';
 
 export type Answer = Pick<QuestionResult, 'correct' | 'given' | 'missed' | 'note'>;
@@ -196,7 +196,7 @@ export const BuildQuestion = ({ q, answer, onAnswer }: Props<BuildQ>) => {
   const built = picked.map((i) => q.bank[i]!);
   const check = () => {
     if (answer || picked.length === 0) return;
-    const correct = built.join(' ') === q.tokens.join(' ');
+    const correct = built.map(tokenKey).join(' ') === q.tokens.map(tokenKey).join(' ');
     onAnswer({ correct, given: built.join(' '), missed: correct ? [] : q.wordIds });
   };
 

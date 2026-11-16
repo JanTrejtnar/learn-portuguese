@@ -2,7 +2,6 @@ import { allWords } from '../content';
 import { Loading } from '../components/Loading';
 import { DAY, dateKey, dayStart, maturity, type Maturity } from '../lib/srs';
 import { useProgress } from '../lib/useProgress';
-import { Breadcrumb } from '../components/Breadcrumb';
 import { units } from '../content';
 import { BADGES, badgeContext } from '../lib/badges';
 import { useStudySettings } from '../lib/settings';
@@ -65,7 +64,7 @@ export const StatsPage = () => {
 
   return (
     <div>
-      <Breadcrumb items={[{ label: 'Pokrok' }]} />
+      
       <h1 class="text-2xl font-bold">Můj pokrok</h1>
 
       <div class="mt-5 rounded-2xl bg-brand-700 p-5 text-white">

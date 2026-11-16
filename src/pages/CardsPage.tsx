@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks';
 import { unitCode, units, unitUnlocked, unlockedWords } from '../content';
+import { Breadcrumb } from '../components/Breadcrumb';
 import { WordRow } from '../components/WordRow';
 import { useProgress } from '../lib/useProgress';
 import { useStudySettings } from '../lib/settings';
@@ -31,6 +32,7 @@ export const CardsPage = () => {
   );
   return (
   <div>
+    <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Karty' }]} />
     <h1 class="text-2xl font-bold">Kartičky</h1>
     <p class="mt-1 text-ink-soft">
       Opakování řídí chytrý plán (SRS): karty se vrací v rostoucích odstupech. Vyber balíček.

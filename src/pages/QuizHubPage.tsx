@@ -1,3 +1,4 @@
+import { Breadcrumb } from '../components/Breadcrumb';
 import { unitCode, units, unitUnlocked } from '../content';
 import { Loading } from '../components/Loading';
 import { PASS_RATIO } from '../lib/quiz';
@@ -17,6 +18,7 @@ export const QuizHubPage = () => {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Testy' }]} />
       <h1 class="text-2xl font-bold">Testy a kvízy</h1>
       <p class="mt-1 text-ink-soft">
         Test jednotky odemyká další jednotku (minimum {Math.round(PASS_RATIO * 100)} %). Chybná slovíčka se vrací do opakování.

@@ -53,7 +53,7 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
   const choices = useMemo(() => [...node.choices].sort(() => Math.random() - 0.5), [nodeId, attempt]);
 
   useEffect(() => {
-    if (!done && settings.autoplay) speak(node.npc.pt);
+    if (!done) speak(node.npc.pt);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodeId, attempt]);
   useEffect(() => stopSpeaking, []);

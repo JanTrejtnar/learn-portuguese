@@ -21,7 +21,7 @@ export const SpeakPage = () => {
   const progress = useProgress();
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Praxe', to: '/practice' }, { label: 'Mluvení' }]} />
+      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Mluvení' }]} />
       <h1 class="text-2xl font-bold">Mluvení 🎤</h1>
       <p class="mt-1 text-ink-soft">Poslechni si větu, zopakuj ji nahlas a uvidíš, která slova zazněla.</p>
       <VoiceWarning />
@@ -129,7 +129,10 @@ const Session = ({ progress }: { progress: Progress }) => {
           )}
 
           {!result && (
-            <button type="button" onClick={next} class="mt-4 w-full text-sm text-muted underline">Přeskočit větu</button>
+            <div class="mt-4 flex flex-col items-center gap-2 text-sm text-muted">
+              <button type="button" onClick={next} class="underline">Přeskočit větu</button>
+              <a href={href('/practice')} class="underline">Teď nemohu mluvit, skončit</a>
+            </div>
           )}
         </>
       )}

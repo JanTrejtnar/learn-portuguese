@@ -41,7 +41,7 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
         <div class="text-2xl font-semibold sm:text-3xl">{word.cs}</div>
       )}
 
-      {!flipped && <p class="mt-4 text-sm text-muted">Klepni nebo stiskni mezerník pro otočení</p>}
+      {!flipped && <p class="mt-4 text-sm text-muted">Klepni pro otočení</p>}
 
       {/* Zadní strana */}
       {flipped && (

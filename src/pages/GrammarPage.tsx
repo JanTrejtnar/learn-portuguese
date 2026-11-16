@@ -67,7 +67,7 @@ const Session = ({ progress }: { progress: Progress }) => {
     days.current.set(key, award.day);
     void saveDay(award.day);
     setXp((x) => x + award.gained);
-    if (award.goalJustReached) toast({ emoji: '🎯', title: 'Denní cíl splněn!', text: `Bonus +${XP_GOAL_BONUS} XP` });
+    if (award.goalJustReached) toast({ emoji: '🎯', title: `Denní cíl splněn! +${XP_GOAL_BONUS} XP` });
     notifyProgress();
     answer.correct ? setRight((n) => n + 1) : setWrong((n) => n + 1);
     setQueue((q) => (answer.correct ? q.slice(1) : [...q.slice(1), q[0]!]));
@@ -95,7 +95,7 @@ const Session = ({ progress }: { progress: Progress }) => {
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Kartičky', to: '/cards' }, { label: 'Gramatika' }]} />
+      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Gramatika' }]} />
       <VoiceWarning />
       <h1 class="text-2xl font-bold">Gramatika: doplňování vět</h1>
       <p class="mt-1 text-sm text-ink-soft">Věty s mezerou z lekcí se opakují stejným plánem jako slovíčka. K opakování: <b>{init.dueCount}</b> · nové: <b>{init.newCount}</b></p>
@@ -119,7 +119,7 @@ const Session = ({ progress }: { progress: Progress }) => {
           )}
           {answer && (
             <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-              Další <span class="text-xs opacity-60">(Enter)</span>
+              Další
             </button>
           )}
         </div>

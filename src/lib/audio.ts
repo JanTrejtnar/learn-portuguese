@@ -44,15 +44,24 @@ export const useVoiceStatus = (): VoiceStatus => {
   return status;
 };
 
-/** Z kartičkového textu (např. „Obrigado / Obrigada“, „Chamo-me…“) udělá text vhodný k přečtení. */
-export const toSpeakable = (pt: string): string =>
+/** Z kartičkového textu rozdělí varianty („Obrigado / Obrigada“) na samostatné úseky; mezi nimi se udělá pauza. */
+export const speechParts = (pt: string): string[] =>
   pt
-    .replace(/\s*\/\s*/g, '. ')
-    .replace(/…/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+    .split(/\s*\/\s*/)
+    .map((p) => p.replace(/…/g, '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+
+/** Zachování staršího názvu: text vhodný k přečtení v jednom kuse. */
+export const toSpeakable = (pt: string): string => speechParts(pt).join('. ');
+
+/** Pauza mezi variantami slova (ms). */
+const PAUSE_MS = 550;
+let playId = 0;
+let pauseTimer: number | undefined;
 
 export const stopSpeaking = (): void => {
+  playId++;
+  clearTimeout(pauseTimer);
   if (supported()) window.speechSynthesis.cancel();
 };
 
@@ -61,13 +70,27 @@ export const speak = (text: string, opts: { slow?: boolean } = {}): boolean => {
   const status = computeStatus();
   if (status === 'unsupported' || status === 'no-pt-pt') return false;
 
+  stopSpeaking();
+  const id = playId;
   const synth = window.speechSynthesis;
-  synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(toSpeakable(text));
-  utterance.lang = 'pt-PT';
   const voice = findPtPtVoice();
-  if (voice) utterance.voice = voice;
-  utterance.rate = opts.slow ? 0.65 : 0.95;
-  synth.speak(utterance);
+  const parts = speechParts(text);
+  const playPart = (i: number) => {
+    if (id !== playId || i >= parts.length) return;
+    const u = new SpeechSynthesisUtterance(parts[i]);
+    u.lang = 'pt-PT';
+    if (voice) u.voice = voice;
+    // pomalé přehrání je opravdu znatelně pomalejší
+    u.rate = opts.slow ? 0.5 : 1;
+    if (i + 1 < parts.length) {
+      const after = () => {
+        pauseTimer = window.setTimeout(() => playPart(i + 1), PAUSE_MS);
+      };
+      u.onend = after;
+      u.onerror = after;
+    }
+    synth.speak(u);
+  };
+  playPart(0);
   return true;
 };

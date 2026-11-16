@@ -82,7 +82,7 @@ export const SettingsPage = () => {
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Nastavení' }]} />
+      <Breadcrumb items={[{ label: 'Domů', to: '/' }, { label: 'Nastavení' }]} />
       <h1 class="text-2xl font-bold">Nastavení ⚙️</h1>
 
       {message && (

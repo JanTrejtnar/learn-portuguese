@@ -20,7 +20,7 @@ export const GrammarRefPage = () => {
     .filter((e) => needle.length < 2 || norm([e.block.title, ...e.block.body, ...(e.block.table ? [...e.block.table.headers, ...e.block.table.rows.flat()] : [])].join(' ')).includes(needle));
   return (
     <div>
-      <Breadcrumb items={[{ label: 'Praxe', to: '/practice' }, { label: 'Gramatika' }]} />
+      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Gramatika' }]} />
       <h1 class="text-2xl font-bold">Přehled gramatiky</h1>
       <p class="mt-1 text-ink-soft">Gramatika ze všech odemčených lekcí na jednom místě.</p>
       <input type="search" value={q} onInput={(e) => setQ(e.currentTarget.value)} placeholder="🔍 Hledat (např. estar, člen, minulý čas)…" aria-label="Hledat v gramatice"

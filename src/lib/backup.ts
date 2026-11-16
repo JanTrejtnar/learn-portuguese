@@ -54,7 +54,7 @@ export const parseBackup = (text: string): ParseResult => {
   } catch {
     return { ok: false, error: 'Soubor není platný JSON.' };
   }
-  if (!isObj(data) || data.app !== BACKUP_APP) return { ok: false, error: 'To není záloha z aplikace Aprender Português.' };
+  if (!isObj(data) || data.app !== BACKUP_APP) return { ok: false, error: 'To není záloha z aplikace Portuglove.' };
   if (data.version !== BACKUP_VERSION) return { ok: false, error: `Nepodporovaná verze zálohy (${String(data.version)}).` };
   const { cards, days, tests, settings, badgesSeen } = data;
   if (!Array.isArray(cards) || !Array.isArray(days) || !Array.isArray(tests)) return { ok: false, error: 'Záloha je poškozená (chybí data).' };
@@ -105,7 +105,7 @@ export const sanitizeSettings = (raw: Record<string, unknown>): Record<string, u
   const out: Record<string, unknown> = {};
   if (raw.direction === 'pt-cs' || raw.direction === 'cs-pt') out.direction = raw.direction;
   if (raw.recall === 'off' || raw.recall === 'sometimes' || raw.recall === 'often') out.recall = raw.recall;
-  for (const k of ['autoplay', 'shuffle', 'showTranslations', 'simpleRating', 'ratingHelpSeen'] as const) if (typeof raw[k] === 'boolean') out[k] = raw[k];
+  for (const k of ['autoplay', 'shuffle', 'showTranslations', 'simpleRating', 'ratingHelpSeen', 'sounds'] as const) if (typeof raw[k] === 'boolean') out[k] = raw[k];
   for (const k of ['newPerDay', 'dailyGoal'] as const) {
     const v = raw[k];
     if (typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 500) out[k] = v;

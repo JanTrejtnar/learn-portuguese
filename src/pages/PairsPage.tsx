@@ -22,7 +22,7 @@ export const PairsPage = () => {
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Praxe', to: '/practice' }, { label: 'Minimální páry' }]} />
+      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Minimální páry' }]} />
       <h1 class="text-2xl font-bold">Minimální páry 👂</h1>
       <p class="mt-1 text-ink-soft">Slova, která se liší jediným zvukem. Naučit se je rozlišit je klíč k dobré výslovnosti.</p>
       <VoiceWarning />
@@ -178,7 +178,7 @@ const Train = ({ progress }: { progress: Progress }) => {
             <span class="flex items-center gap-1"><AudioButton text={q!.pair.b.pt} />{q!.pair.b.pt}</span>
           </div>
           <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-            {index + 1 === round.length ? 'Zobrazit výsledek' : 'Další'} <span class="text-xs opacity-60">(Enter)</span>
+            {index + 1 === round.length ? 'Zobrazit výsledek' : 'Další'}
           </button>
         </div>
       )}

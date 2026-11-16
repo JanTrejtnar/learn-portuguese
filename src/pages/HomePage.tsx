@@ -55,13 +55,6 @@ const greeting = (): { pt: string; cs: string } => {
   return h < 12 ? { pt: 'Bom dia!', cs: 'Dobré ráno' } : h < 19 ? { pt: 'Boa tarde!', cs: 'Dobré odpoledne' } : { pt: 'Boa noite!', cs: 'Dobrý večer' };
 };
 
-const quick = [
-  { to: '/cards/all', emoji: '🃏', label: 'Karty' },
-  { to: '/quiz/quick', emoji: '⚡', label: 'Rychlý kvíz' },
-  { to: '/roleplay', emoji: '🎭', label: 'Scénáře' },
-  { to: '/speak', emoji: '🎤', label: 'Mluvení' },
-];
-
 export const HomePage = () => {
   const progress = useProgress();
   const g = greeting();
@@ -79,17 +72,6 @@ export const HomePage = () => {
 
     <div class="mt-5">{progress ? <PlayerStripWithSettings progress={progress} /> : <div class="skeleton h-24" />}</div>
     {progress && <TodayCard progress={progress} />}
-
-    <ul class="mt-4 grid grid-cols-4 gap-2" aria-label="Rychlé akce">
-      {quick.map((q) => (
-        <li key={q.to}>
-          <a href={href(q.to)} class="flex flex-col items-center gap-1 rounded-2xl border border-line bg-surface px-1 py-3 text-center text-xs font-semibold shadow-soft hover:border-brand-500">
-            <span class="text-2xl" aria-hidden="true">{q.emoji}</span>
-            {q.label}
-          </a>
-        </li>
-      ))}
-    </ul>
 
     <ViewSwitch current="list" />
 

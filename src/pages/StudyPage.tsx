@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { AudioButton } from '../components/AudioButton';
+import { Celebrate } from '../components/Celebrate';
 import { Flashcard } from '../components/Flashcard';
 import { TypingQuestion, type Answer } from '../components/QuizQuestions';
 import { hasInfo, WordInfo } from '../components/WordInfo';
@@ -13,7 +14,7 @@ import { typingQuestion } from '../lib/quiz';
 import { recallVariant } from '../lib/recall';
 import { buildQueue, newIntroducedToday, shuffled } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
-import { dateKey, previewIntervals, schedule, type Rating } from '../lib/srs';
+import { dateKey, schedule, type Rating } from '../lib/srs';
 import { useKeydown } from '../lib/useKeydown';
 import { notifyProgress, toast } from '../lib/toast';
 import { XP_GOAL_BONUS, awardXp, xpForRating } from '../lib/xp';
@@ -25,24 +26,11 @@ import { NotFoundPage } from './NotFoundPage';
 /** Po kolika zapomenutích se karta považuje za „pijavici“ a ukáže se jí vysvětlení. */
 const LEECH_LAPSES = 4;
 
-interface RatingDef { id: Rating; label: string; key: string; tone: string }
-const advancedRatings: RatingDef[] = [
-  { id: 'again', label: 'Nevěděl jsem', key: '1', tone: 'bg-flag-600 text-white hover:bg-flag-500' },
-  { id: 'hard', label: 'Těžce', key: '2', tone: 'bg-gold-400 text-brand-950 hover:bg-gold-300' },
-  { id: 'good', label: 'Věděl jsem', key: '3', tone: 'bg-brand-600 text-white hover:bg-brand-500' },
-  { id: 'easy', label: 'Hračka', key: '4', tone: 'bg-brand-800 text-white hover:bg-brand-700' },
+interface RatingDef { id: Rating; label: string; tone: string }
+const ratings: RatingDef[] = [
+  { id: 'again', label: 'Neznal jsem', tone: 'bg-flag-600 text-white hover:bg-flag-500' },
+  { id: 'good', label: 'Znal jsem', tone: 'bg-brand-600 text-white hover:bg-brand-500' },
 ];
-const simpleRatings: RatingDef[] = [
-  { id: 'again', label: 'Neznal jsem', key: '1', tone: 'bg-flag-600 text-white hover:bg-flag-500' },
-  { id: 'good', label: 'Znal jsem', key: '2', tone: 'bg-brand-600 text-white hover:bg-brand-500' },
-];
-
-const Toggle = ({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) => (
-  <label class="flex cursor-pointer items-center gap-2 text-sm">
-    <input type="checkbox" checked={on} onChange={(e) => onChange(e.currentTarget.checked)} class="h-4 w-4 accent-teal-700" />
-    {label}
-  </label>
-);
 
 export const StudyPage = ({ deckId, mode }: { deckId: string; mode: 'srs' | 'free' }) => {
   const deck = getDeck(deckId);
@@ -61,7 +49,7 @@ interface SessionProps {
 }
 
 const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
-  const [settings, update] = useStudySettings();
+  const [settings] = useStudySettings();
   const srs = mode === 'srs';
   const cards = useRef(progress.cards); // průběžně aktualizovaný stav karet
   const days = useRef(progress.days);
@@ -93,10 +81,12 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
   const done = useMemo(() => total - new Set(queue.map((w) => w.id)).size, [queue, total]);
   const unseenLeft = words.filter((w) => !cards.current.has(w.id)).length;
 
+  // Výslovnost se přehraje jednou, když se portugalština poprvé objeví (otočení karty ji nepouští znovu).
+  const ptVisible = settings.direction === 'pt-cs' || flipped;
   useEffect(() => {
-    if (current && !variant && settings.autoplay && (settings.direction === 'pt-cs' || flipped)) speak(current.pt);
+    if (current && !variant && ptVisible) speak(current.pt);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current?.id, flipped, settings.direction, settings.autoplay, !!variant]);
+  }, [current?.id, ptVisible, !!variant]);
   useEffect(() => stopSpeaking, []);
 
   // Pojistka proti dvojímu hodnocení téže karty (dva rychlé stisky před překreslením).
@@ -121,7 +111,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
       days.current.set(key, award.day);
       void saveDay(award.day);
       setSessionXp((x) => x + award.gained);
-      if (award.goalJustReached) toast({ emoji: '🎯', title: 'Denní cíl splněn!', text: `Bonus +${XP_GOAL_BONUS} XP` });
+      if (award.goalJustReached) toast({ emoji: '🎯', title: `Denní cíl splněn! +${XP_GOAL_BONUS} XP` });
       notifyProgress();
     }
     setCounts((c) => ({ ...c, [r]: c[r] + 1 }));
@@ -167,7 +157,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
       e.preventDefault();
       if (learning) { learnNext(); return; }
       setFlipped((f) => (current ? !f : f));
-    } else if (['1', '2', '3', '4'].includes(e.key)) {
+    } else if (['1', '2'].includes(e.key)) {
       if (flipped && !learning) {
         const r = ratings[Number(e.key) - 1];
         if (r) rate(r.id);
@@ -176,33 +166,19 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     else if (e.key.toLowerCase() === 'p' && current) speak(current.pt);
   });
 
-  const ratings = settings.simpleRating ? simpleRatings : advancedRatings;
-  const intervals = current && srs && flipped ? previewIntervals(cards.current.get(current.id), current.id, Date.now()) : null;
   const sessionDone = total > 0 && !current;
   const nothingToDo = total === 0;
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Kartičky', to: '/cards' }, { label: title }]} />
+      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: title }]} />
       <VoiceWarning />
 
-      {!srs && <p class="mb-3 rounded-lg bg-surface-2 px-3 py-2 text-xs text-ink-soft">Volné procvičování: pokrok se neukládá.</p>}
-
-      <div class="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-        <button
-          type="button"
-          class="rounded-lg border border-line-strong px-3 py-1 text-sm hover:border-brand-500"
-          onClick={() => update({ direction: settings.direction === 'pt-cs' ? 'cs-pt' : 'pt-cs' })}
-        >
-          ⇄ {settings.direction === 'pt-cs' ? 'PT → CZ' : 'CZ → PT'}
-        </button>
-        <Toggle label="Autoplay" on={settings.autoplay} onChange={(v) => update({ autoplay: v })} />
-        {!srs && <Toggle label="Zamíchat" on={settings.shuffle} onChange={(v) => update({ shuffle: v })} />}
-      </div>
+      {!srs && <p class="mb-3 text-xs text-muted">Volné procvičování (pokrok se neukládá)</p>}
 
       {srs && total > 0 && (
         <p class="mb-3 text-sm text-ink-soft">
-          K opakování: <b>{init.dueCount}</b> · nové: <b>{init.newCount}</b>
+          {init.dueCount > 0 && <>K opakování: <b>{init.dueCount}</b></>}{init.dueCount > 0 && init.newCount > 0 && ' · '}{init.newCount > 0 && <>nové: <b>{init.newCount}</b></>}
         </p>
       )}
 
@@ -228,7 +204,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
           </div>
           {recallAns ? (
             <button type="button" onClick={() => rate(recallAns.correct ? 'good' : 'again', true)} class="mt-4 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-              Další <span class="text-xs opacity-60">(Enter)</span>
+              Další
             </button>
           ) : (
             <button type="button" onClick={() => setNoTyping(true)} class="mt-3 text-xs text-muted underline">Dnes bez psaní (jen otáčet karty)</button>
@@ -252,48 +228,36 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
             </div>
           ) : flipped ? (
             <div class="mt-4">
-              {srs && !settings.ratingHelpSeen && (
-                <div class="mb-3 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm">
-                  <p><b>Jak hodnotit?</b> Řekni, jak dobře jsi slovíčko znal. Čím lépe ho znáš, tím později ti ho ukážu znovu. Pod tlačítkem vidíš, kdy to bude.</p>
-                  <button type="button" onClick={() => update({ ratingHelpSeen: true })} class="mt-2 rounded-lg bg-brand-700 px-3 py-1 text-xs font-semibold text-white">Rozumím</button>
-                </div>
-              )}
-              <div class={`grid gap-2 ${settings.simpleRating ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4'}`}>
-              {ratings.map((r) => (
-                <button key={r.id} type="button" onClick={() => rate(r.id)} class={`min-h-14 rounded-xl px-2 py-3 text-sm font-bold shadow-soft ${r.tone}`}>
-                  {r.label}
-                  <span class="block text-[11px] font-normal opacity-90">{intervals ? intervals[r.id] : `[${r.key}]`}</span>
-                </button>
-              ))}
+              <div class="grid grid-cols-2 gap-2">
+                {ratings.map((r) => (
+                  <button key={r.id} type="button" onClick={() => rate(r.id)} class={`min-h-14 rounded-xl px-2 py-3 text-base font-bold shadow-soft ${r.tone}`}>
+                    {r.label}
+                  </button>
+                ))}
               </div>
-              {srs && (
-                <button type="button" class="mt-2 text-xs text-muted underline" onClick={() => update({ simpleRating: !settings.simpleRating })}>
-                  {settings.simpleRating ? 'Chci podrobnější hodnocení (4 tlačítka)' : 'Zpět na jednoduché hodnocení'}
-                </button>
-              )}
             </div>
           ) : (
             <button type="button" onClick={() => setFlipped(true)} class="mt-4 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
               Otočit
             </button>
           )}
-          <p class="mt-3 hidden text-center text-xs text-muted md:block">Mezerník = otočit · 1–{ratings.length} = hodnocení · P = přehrát · I = vysvětlení</p>
         </>
       )}
 
       {(sessionDone || nothingToDo) && (
-        <div class="rounded-3xl border border-line bg-surface p-8 text-center">
+        <div class="relative rounded-3xl border border-line bg-surface p-8 text-center">
+          {sessionDone && <Celebrate />}
           <div class="text-5xl" aria-hidden="true">{sessionDone ? '🎉' : '✅'}</div>
-          <h2 class="mt-3 text-xl font-bold">{sessionDone ? 'Hotovo! Muito bem!' : 'Na dnes máš splněno'}</h2>
+          <h2 class="mt-3 text-xl font-bold">{sessionDone ? 'Hotovo! Muito bem!' : 'Tady už máš všechno zopakované'}</h2>
           {sessionDone ? (
-            <p class="mt-2 text-sm text-ink-soft">
-              {[['Znovu', counts.again], ['Těžké', counts.hard], ['Dobře', counts.good], ['Snadno', counts.easy]].filter(([, n]) => n).map(([l, n]) => `${l}: ${n}`).join(' · ') || 'Žádné hodnocení'}
-            </p>
+            counts.again + counts.good + counts.hard + counts.easy > 0 && (
+              <p class="mt-2 text-sm text-ink-soft">Znal(a) jsi {counts.good + counts.hard + counts.easy} z {counts.again + counts.good + counts.hard + counts.easy} karet</p>
+            )
           ) : (
-            <p class="mt-2 text-sm text-ink-soft">V tomto balíčku není nic k opakování a denní limit nových karet je vyčerpán.</p>
+            <p class="mt-2 text-sm text-ink-soft">Chceš si procvičit víc? Vyber, jak chceš pokračovat.</p>
           )}
           {srs && sessionXp > 0 && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{sessionXp} XP ⭐</p>}
-          <div class="mt-6 flex flex-wrap justify-center gap-3">
+          <div class="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
             {srs && unseenLeft > 0 && (
               <button type="button" onClick={learnMore} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">
                 Učit dalších {Math.min(10, unseenLeft)} nových
@@ -303,9 +267,9 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
               <button type="button" onClick={() => restart()} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Znovu celý balíček</button>
             )}
             {srs && (
-              <a href={href(`/free/${deckId}`)} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Volně procvičit</a>
+              <a href={href(`/free/${deckId}`)} class={`rounded-xl px-4 py-2.5 font-semibold ${unseenLeft > 0 ? 'border border-line-strong' : 'bg-brand-700 text-white hover:bg-brand-600'}`}>Procvičit znovu</a>
             )}
-            <a href={href('/stats')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Můj pokrok</a>
+            <a href={href('/quiz/quick')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">⚡ Rychlý kvíz</a>
           </div>
         </div>
       )}

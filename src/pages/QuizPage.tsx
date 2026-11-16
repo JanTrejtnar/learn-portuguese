@@ -3,6 +3,7 @@ import { Loading } from '../components/Loading';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { AudioButton } from '../components/AudioButton';
 import { BuildQuestion, ChoiceQuestion, MatchQuestion, TypingQuestion, type Answer } from '../components/QuizQuestions';
+import { Celebrate } from '../components/Celebrate';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { allWords, getTestScope, units, unitUnlocked } from '../content';
 import { getVoiceStatus } from '../lib/audio';
@@ -40,7 +41,7 @@ const resolveScope = (id: string, progress: Progress): Scope | 'empty' | undefin
     if (seen.length < 4) return 'empty';
     // Nejslabší karty (nízký ease, hodně chyb) mají přednost.
     const weakest = [...seen].sort((a, b) => progress.cards.get(a.id)!.ease - progress.cards.get(b.id)!.ease + (Math.random() - 0.5)).slice(0, 14);
-    return { id, title: 'Rychlý kvíz', graded: false, unlocks: false, words: weakest, lessons: allLessons(), count: 10, back: { label: 'Testy', to: '/quiz' } };
+    return { id, title: 'Rychlý kvíz', graded: false, unlocks: false, words: weakest, lessons: allLessons(), count: 10, back: { label: 'Procvičit', to: '/practice' } };
   }
   const scope = getTestScope(id);
   if (!scope) return undefined;
@@ -53,7 +54,7 @@ const resolveScope = (id: string, progress: Progress): Scope | 'empty' | undefin
     words: scope.words,
     lessons: scope.lessons,
     count: scope.kind === 'unit' ? 20 : 12,
-    back: { label: 'Testy', to: '/quiz' },
+    back: scope.kind === 'unit' ? { label: scope.title, to: `/unit/${scope.unitId}` } : { label: 'Zpět na lekci', to: `/lesson/${id}` },
   };
 };
 
@@ -88,12 +89,15 @@ export const QuizPage = ({ id }: { id: string }) => {
 const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const [settings] = useStudySettings();
   const [attempt, setAttempt] = useState(0);
-  const questions = useMemo<Question[]>(() => {
+  const [skippedIds, setSkippedIds] = useState<string[]>([]);
+  const allQuestions = useMemo<Question[]>(() => {
     const audio = getVoiceStatus();
     const sentences = collectSentences(scope.lessons).filter((s) => scope.id !== 'quick' || (s.wordId && scope.words.some((w) => w.id === s.wordId)));
     return generateQuiz({ words: scope.words, pool: allWords(), sentences, cloze: scope.id === 'quick' ? [] : collectCloze(scope.lessons), count: scope.count, audio: audio !== 'unsupported' && audio !== 'no-pt-pt' });
   }, [attempt]);
 
+  // „Nemohu poslouchat“: poslechové otázky se vyřadí a nepočítají se
+  const questions = useMemo(() => allQuestions.filter((x) => !skippedIds.includes(x.id)), [allQuestions, skippedIds]);
   const [index, setIndex] = useState(0);
   const [results, setResults] = useState<QuestionResult[]>([]);
   const [answer, setAnswer] = useState<Answer | null>(null);
@@ -104,7 +108,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const q = questions[index];
   const finished = index >= questions.length;
   const correctCount = results.filter((r) => r.correct).length;
-  const ratio = results.length ? correctCount / questions.length : 0;
+  const ratio = results.length && questions.length ? correctCount / questions.length : 0;
 
   // Pojistka: každá otázka se uzavře nejvýš jednou, i když doběhne zastaralá obsluha klávesy.
   const closed = useRef<string | null>(null);
@@ -163,7 +167,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     const award = awardXp(progress.days, now, xp, settings.dailyGoal);
     progress.days.set(award.day.date, award.day);
     void saveDay(award.day);
-    if (award.goalJustReached) toast({ emoji: '🎯', title: 'Denní cíl splněn!', text: `Bonus +${XP_GOAL_BONUS} XP` });
+    if (award.goalJustReached) toast({ emoji: '🎯', title: `Denní cíl splněn! +${XP_GOAL_BONUS} XP` });
     notifyProgress();
     setOutcome({ passed, newlyUnlocked, xp: award.gained, attempts });
   }, [finished]);
@@ -187,6 +191,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     setResults([]);
     setIndex(0);
     setAnswer(null);
+    setSkippedIds([]);
     setAttempt((a) => a + 1);
   };
 
@@ -212,6 +217,19 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             {q2.kind === 'build' && <BuildQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
           </div>
 
+          {!answer && (q2.kind === 'listen' || q2.kind === 'dictation') && (
+            <button
+              type="button"
+              class="mt-4 text-sm text-muted underline"
+              onClick={() => {
+                const ids = allQuestions.filter((x) => x.kind === 'listen' || x.kind === 'dictation').map((x) => x.id);
+                setSkippedIds((s) => [...new Set([...s, ...ids])]);
+              }}
+            >
+              Nemohu poslouchat, přeskočit poslech
+            </button>
+          )}
+
           {answer && (
             <div role="status" class={`mt-5 rounded-2xl p-4 ${answer.correct ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100' : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'}`}>
               <p class="font-bold">{answer.correct ? '✅ Správně!' : '❌ Chyba'}</p>
@@ -224,7 +242,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
                 </p>
               )}
               <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-                {index + 1 === questions.length ? 'Zobrazit výsledek' : 'Další'} <span class="text-xs opacity-60">(Enter)</span>
+                {index + 1 === questions.length ? 'Zobrazit výsledek' : 'Další'}
               </button>
             </div>
           )}
@@ -233,7 +251,8 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
 
       {finished && (
         <div>
-          <div class="rounded-3xl border border-line bg-surface p-6 text-center">
+          <div class="relative rounded-3xl border border-line bg-surface p-6 text-center">
+            {ratio >= PASS_RATIO && <Celebrate />}
             <div class="text-5xl" aria-hidden="true">{ratio >= PASS_RATIO ? '🎉' : '💪'}</div>
             <h1 class="mt-2 text-3xl font-bold">{Math.round(ratio * 100)} %</h1>
             <p class="text-ink-soft">{correctCount} z {questions.length} správně</p>

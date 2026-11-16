@@ -106,3 +106,15 @@ test('stejný význam: špatná možnost není druhá správná a psaní uzná v
     }
   }
 });
+
+test('interpunkce nerozhoduje: „Olá!“ a „Olá,“ je totéž slovo', async () => {
+  const { tokenKey } = await import('../src/lib/quiz.ts');
+  assert.equal(tokenKey('Olá!'), tokenKey('Olá,'));
+  assert.notEqual(tokenKey('Olá'), tokenKey('Obrigado'));
+});
+
+test('rozdělení variant pro audio: lomítko dělá pauzu', async () => {
+  const { speechParts } = await import('../src/lib/audio.ts');
+  assert.deepEqual(speechParts('divertido / divertida'), ['divertido', 'divertida']);
+  assert.deepEqual(speechParts('Chamo-me…'), ['Chamo-me']);
+});

@@ -32,7 +32,7 @@ export const useToasts = (): [Toast[], (id: number) => void] => {
   useEffect(() => {
     const listener = (t: Toast) => {
       setList((l) => [...l.slice(-2), t]);
-      setTimeout(() => setList((l) => l.filter((x) => x.id !== t.id)), 5500);
+      setTimeout(() => setList((l) => l.filter((x) => x.id !== t.id)), 3200);
     };
     toastListeners.add(listener);
     return () => {
