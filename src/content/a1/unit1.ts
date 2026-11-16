@@ -29,7 +29,7 @@ export const unit1: Unit = {
         w('u1l1-adeus', 'Adeus', 'Nashledanou', { pos: 'interj' }),
         w('u1l1-ate-logo', 'Até logo', 'Na shledanou (brzy)', { pos: 'phrase' }),
         w('u1l1-ate-amanha', 'Até amanhã', 'Do zítřka', { pos: 'phrase' }),
-        w('u1l1-tchau', 'Tchau', 'Čau', { pos: 'interj', note: 'Neformální. V Portugalsku se používá také, ale „adeus“ a „até logo“ jsou běžnější.' }),
+        w('u1l1-tchau', 'Tchau', 'Čau', { pos: 'interj', note: 'Neformální, hlavně mezi přáteli a mladšími lidmi.' }),
         w('u1l1-tudo-bem', 'Tudo bem?', 'Všechno v pořádku?', { pos: 'phrase', example: { pt: 'Olá, tudo bem?', cs: 'Ahoj, jak se máš?' }, note: 'Velmi častý neformální pozdrav; odpověď: „Tudo bem.“' }),
         w('u1l1-como-estas', 'Como estás?', 'Jak se máš?', { pos: 'phrase', note: 'Neformální (tykání).' }),
         w('u1l1-como-esta', 'Como está?', 'Jak se máte?', { pos: 'phrase', note: 'Zdvořilé (vykání).' }),
@@ -66,7 +66,7 @@ export const unit1: Unit = {
         c('Como ___ chamas?', 'Jak se jmenuješ?', 'te', ['se', 'me']),
         c('Como ___ chama, senhora?', 'Jak se jmenujete, paní?', 'se', ['te', 'me']),
         c('Chamo-___ Tomáš.', 'Jmenuji se Tomáš.', 'me', ['te', 'se']),
-        c('De onde ___?', 'Odkud jsi?', 'és', ['é', 'sou']),
+        c('De onde ___?', 'Odkud jsi?', 'és', ['somos', 'sou']),
       ],
       words: [
         w('u1l2-eu', 'eu', 'já', { pos: 'pron' }),

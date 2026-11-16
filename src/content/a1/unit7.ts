@@ -89,7 +89,7 @@ export const unit7: Unit = {
       cloze: [
         c('___ um banco aqui perto?', 'Je tady poblíž banka?', 'Há', ['Está', 'É']),
         c('Não ___ problema.', 'Není problém.', 'há', ['está', 'tem']),
-        c('Posso pagar ___ cartão?', 'Mohu platit kartou?', 'com', ['de', 'em']),
+        c('Posso pagar ___ cartão?', 'Mohu platit kartou?', 'com', ['de', 'para']),
         c('Onde ___ um Multibanco?', 'Kde je bankomat?', 'há', ['é', 'estão']),
       ],
     },

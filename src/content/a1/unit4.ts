@@ -38,7 +38,7 @@ export const unit4: Unit = {
         title: 'Množné číslo',
         body: [
           'Většina podstatných jmen tvoří množné číslo přidáním -s: café → cafés, bica → bicas.',
-          'Slova na -l mění koncovku na -is (pastel → pastéis, jornal → jornais). Slova na -ão mají různá množná čísla: pão → pães, limão → limões, irmão → irmãos. Slova na -s se nemění: a sandes → as sandes.',
+          'Slova na -l mění koncovku na -is (pastel → pastéis, jornal → jornais). Slova na -ão mají různá množná čísla: pão → pães, limão → limões, irmão → irmãos. Slova na -s s nepřízvučnou poslední slabikou se nemění: a sandes → as sandes. Slova s přízvukem na konci přidávají -es: o país → os países, o mês → os meses.',
         ],
         table: {
           headers: ['Jednotné', 'Množné'],
@@ -55,7 +55,7 @@ export const unit4: Unit = {
         c('Dois ___, por favor.', 'Dvě espressa, prosím.', 'cafés', ['café', 'cafe']),
         c('Dois ___ de nata, por favor.', 'Dva pastéis de nata, prosím.', 'pastéis', ['pasteis', 'pasteles']),
         c('Duas ___, por favor.', 'Dvě espressa (bica), prosím.', 'bicas', ['bica', 'bicais']),
-        c('Quero três ___.', 'Chci tři chleby.', 'pães', ['pãos', 'pãoes']),
+        c('Quero três ___.', 'Chci tři housky.', 'pães', ['pãos', 'pãoes']),
       ],
     },
     {
@@ -84,7 +84,7 @@ export const unit4: Unit = {
       grammar: {
         title: 'Zdvořilá žádost: Queria…',
         body: [
-          'V kavárně i v obchodě je nejzdvořilejší „Queria…“ (chtěl bych / chtěla bych). Přímé „Quero…“ (chci) zní příkře.',
+          'V kavárně i v obchodě je nejzdvořilejší „Queria…“ (chtěl bych / chtěla bych). „Quero…“ (chci) je také běžné a neurážlivé, „Queria…“ zní ale zdvořileji.',
           'K tomu přidej „por favor“ nebo „se faz favor“. Obsluha se zdraví „Bom dia!“ a ptá se „O que deseja?“ nebo „Diga!“.',
         ],
         table: {
@@ -96,9 +96,9 @@ export const unit4: Unit = {
         },
       },
       cloze: [
-        c('___ um café, por favor.', 'Chtěl bych espresso, prosím.', 'Queria', ['Quero', 'Tem']),
+        c('___ um café, por favor.', 'Chtěl bych espresso, prosím.', 'Queria', ['Querem', 'Tem']),
         c('A ___, se faz favor.', 'Účet, prosím.', 'conta', ['troco', 'cartão']),
-        c('Posso pagar ___ cartão?', 'Mohu platit kartou?', 'com', ['sem', 'em']),
+        c('Posso pagar ___ cartão?', 'Mohu platit kartou?', 'com', ['sem', 'para']),
         c('Mais alguma ___?', 'Ještě něco?', 'coisa', ['conta', 'bica']),
       ],
       dialogue: [

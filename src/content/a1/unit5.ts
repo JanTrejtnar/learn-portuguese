@@ -133,7 +133,7 @@ export const unit5: Unit = {
         title: 'Hodiny: «é» × «são» a «às»',
         body: [
           'Hodiny: u jedné hodiny „É uma hora“, od dvou „São duas horas“. Čtvrt a půl: „e um quarto“, „e meia“; před celou: „menos um quarto“.',
-          'Čas události: „às“ + hodina (Às oito.), ale „à uma“ (v jednu). Dny v týdnu se píší malým písmenem. „V pondělí“ je „na segunda-feira“.',
+          'Čas události: „às“ + hodina (Às oito.), ale „à uma“ (v jednu). Dny v týdnu se píší malým písmenem. Konkrétní den: „na segunda-feira“ (toto pondělí), „no sábado“. Pravidelně: „à segunda-feira“, „às segundas“, „ao domingo“.',
         ],
         table: {
           headers: ['Čas', 'Portugalsky'],
@@ -196,7 +196,7 @@ export const unit5: Unit = {
         c('Ela deita-___ tarde.', 'Ona chodí spát pozdě.', 'se', ['me', 'nos']),
         c('Nós levantamo-___ cedo.', 'Vstáváme brzy.', 'nos', ['se', 'me']),
         c('Não ___ levanto cedo.', 'Nevstávám brzy.', 'me', ['te', 'nos']),
-        c('Tu ___ chamas Rui?', 'Ty se jmenuješ Rui?', 'te', ['me', 'se']),
+        c('Tu chamas-___ Rui?', 'Ty se jmenuješ Rui?', 'te', ['me', 'se']),
         c('Nunca ___ deito cedo.', 'Nikdy nechodím spát brzy.', 'me', ['te', 'nos']),
       ],
       dialogue: [

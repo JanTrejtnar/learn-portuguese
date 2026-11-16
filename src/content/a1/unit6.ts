@@ -33,7 +33,7 @@ export const unit6: Unit = {
       grammar: {
         title: 'Sloveso «ir» a budoucnost: ir + infinitivo',
         body: [
-          '„Ir“ je nepravidelné. Kam jdu, říkám s „a“ (ao, à, aos, às): „Vou ao cinema.“ Když se nechystám zůstat, jen mířím někam, může být „para“: „Vou para casa.“',
+          '„Ir“ je nepravidelné. Kam jdu na chvíli, říkám s „a“ (ao, à, aos, às): „Vou ao cinema.“ Když tam zůstanu nebo mířím domů či do země, je „para“: „Vou para casa.“, „Vou para Portugal.“',
           'Nejběžnější budoucí čas je „ir“ + infinitiv: „Vou comer.“ (budu jíst), „Vamos estudar.“ (budeme se učit), „Ela vai chegar tarde.“ (přijde pozdě).',
         ],
         table: {
@@ -123,7 +123,7 @@ export const unit6: Unit = {
         w('u6l3-atravessar', 'atravessar', 'přejít', { pos: 'verb', example: { pt: 'Atravesse a rua.', cs: 'Přejděte ulici.' } }),
         w('u6l3-esquina', 'a esquina', 'roh', { pos: 'noun', gender: 'f' }),
         w('u6l3-fundo', 'ao fundo da rua', 'na konci ulice', { pos: 'phrase' }),
-        w('u6l3-primeira', 'a primeira rua', 'první ulice', { pos: 'phrase', example: { pt: 'É a segunda rua à esquerda.', cs: 'Je to druhá ulice vlevo.' } }),
+        w('u6l3-primeira', 'a primeira rua', 'první ulice', { pos: 'phrase', example: { pt: 'É a primeira rua à esquerda.', cs: 'Je to první ulice vlevo.' } }),
         w('u6l3-segundo', 'segundo / segunda', 'druhý / druhá', { pos: 'adj' }),
         w('u6l3-terceiro', 'terceiro / terceira', 'třetí', { pos: 'adj' }),
         w('u6l3-minutos', 'a cinco minutos', 'pět minut odtud', { pos: 'phrase', example: { pt: 'Fica a cinco minutos a pé.', cs: 'Je to pět minut pěšky.' } }),
@@ -149,7 +149,7 @@ export const unit6: Unit = {
         c('___ em frente.', 'Jděte rovně.', 'Siga', ['Segue', 'Seguir']),
         c('___ a rua.', 'Přejděte ulici.', 'Atravesse', ['Atravessa', 'Atravessar']),
         c('O banco fica ___ esquerda.', 'Banka je vlevo.', 'à', ['ao', 'na']),
-        c('A farmácia é a ___ rua.', 'Lékárna je ve druhé ulici.', 'segunda', ['segundo', 'dois']),
+        c('A farmácia fica na ___ rua.', 'Lékárna je ve druhé ulici.', 'segunda', ['segundo', 'dois']),
       ],
       dialogue: [
         { speaker: 'Turista', pt: 'Desculpe, onde fica a estação?', cs: 'Promiňte, kde je nádraží?' },

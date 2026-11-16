@@ -81,7 +81,7 @@ export const unit8: Unit = {
         title: 'Nepravidelná slovesa «fazer» a «ver»',
         body: [
           '„Fazer“ (dělat) a „ver“ (vidět, dívat se) patří k nejčastějším nepravidelným slovesům. Učí se nazpaměť.',
-          'Pozor na tvary: „ele vê“, ale „eles veem“ (bez čárky nad e v množném čísle).',
+          'Pozor na tvary: „ele vê“ (se stříškou), ale „eles veem“ (v množném čísle bez stříšky).',
         ],
         table: {
           headers: ['Osoba', 'fazer', 'ver'],
@@ -132,7 +132,7 @@ export const unit8: Unit = {
         title: 'Přídavná jména: shoda a pozice',
         body: [
           'Přídavné jméno se řídí rodem a číslem podstatného jména a stojí obvykle ZA ním: a casa branca, o carro vermelho, os livros azuis.',
-          'Přídavná jména na -o mají ženský tvar na -a (branco → branca); na -e a na souhlásku mají stejný tvar pro oba rody (verde, azul); množné číslo: azul → azuis.',
+          'Přídavná jména na -o mají ženský tvar na -a (branco → branca); na -e a většina na -l mají stejný tvar pro oba rody (verde, azul); národnosti a přídavná jména na -or mají ženský tvar na -a (português → portuguesa, trabalhador → trabalhadora); množné číslo: azul → azuis.',
         ],
         table: {
           headers: ['Typ', 'Mužský', 'Ženský', 'Množné (m)'],
