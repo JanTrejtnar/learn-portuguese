@@ -6,12 +6,12 @@ import { href } from '../router';
 const Row = ({ to, title, meta, emoji }: { to: string; title: string; meta: string; emoji: string }) => (
   <a
     href={href(to)}
-    class="flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-4 hover:border-brand-500 dark:border-stone-800 dark:bg-stone-900"
+    class="flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 hover:border-brand-500"
   >
     <span class="text-2xl" aria-hidden="true">{emoji}</span>
     <span class="min-w-0">
       <span class="block font-semibold">{title}</span>
-      <span class="block text-sm text-stone-600 dark:text-stone-400">{meta}</span>
+      <span class="block text-sm text-ink-soft">{meta}</span>
     </span>
   </a>
 );
@@ -23,7 +23,7 @@ export const CardsPage = () => {
   return (
   <div>
     <h1 class="text-2xl font-bold">Kartičky</h1>
-    <p class="mt-1 text-stone-600 dark:text-stone-400">
+    <p class="mt-1 text-ink-soft">
       Opakování řídí chytrý plán (SRS): karty se vrací v rostoucích odstupech. Vyber balíček.
     </p>
     <label class="mt-4 flex items-center gap-2 text-sm">
@@ -31,7 +31,7 @@ export const CardsPage = () => {
       <select
         value={settings.newPerDay}
         onChange={(e) => update({ newPerDay: Number(e.currentTarget.value) })}
-        class="rounded-lg border border-stone-300 bg-white px-2 py-1 dark:border-stone-700 dark:bg-stone-900"
+        class="rounded-lg border border-line-strong bg-surface px-2 py-1"
       >
         {[5, 10, 15, 20, 30].map((n) => <option key={n} value={n}>{n}</option>)}
       </select>
@@ -43,7 +43,7 @@ export const CardsPage = () => {
 
     {units.filter((u) => open(u.id)).map((u) => (
       <section key={u.id} class="mt-8">
-        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-stone-500">
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
           Jednotka {unitCode(u)}: {u.title}
         </h2>
         <div class="space-y-2">

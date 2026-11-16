@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { Loading } from '../components/Loading';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { AudioButton } from '../components/AudioButton';
 import { BuildQuestion, ChoiceQuestion, MatchQuestion, TypingQuestion, type Answer } from '../components/QuizQuestions';
@@ -58,7 +59,7 @@ const resolveScope = (id: string, progress: Progress): Scope | 'empty' | undefin
 
 export const QuizPage = ({ id }: { id: string }) => {
   const progress = useProgress();
-  if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
+  if (!progress) return <Loading />;
   const scope = resolveScope(id, progress);
   if (!scope) return <NotFoundPage />;
   if (scope === 'empty') {
@@ -66,7 +67,7 @@ export const QuizPage = ({ id }: { id: string }) => {
       <div class="py-12 text-center">
         <div class="text-5xl" aria-hidden="true">🃏</div>
         <h1 class="mt-3 text-xl font-bold">Rychlý kvíz zatím není k dispozici</h1>
-        <p class="mt-2 text-stone-600 dark:text-stone-400">Nejdřív si procvič aspoň pár kartiček, pak se kvíz zeptá na ta nejslabší slovíčka.</p>
+        <p class="mt-2 text-ink-soft">Nejdřív si procvič aspoň pár kartiček, pak se kvíz zeptá na ta nejslabší slovíčka.</p>
         <a href={href('/cards/all')} class="mt-5 inline-block rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white">Jít na kartičky</a>
       </div>
     );
@@ -76,7 +77,7 @@ export const QuizPage = ({ id }: { id: string }) => {
       <div class="py-12 text-center">
         <div class="text-5xl" aria-hidden="true">🔒</div>
         <h1 class="mt-3 text-xl font-bold">Tato jednotka je zamčená</h1>
-        <p class="mt-2 text-stone-600 dark:text-stone-400">Nejdřív splň test předchozí jednotky.</p>
+        <p class="mt-2 text-ink-soft">Nejdřív splň test předchozí jednotky.</p>
         <a href={href('/quiz')} class="mt-5 inline-block rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white">Přehled testů</a>
       </div>
     );
@@ -183,10 +184,10 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       {!finished && q2 && (
         <>
           <div class="mb-5">
-            <div class="h-2 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
+            <div class="h-2 overflow-hidden rounded-full bg-track">
               <div class="h-full bg-brand-500 transition-all" style={{ width: `${(index / questions.length) * 100}%` }} />
             </div>
-            <p class="mt-1 text-right text-xs text-stone-500">Otázka {index + 1} / {questions.length}</p>
+            <p class="mt-1 text-right text-xs text-muted">Otázka {index + 1} / {questions.length}</p>
           </div>
 
           <div key={q2.id}>
@@ -207,7 +208,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
                   {q2.kind !== 'match' && q2.kind !== 'pt-to-cs' && q2.kind !== 'cloze' && <AudioButton text={correctText(q2)} />}
                 </p>
               )}
-              <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-stone-900 py-2.5 font-semibold text-white dark:bg-white dark:text-stone-900">
+              <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
                 {index + 1 === questions.length ? 'Zobrazit výsledek' : 'Další'} <span class="text-xs opacity-60">(Enter)</span>
               </button>
             </div>
@@ -217,10 +218,10 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
 
       {finished && (
         <div>
-          <div class="rounded-3xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-900">
+          <div class="rounded-3xl border border-line bg-surface p-6 text-center">
             <div class="text-5xl" aria-hidden="true">{ratio >= PASS_RATIO ? '🎉' : '💪'}</div>
             <h1 class="mt-2 text-3xl font-bold">{Math.round(ratio * 100)} %</h1>
-            <p class="text-stone-600 dark:text-stone-400">{correctCount} z {questions.length} správně</p>
+            <p class="text-ink-soft">{correctCount} z {questions.length} správně</p>
             {scope.graded ? (
               ratio >= PASS_RATIO ? (
                 <p class="mt-3 font-semibold text-green-700 dark:text-green-400">
@@ -230,12 +231,12 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
                 <p class="mt-3 font-semibold text-amber-700 dark:text-amber-400">Na splnění je potřeba aspoň {Math.round(PASS_RATIO * 100)} %. Zkus to znovu!</p>
               )
             ) : (
-              <p class="mt-3 text-sm text-stone-500">{ratio >= PASS_RATIO ? 'Skvělé!' : 'Chybná slovíčka se vrátí do opakování.'}</p>
+              <p class="mt-3 text-sm text-muted">{ratio >= PASS_RATIO ? 'Skvělé!' : 'Chybná slovíčka se vrátí do opakování.'}</p>
             )}
             {outcome && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{outcome.xp} XP ⭐</p>}
             <div class="mt-5 flex flex-wrap justify-center gap-3">
               <button type="button" onClick={retry} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Nový pokus</button>
-              <a href={href('/quiz')} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Přehled testů</a>
+              <a href={href('/quiz')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Přehled testů</a>
             </div>
           </div>
 
@@ -244,8 +245,8 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
               <h2 class="mb-3 text-lg font-semibold">Co zlepšit</h2>
               <ul class="space-y-2 text-sm">
                 {results.filter((r) => !r.correct).map((r) => (
-                  <li key={r.question.id} class="rounded-xl border border-stone-200 bg-white p-3 dark:border-stone-800 dark:bg-stone-900">
-                    <div class="text-stone-500">{promptText(r.question)}</div>
+                  <li key={r.question.id} class="rounded-xl border border-line bg-surface p-3">
+                    <div class="text-muted">{promptText(r.question)}</div>
                     <div>
                       {r.given && <span class="text-red-600 line-through">{r.given}</span>}{' '}
                       <b class="text-green-700 dark:text-green-400">{correctText(r.question, r.missed)}</b>

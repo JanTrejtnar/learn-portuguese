@@ -11,7 +11,7 @@ const prefersDark = (): boolean => typeof matchMedia === 'function' && matchMedi
 export const applyTheme = (theme: Theme): void => {
   const dark = theme === 'dark' || (theme === 'auto' && prefersDark());
   document.documentElement.classList.toggle('dark', dark);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#134e4a' : '#0f766e');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0a120e' : '#046a38');
 };
 
 /** Při režimu „auto“ sleduje změnu nastavení systému. */

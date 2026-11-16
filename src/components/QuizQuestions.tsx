@@ -36,7 +36,7 @@ export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
 
   return (
     <div>
-      <p class="mb-1 text-sm text-stone-500">
+      <p class="mb-1 text-sm text-muted">
         {q.kind === 'pt-to-cs' ? 'Co to znamená česky?' : q.kind === 'cs-to-pt' ? 'Jak se to řekne portugalsky (PT-PT)?' : q.kind === 'cloze' ? 'Doplň správný tvar:' : 'Co slyšíš?'}
       </p>
       <div class="mb-5 flex items-center gap-3">
@@ -45,7 +45,7 @@ export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
         ) : q.kind === 'cloze' ? (
           <div>
             <span lang="pt-PT" class="text-2xl font-bold text-brand-700 dark:text-brand-100">{q.prompt.replace('___', answer ? q.options[q.answer]! : '＿＿＿')}</span>
-            {q.hint && <span class="mt-1 block text-sm text-stone-500">{q.hint}</span>}
+            {q.hint && <span class="mt-1 block text-sm text-muted">{q.hint}</span>}
           </div>
         ) : (
           <>
@@ -58,15 +58,15 @@ export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
         {q.options.map((opt, i) => {
           const state = !answer ? 'idle' : i === q.answer ? 'right' : opt === answer.given ? 'wrong' : 'dim';
           const tone = {
-            idle: 'border-stone-200 bg-white hover:border-brand-500 dark:border-stone-800 dark:bg-stone-900',
+            idle: 'border-line bg-surface hover:border-brand-500',
             right: 'border-green-600 bg-green-50 dark:bg-green-950',
             wrong: 'border-red-600 bg-red-50 dark:bg-red-950',
-            dim: 'border-stone-200 bg-white opacity-50 dark:border-stone-800 dark:bg-stone-900',
+            dim: 'border-line bg-surface opacity-50',
           }[state];
           return (
             <li key={opt}>
               <button type="button" disabled={!!answer} onClick={() => pick(i)} lang={q.optionsLang === 'pt' ? 'pt-PT' : 'cs'} class={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left font-medium ${tone}`}>
-                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-100 text-xs text-stone-600 dark:bg-stone-800">{i + 1}</span>
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs text-ink-soft">{i + 1}</span>
                 {opt}
               </button>
             </li>
@@ -100,7 +100,7 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
 
   return (
     <div>
-      <p class="mb-1 text-sm text-stone-500">{q.kind === 'typing' ? 'Napiš portugalsky (PT-PT):' : 'Napiš, co slyšíš:'}</p>
+      <p class="mb-1 text-sm text-muted">{q.kind === 'typing' ? 'Napiš portugalsky (PT-PT):' : 'Napiš, co slyšíš:'}</p>
       <div class="mb-5 flex items-center gap-3">
         {q.kind === 'typing' ? <span class="text-3xl font-bold">{q.prompt}</span> : <AudioButton text={q.audio!} size="md" withSlow />}
       </div>
@@ -115,11 +115,11 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
           autocapitalize="off"
           spellcheck={false}
           placeholder="Tvoje odpověď…"
-          class="min-w-0 flex-1 rounded-xl border-2 border-stone-200 bg-white px-4 py-3 text-lg disabled:opacity-60 dark:border-stone-700 dark:bg-stone-900"
+          class="min-w-0 flex-1 rounded-xl border-2 border-line bg-surface px-4 py-3 text-lg disabled:opacity-60"
         />
         {!answer && <button type="submit" class="rounded-xl bg-brand-700 px-5 font-semibold text-white hover:bg-brand-600">Zkontrolovat</button>}
       </form>
-      <p class="mt-2 text-xs text-stone-400">Tip: přízvuky (á, ã, ç…) si můžeš zkopírovat z lekce, chybějící diakritika se jen upozorní.</p>
+      <p class="mt-2 text-xs text-muted">Tip: přízvuky (á, ã, ç…) si můžeš zkopírovat z lekce, chybějící diakritika se jen upozorní.</p>
     </div>
   );
 };
@@ -156,11 +156,11 @@ export const MatchQuestion = ({ q, answer, onAnswer }: Props<MatchQ>) => {
       matched.has(id) ? 'border-green-600 bg-green-50 opacity-60 dark:bg-green-950'
       : bad ? 'border-red-600 bg-red-50 dark:bg-red-950'
       : active ? 'border-brand-600 bg-brand-50 dark:bg-brand-900'
-      : 'border-stone-200 bg-white hover:border-brand-500 dark:border-stone-800 dark:bg-stone-900'}`;
+      : 'border-line bg-surface hover:border-brand-500'}`;
 
   return (
     <div>
-      <p class="mb-4 text-sm text-stone-500">Spoj portugalské výrazy s českými významy.</p>
+      <p class="mb-4 text-sm text-muted">Spoj portugalské výrazy s českými významy.</p>
       <div class="grid grid-cols-2 gap-3">
         <ul class="space-y-2">
           {q.pairs.map((p) => (
@@ -202,17 +202,17 @@ export const BuildQuestion = ({ q, answer, onAnswer }: Props<BuildQ>) => {
 
   return (
     <div>
-      <p class="mb-1 text-sm text-stone-500">Poskládej větu portugalsky (PT-PT):</p>
+      <p class="mb-1 text-sm text-muted">Poskládej větu portugalsky (PT-PT):</p>
       <p class="mb-4 text-2xl font-bold">{q.prompt}</p>
-      <div lang="pt-PT" class="mb-4 flex min-h-16 flex-wrap items-center gap-2 rounded-2xl border-2 border-dashed border-stone-300 p-3 dark:border-stone-700">
-        {picked.length === 0 && <span class="text-sm text-stone-400">Klepej na slova níže…</span>}
+      <div lang="pt-PT" class="mb-4 flex min-h-16 flex-wrap items-center gap-2 rounded-2xl border-2 border-dashed border-line-strong p-3">
+        {picked.length === 0 && <span class="text-sm text-muted">Klepej na slova níže…</span>}
         {picked.map((i) => (
           <button key={i} type="button" disabled={!!answer} onClick={() => toggle(i)} class="rounded-lg bg-brand-100 px-3 py-1.5 font-medium text-brand-900">{q.bank[i]}</button>
         ))}
       </div>
       <div lang="pt-PT" class="flex flex-wrap gap-2">
         {q.bank.map((t, i) => (
-          <button key={i} type="button" disabled={!!answer || picked.includes(i)} onClick={() => toggle(i)} class="rounded-lg border border-stone-300 bg-white px-3 py-1.5 font-medium disabled:opacity-30 dark:border-stone-700 dark:bg-stone-900">{t}</button>
+          <button key={i} type="button" disabled={!!answer || picked.includes(i)} onClick={() => toggle(i)} class="rounded-lg border border-line-strong bg-surface px-3 py-1.5 font-medium disabled:opacity-30">{t}</button>
         ))}
       </div>
       {!answer && (

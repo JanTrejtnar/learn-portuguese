@@ -83,3 +83,26 @@ test('přiřazování: páry mají unikátní obě strany i při duplicitních p
     }
   }
 });
+
+test('stejný význam: špatná možnost není druhá správná a psaní uzná všechny varianty', () => {
+  const ws = [
+    W('a', 'Quanto custa?', 'Kolik to stojí?', 'phrase'),
+    W('b', 'Quanto custa isto?', 'Kolik to stojí?', 'phrase'),
+    W('c', 'Bom dia', 'Dobré ráno', 'phrase'),
+    W('d', 'Boa tarde', 'Dobré odpoledne', 'phrase'),
+    W('e', 'Boa noite', 'Dobrou noc', 'phrase'),
+    W('f', 'Adeus', 'Nashledanou', 'phrase'),
+  ];
+  for (let i = 0; i < 200; i++) {
+    for (const q of generateQuiz({ words: ws, pool: ws, sentences: [], count: 6, audio: true })) {
+      if (q.kind === 'cs-to-pt' && (q.prompt === 'Kolik to stojí?')) {
+        const wrong = q.options.filter((_, j) => j !== q.answer);
+        assert.ok(!wrong.some((o) => o.startsWith('Quanto custa')), 'druhá správná varianta mezi špatnými');
+      }
+      if (q.kind === 'typing' && q.prompt === 'Kolik to stojí?') {
+        assert.equal(checkTyped('Quanto custa?', q.accepted), 'exact');
+        assert.equal(checkTyped('quanto custa isto', q.accepted), 'exact');
+      }
+    }
+  }
+});

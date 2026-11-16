@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'preact/hooks';
+import { Loading } from '../components/Loading';
 import { AudioButton } from '../components/AudioButton';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { VoiceWarning } from '../components/VoiceWarning';
@@ -23,14 +24,14 @@ export const PairsPage = () => {
     <div class="mx-auto max-w-xl">
       <Breadcrumb items={[{ label: 'Praxe', to: '/practice' }, { label: 'Minimální páry' }]} />
       <h1 class="text-2xl font-bold">Minimální páry 👂</h1>
-      <p class="mt-1 text-stone-600 dark:text-stone-400">Slova, která se liší jediným zvukem. Naučit se je rozlišit je klíč k dobré výslovnosti.</p>
+      <p class="mt-1 text-ink-soft">Slova, která se liší jediným zvukem. Naučit se je rozlišit je klíč k dobré výslovnosti.</p>
       <VoiceWarning />
-      <p class="mb-4 text-xs text-stone-500">Rozdíly nejlépe uslyšíš na kvalitním hlasu pt-PT. Syntetický hlas nemusí být dokonalý.</p>
+      <p class="mb-4 text-xs text-muted">Rozdíly nejlépe uslyšíš na kvalitním hlasu pt-PT. Syntetický hlas nemusí být dokonalý.</p>
 
       <div class="mb-5 flex gap-2" role="tablist">
         {([['learn', 'Poslechnout si'], ['train', 'Trénink']] as const).map(([id, label]) => (
           <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}
-            class={`rounded-xl px-4 py-2 font-semibold ${tab === id ? 'bg-brand-700 text-white' : 'border border-stone-300 dark:border-stone-700'}`}>
+            class={`rounded-xl px-4 py-2 font-semibold ${tab === id ? 'bg-brand-700 text-white' : 'border border-line-strong'}`}>
             {label}
           </button>
         ))}
@@ -39,14 +40,14 @@ export const PairsPage = () => {
       {tab === 'learn' ? (
         <ul class="space-y-3">
           {minimalPairs.map((p) => (
-            <li key={p.id} class="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+            <li key={p.id} class="rounded-2xl border border-line bg-surface p-4">
               <div class="grid grid-cols-2 gap-3">
                 {[p.a, p.b].map((w) => (
                   <div key={w.pt} class="flex items-center gap-2">
                     <AudioButton text={w.pt} size="md" />
                     <div>
                       <div lang="pt-PT" class="text-lg font-bold text-brand-700 dark:text-brand-100">{w.pt}</div>
-                      <div class="text-sm text-stone-500">{w.cs}</div>
+                      <div class="text-sm text-muted">{w.cs}</div>
                     </div>
                   </div>
                 ))}
@@ -58,7 +59,7 @@ export const PairsPage = () => {
       ) : progress ? (
         <Train progress={progress} />
       ) : (
-        <p class="text-stone-500">Načítám…</p>
+        <Loading />
       )}
     </div>
   );
@@ -120,10 +121,10 @@ const Train = ({ progress }: { progress: Progress }) => {
 
   if (!started) {
     return (
-      <div class="rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-900">
+      <div class="rounded-2xl border border-line bg-surface p-6 text-center">
         <div class="text-4xl" aria-hidden="true">🎧</div>
         <h2 class="mt-2 text-lg font-bold">Co jsi slyšel?</h2>
-        <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">{ROUND} slov. Poslechni si nahrávku a vyber, které ze dvou slov zaznělo.</p>
+        <p class="mt-1 text-sm text-ink-soft">{ROUND} slov. Poslechni si nahrávku a vyber, které ze dvou slov zaznělo.</p>
         <button type="button" onClick={start} class="mt-5 rounded-xl bg-brand-700 px-6 py-3 font-semibold text-white hover:bg-brand-600">Začít</button>
       </div>
     );
@@ -131,14 +132,14 @@ const Train = ({ progress }: { progress: Progress }) => {
 
   if (finished) {
     return (
-      <div class="rounded-3xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-900">
+      <div class="rounded-3xl border border-line bg-surface p-6 text-center">
         <div class="text-5xl" aria-hidden="true">{correct >= 8 ? '🎉' : '💪'}</div>
         <h2 class="mt-2 text-3xl font-bold">{correct} / {round.length}</h2>
-        <p class="text-stone-600 dark:text-stone-400">{correct >= 8 ? 'Skvělé ucho!' : 'Zkus si pár dvojic ještě poslechnout a zopakuj to.'}</p>
+        <p class="text-ink-soft">{correct >= 8 ? 'Skvělé ucho!' : 'Zkus si pár dvojic ještě poslechnout a zopakuj to.'}</p>
         {xp > 0 && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{xp} XP ⭐</p>}
         <div class="mt-5 flex flex-wrap justify-center gap-3">
           <button type="button" onClick={() => { restart(); }} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Nové kolo</button>
-          <a href={href('/practice')} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Zpět na praxi</a>
+          <a href={href('/practice')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Zpět na praxi</a>
         </div>
       </div>
     );
@@ -147,23 +148,23 @@ const Train = ({ progress }: { progress: Progress }) => {
   return (
     <div>
       <div class="mb-4">
-        <div class="h-2 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800"><div class="h-full bg-brand-500 transition-all" style={{ width: `${(index / round.length) * 100}%` }} /></div>
-        <p class="mt-1 text-right text-xs text-stone-500">Slovo {index + 1} / {round.length}</p>
+        <div class="h-2 overflow-hidden rounded-full bg-track"><div class="h-full bg-brand-500 transition-all" style={{ width: `${(index / round.length) * 100}%` }} /></div>
+        <p class="mt-1 text-right text-xs text-muted">Slovo {index + 1} / {round.length}</p>
       </div>
-      <div class="flex flex-col items-center gap-2 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900">
-        <p class="text-sm text-stone-500">Které slovo slyšíš?</p>
+      <div class="flex flex-col items-center gap-2 rounded-2xl border border-line bg-surface p-6">
+        <p class="text-sm text-muted">Které slovo slyšíš?</p>
         <AudioButton text={q!.pair[q!.played].pt} size="md" withSlow />
       </div>
       <div class="mt-4 grid grid-cols-2 gap-3">
         {order.map((side, i) => {
           const w = q!.pair[side];
           const state = !picked ? 'idle' : side === q!.played ? 'right' : side === picked ? 'wrong' : 'dim';
-          const cls = { idle: 'border-stone-200 bg-white hover:border-brand-500 dark:border-stone-700 dark:bg-stone-900', right: 'border-green-600 bg-green-50 dark:bg-green-950', wrong: 'border-red-600 bg-red-50 dark:bg-red-950', dim: 'opacity-50 border-stone-200 dark:border-stone-800' }[state];
+          const cls = { idle: 'border-line bg-surface hover:border-brand-500', right: 'border-green-600 bg-green-50 dark:bg-green-950', wrong: 'border-red-600 bg-red-50 dark:bg-red-950', dim: 'opacity-50 border-line' }[state];
           return (
             <button key={side} type="button" disabled={!!picked} onClick={() => answer(side)} lang="pt-PT" class={`rounded-2xl border-2 px-3 py-4 text-center ${cls}`}>
               <span class="block text-2xl font-bold">{w.pt}</span>
-              <span class="block text-sm text-stone-500">{w.cs}</span>
-              <span class="mt-1 block text-[10px] text-stone-400">[{i + 1}]</span>
+              <span class="block text-sm text-muted">{w.cs}</span>
+              <span class="mt-1 block text-[10px] text-muted">[{i + 1}]</span>
             </button>
           );
         })}
@@ -176,7 +177,7 @@ const Train = ({ progress }: { progress: Progress }) => {
             <span class="flex items-center gap-1"><AudioButton text={q!.pair.a.pt} />{q!.pair.a.pt}</span>
             <span class="flex items-center gap-1"><AudioButton text={q!.pair.b.pt} />{q!.pair.b.pt}</span>
           </div>
-          <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-stone-900 py-2.5 font-semibold text-white dark:bg-white dark:text-stone-900">
+          <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
             {index + 1 === round.length ? 'Zobrazit výsledek' : 'Další'} <span class="text-xs opacity-60">(Enter)</span>
           </button>
         </div>

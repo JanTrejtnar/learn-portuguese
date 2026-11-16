@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'preact/hooks';
+import { Loading } from '../components/Loading';
 import { AudioButton } from '../components/AudioButton';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { VoiceWarning } from '../components/VoiceWarning';
@@ -22,9 +23,9 @@ export const SpeakPage = () => {
     <div class="mx-auto max-w-xl">
       <Breadcrumb items={[{ label: 'Praxe', to: '/practice' }, { label: 'Mluvení' }]} />
       <h1 class="text-2xl font-bold">Mluvení 🎤</h1>
-      <p class="mt-1 text-stone-600 dark:text-stone-400">Poslechni si větu, zopakuj ji nahlas a uvidíš, která slova zazněla.</p>
+      <p class="mt-1 text-ink-soft">Poslechni si větu, zopakuj ji nahlas a uvidíš, která slova zazněla.</p>
       <VoiceWarning />
-      {progress ? <Session progress={progress} /> : <p class="mt-6 text-stone-500">Načítám…</p>}
+      {progress ? <Session progress={progress} /> : <Loading />}
     </div>
   );
 };
@@ -77,7 +78,7 @@ const Session = ({ progress }: { progress: Progress }) => {
     setAttempt((a) => a + 1);
   };
 
-  if (phrases.length === 0) return <p class="mt-6 text-stone-500">Zatím není k dispozici žádná věta.</p>;
+  if (phrases.length === 0) return <p class="mt-6 text-muted">Zatím není k dispozici žádná věta.</p>;
 
   return (
     <div class="mt-4">
@@ -87,17 +88,17 @@ const Session = ({ progress }: { progress: Progress }) => {
         </p>
       )}
       {supported && (
-        <p class="mb-4 text-xs text-stone-500">
+        <p class="mb-4 text-xs text-muted">
           ℹ️ Rozpoznávání řeči v prohlížeči Chrome posílá nahrávku k vyhodnocení na servery výrobce prohlížeče. Funguje jen na zabezpečeném připojení (https).
         </p>
       )}
 
       {!finished && phrase && (
         <>
-          <p class="mb-2 text-right text-xs text-stone-500">Věta {index + 1} / {phrases.length}</p>
-          <div class="rounded-3xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-900">
+          <p class="mb-2 text-right text-xs text-muted">Věta {index + 1} / {phrases.length}</p>
+          <div class="rounded-3xl border border-line bg-surface p-6 text-center">
             <p lang="pt-PT" class="text-2xl font-bold text-brand-700 dark:text-brand-100">{phrase.pt}</p>
-            <p class="mt-1 text-sm text-stone-500">{phrase.cs}</p>
+            <p class="mt-1 text-sm text-muted">{phrase.cs}</p>
             <div class="mt-4 flex items-center justify-center gap-3">
               <AudioButton text={phrase.pt} size="md" withSlow />
               <button
@@ -114,36 +115,36 @@ const Session = ({ progress }: { progress: Progress }) => {
           {error && <p role="alert" class="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-900 dark:bg-red-950 dark:text-red-100">{error}</p>}
 
           {result && (
-            <div role="status" class="mt-4 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+            <div role="status" class="mt-4 rounded-2xl border border-line bg-surface p-4">
               <p class="text-lg font-bold">{Math.round(result.cmp.score * 100)} % {result.cmp.score >= 0.8 ? '🎉' : result.cmp.score >= 0.5 ? '👍' : '💪'}</p>
               <p lang="pt-PT" class="mt-2 flex flex-wrap gap-x-2 text-lg">
                 {result.cmp.words.map((w, i) => <span key={i} class={w.matched ? 'text-green-700 dark:text-green-400' : 'text-red-600 underline decoration-wavy'}>{w.word}</span>)}
               </p>
-              <p class="mt-2 text-sm text-stone-500">Rozpoznáno: „{result.heard}“</p>
+              <p class="mt-2 text-sm text-muted">Rozpoznáno: „{result.heard}“</p>
               <div class="mt-3 flex gap-3">
-                <button type="button" onClick={record} class="rounded-xl border border-stone-300 px-4 py-2 font-semibold dark:border-stone-700">Zkusit znovu</button>
+                <button type="button" onClick={record} class="rounded-xl border border-line-strong px-4 py-2 font-semibold">Zkusit znovu</button>
                 <button type="button" onClick={next} class="flex-1 rounded-xl bg-brand-700 py-2 font-semibold text-white hover:bg-brand-600">{index + 1 === phrases.length ? 'Dokončit' : 'Další věta'}</button>
               </div>
             </div>
           )}
 
           {!result && (
-            <button type="button" onClick={next} class="mt-4 w-full text-sm text-stone-500 underline">Přeskočit větu</button>
+            <button type="button" onClick={next} class="mt-4 w-full text-sm text-muted underline">Přeskočit větu</button>
           )}
         </>
       )}
 
       {finished && (
-        <div class="rounded-3xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-900">
+        <div class="rounded-3xl border border-line bg-surface p-6 text-center">
           <div class="text-5xl" aria-hidden="true">🗣️</div>
           <h2 class="mt-2 text-xl font-bold">Hotovo!</h2>
-          <p class="text-stone-600 dark:text-stone-400">
+          <p class="text-ink-soft">
             {scores.length > 0 ? `Průměrná shoda: ${Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100)} %` : 'Žádná věta nebyla vyhodnocena.'}
           </p>
           {totalXp > 0 && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{totalXp} XP ⭐</p>}
           <div class="mt-5 flex flex-wrap justify-center gap-3">
             <button type="button" onClick={restart} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Další kolo</button>
-            <a href={href('/practice')} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Zpět na praxi</a>
+            <a href={href('/practice')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Zpět na praxi</a>
           </div>
         </div>
       )}

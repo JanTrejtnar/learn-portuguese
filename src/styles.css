@@ -1,19 +1,122 @@
 @import "tailwindcss";
 
-/* Tmavý režim řízený třídou .dark na <html> (nastavuje se podle systému nebo volby uživatele). */
+/* Tmavý režim řízený třídou .dark na <html> (podle systému nebo volby uživatele). */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ───────── Barvy portugalské vlajky ─────────
+   zelená #046a38, červená #da291c, žlutá/zlatá #ffe900 (armilární sféra) */
 @theme {
-  --color-brand-50: #f0fdfa;
-  --color-brand-100: #ccfbf1;
-  --color-brand-500: #14b8a6;
-  --color-brand-600: #0d9488;
-  --color-brand-700: #0f766e;
-  --color-brand-900: #134e4a;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-brand-50: #eef9f1;
+  --color-brand-100: #d5f0dd;
+  --color-brand-200: #aee0bd;
+  --color-brand-300: #7fca97;
+  --color-brand-400: #4aae6e;
+  --color-brand-500: #22914f;
+  --color-brand-600: #0f7a41;
+  --color-brand-700: #046a38;
+  --color-brand-800: #04552d;
+  --color-brand-900: #064427;
+  --color-brand-950: #032a18;
+
+  --color-flag-50: #fff0ee;
+  --color-flag-100: #ffdad6;
+  --color-flag-400: #f06a5f;
+  --color-flag-500: #e63a2e;
+  --color-flag-600: #da291c;
+  --color-flag-700: #b3200f;
+  --color-flag-900: #6b140b;
+
+  --color-gold-200: #fff8a8;
+  --color-gold-300: #fff176;
+  --color-gold-400: #ffe900;
+  --color-gold-500: #f0d400;
+  --color-gold-600: #c9ae00;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --shadow-soft: 0 1px 2px rgb(16 40 28 / 0.06), 0 4px 16px -6px rgb(16 40 28 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(16 40 28 / 0.08), 0 12px 28px -10px rgb(16 40 28 / 0.22);
 }
 
-html, body { height: 100%; }
-body { @apply bg-stone-50 text-stone-900 antialiased; }
+/* ───────── Sémantické povrchy (světlý / tmavý) ───────── */
+:root {
+  --bg: #f6f4ec;
+  --surface: #ffffff;
+  --surface-2: #efece1;
+  --ink: #14221a;
+  --ink-soft: #33463b;
+  --muted: #5f7066;
+  --line: #e2dece;
+  --line-strong: #cfc9b4;
+  --track: #e5e1d2;
+}
+.dark {
+  --bg: #0a120e;
+  --surface: #111c16;
+  --surface-2: #17251d;
+  --ink: #edf4ef;
+  --ink-soft: #c5d3c9;
+  --muted: #8fa497;
+  --line: #1f3027;
+  --line-strong: #2d4437;
+  --track: #1d2b23;
+}
+
+@theme inline {
+  --color-app: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-track: var(--track);
+}
+
+html { color-scheme: light; -webkit-tap-highlight-color: transparent; }
 html.dark { color-scheme: dark; }
-.dark body { @apply bg-stone-950 text-stone-100; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 { letter-spacing: -0.01em; }
+
+/* Čitelný fokus pro klávesnici */
+:where(a, button, input, select, [role="button"], [tabindex]):focus-visible {
+  outline: 3px solid var(--color-gold-500);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+.dark :where(a, button, input, select, [role="button"], [tabindex]):focus-visible { outline-color: var(--color-gold-400); }
+
+/* Dotykové cíle a odezva */
+button, [role="button"], a { touch-action: manipulation; }
+button:not(:disabled), a { transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .1s ease, box-shadow .15s ease; }
+button:not(:disabled):active { transform: scale(0.98); }
+
+/* Jemné animace; vypnuté při „omezit pohyb“ */
+@keyframes page-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes pop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.page-in { animation: page-in .25s ease-out both; }
+.pop { animation: pop .45s cubic-bezier(.2,.9,.3,1.3) both; }
+.skeleton {
+  background: linear-gradient(90deg, var(--track) 25%, var(--surface-2) 50%, var(--track) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 0.75rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+
+/* Odkaz „přeskočit na obsah“ */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; padding: .75rem 1rem; background: var(--color-brand-700); color: #fff; border-radius: 0 0 .75rem 0; font-weight: 600; }
+.skip-link:focus { left: 0; }
+
+/* Praporek vlajky: zelená 2/5, červená 3/5 */
+.flag-stripe { background: linear-gradient(90deg, var(--color-brand-700) 0 40%, var(--color-flag-600) 40% 100%); }

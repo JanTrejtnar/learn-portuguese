@@ -16,13 +16,13 @@ const themes: { id: Theme; label: string }[] = [
 ];
 
 const Card = ({ title, children }: { title: string; children: preact.ComponentChildren }) => (
-  <section class="mt-5 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+  <section class="mt-5 rounded-2xl border border-line bg-surface p-4">
     <h2 class="mb-2 font-semibold">{title}</h2>
     {children}
   </section>
 );
 
-const btn = 'rounded-xl border border-stone-300 px-4 py-2 font-semibold hover:border-brand-500 dark:border-stone-700';
+const btn = 'rounded-xl border border-line-strong px-4 py-2 font-semibold hover:border-brand-500';
 
 export const SettingsPage = () => {
   const [theme, setTheme] = useTheme();
@@ -87,7 +87,7 @@ export const SettingsPage = () => {
         <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Vzhled">
           {themes.map((t) => (
             <button key={t.id} type="button" role="radio" aria-checked={theme === t.id} onClick={() => setTheme(t.id)}
-              class={`rounded-xl border-2 px-3 py-2 text-sm font-semibold ${theme === t.id ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-stone-200 dark:border-stone-700'}`}>
+              class={`rounded-xl border-2 px-3 py-2 text-sm font-semibold ${theme === t.id ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-line'}`}>
               {t.label}
             </button>
           ))}
@@ -109,13 +109,13 @@ export const SettingsPage = () => {
           ) : install.ios ? (
             <p class="text-sm">📲 Na iPhonu nebo iPadu: v Safari klepni na <b>Sdílet</b> a potom <b>Přidat na plochu</b>.</p>
           ) : (
-            <p class="text-sm text-stone-500">📲 Instalace: v nabídce prohlížeče zvol „Nainstalovat aplikaci“ nebo „Přidat na plochu“ (pokud ji tvůj prohlížeč nabízí).</p>
+            <p class="text-sm text-muted">📲 Instalace: v nabídce prohlížeče zvol „Nainstalovat aplikaci“ nebo „Přidat na plochu“ (pokud ji tvůj prohlížeč nabízí).</p>
           )}
         </div>
       </Card>
 
       <Card title="Záloha pokroku">
-        <p class="text-sm text-stone-600 dark:text-stone-400">
+        <p class="text-sm text-ink-soft">
           Pokrok je uložený jen v tomto prohlížeči. Záloha ti umožní přenést ho na jiné zařízení nebo ochránit před smazáním dat. Soubor obsahuje jen tvůj pokrok a nastavení (verze zálohy {BACKUP_VERSION}).
         </p>
         <div class="mt-3 flex flex-wrap gap-2">
@@ -127,7 +127,7 @@ export const SettingsPage = () => {
       </Card>
 
       <Card title="Smazat pokrok">
-        <p class="text-sm text-stone-600 dark:text-stone-400">Vrátí aplikaci do původního stavu (karty, XP, testy i odznaky). Nastavení učení zůstane.</p>
+        <p class="text-sm text-ink-soft">Vrátí aplikaci do původního stavu (karty, XP, testy i odznaky). Nastavení učení zůstane.</p>
         <button type="button" onClick={reset} class="mt-3 rounded-xl border border-red-300 px-4 py-2 font-semibold text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950">🗑️ Smazat veškerý pokrok</button>
       </Card>
     </div>

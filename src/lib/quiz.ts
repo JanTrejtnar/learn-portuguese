@@ -147,9 +147,13 @@ export interface GenerateOptions {
   rng?: Rng;
 }
 
-const pickDistractors = (word: Word, text: (w: Word) => string, scope: Word[], pool: Word[], rng: Rng): string[] => {
+/** Normalizovaný text bez závorkových vysvětlivek (pro porovnání významu). */
+const key = (s: string): string => s.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+
+const pickDistractors = (word: Word, text: (w: Word) => string, scope: Word[], pool: Word[], rng: Rng, toPt: boolean): string[] => {
   const correct = text(word);
-  const ok = (w: Word) => w.id !== word.id && text(w) !== correct;
+  // Špatná možnost nesmí být také správná: stejný význam (cs) u PT možností, stejné slovo (pt) u CZ možností.
+  const ok = (w: Word) => w.id !== word.id && text(w) !== correct && (toPt ? key(w.cs) !== key(word.cs) : key(w.pt) !== key(word.pt));
   const rank = (list: Word[]) => shuffle(list.filter(ok), rng).sort((a, b) => Number(b.pos === word.pos) - Number(a.pos === word.pos));
   const out: string[] = [];
   for (const w of [...rank(scope), ...rank(pool)]) {
@@ -163,7 +167,7 @@ const pickDistractors = (word: Word, text: (w: Word) => string, scope: Word[], p
 const choice = (kind: ChoiceQ['kind'], word: Word, scope: Word[], pool: Word[], rng: Rng, id: string): ChoiceQ => {
   const toPt = kind !== 'pt-to-cs';
   const text = (w: Word) => (toPt ? w.pt : w.cs);
-  const options = shuffle([text(word), ...pickDistractors(word, text, scope, pool, rng)], rng);
+  const options = shuffle([text(word), ...pickDistractors(word, text, scope, pool, rng, toPt)], rng);
   return {
     id,
     kind,
@@ -238,7 +242,8 @@ export const generateQuiz = (opts: GenerateOptions): Question[] => {
         id: nextId(), kind, wordIds: [word.id],
         prompt: kind === 'typing' ? word.cs : '',
         audio: kind === 'dictation' ? word.pt : undefined,
-        accepted: answerVariants(word.pt), display: word.pt,
+        // Uznej i jiná slovíčka se stejným překladem (např. dvě různé správné fráze pro „Kolik to stojí?“).
+        accepted: [...new Set([word.pt, ...pool.filter((x) => key(x.cs) === key(word.cs)).map((x) => x.pt)].flatMap(answerVariants))], display: word.pt,
       });
     } else {
       questions.push(choice(kind, word, words, pool, rng, nextId()));

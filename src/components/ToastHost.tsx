@@ -44,13 +44,13 @@ export const ToastHost = ({ path }: { path: string }) => {
   useBadgeWatcher(path);
 
   return (
-    <div class="pointer-events-none fixed inset-x-0 top-16 z-30 flex flex-col items-center gap-2 px-4 md:top-4" aria-live="polite">
+    <div class="pointer-events-none fixed inset-x-0 top-16 z-30 flex flex-col items-center gap-2 px-4 md:top-4 md:items-end md:pr-6" aria-live="polite">
       {toasts.map((t) => (
         <button
           key={t.id}
           type="button"
           onClick={() => dismiss(t.id)}
-          class="pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-2xl bg-stone-900 px-4 py-3 text-left text-white shadow-lg dark:bg-white dark:text-stone-900"
+          class="pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-2xl border border-line bg-ink px-4 py-3 text-left text-app shadow-lift"
         >
           <span class="text-2xl" aria-hidden="true">{t.emoji}</span>
           <span>

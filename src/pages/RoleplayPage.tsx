@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { Loading } from '../components/Loading';
 import { AudioButton } from '../components/AudioButton';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { VoiceWarning } from '../components/VoiceWarning';
@@ -23,7 +24,7 @@ export const RoleplayPage = ({ id }: { id: string }) => {
   const scenario = getScenario(id);
   const progress = useProgress();
   if (!scenario) return <NotFoundPage />;
-  if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
+  if (!progress) return <Loading />;
   if (!unitUnlocked(scenario.unitId, progress.tests)) {
     return (
       <div class="py-12 text-center">
@@ -98,13 +99,13 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
   const result = scoreTurns(turns);
   const Bubble = ({ who, pt, cs, right }: { who: string; pt: string; cs: string; right?: boolean }) => (
     <div class={`flex ${right ? 'justify-end' : 'justify-start'}`}>
-      <div class={`max-w-[85%] rounded-2xl px-4 py-3 ${right ? 'bg-brand-700 text-white' : 'border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900'}`}>
+      <div class={`max-w-[85%] rounded-2xl px-4 py-3 ${right ? 'bg-brand-700 text-white' : 'border border-line bg-surface'}`}>
         <div class={`text-xs font-semibold ${right ? 'opacity-80' : 'text-brand-700 dark:text-brand-100'}`}>{who}</div>
         <div class="flex items-start gap-2">
           <p lang="pt-PT" class="font-medium">{pt}</p>
           {!right && <AudioButton text={pt} />}
         </div>
-        {settings.showTranslations && <p class={`mt-1 text-sm ${right ? 'opacity-80' : 'text-stone-500'}`}>{cs}</p>}
+        {settings.showTranslations && <p class={`mt-1 text-sm ${right ? 'opacity-80' : 'text-muted'}`}>{cs}</p>}
       </div>
     </div>
   );
@@ -149,9 +150,9 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
         <ul class="mt-4 space-y-2" aria-label="Co odpovíš?">
           {choices.map((c) => (
             <li key={c.pt}>
-              <button type="button" onClick={() => pick(c)} class="w-full rounded-xl border-2 border-stone-200 bg-white px-4 py-3 text-left hover:border-brand-500 dark:border-stone-700 dark:bg-stone-900">
+              <button type="button" onClick={() => pick(c)} class="w-full rounded-xl border-2 border-line bg-surface px-4 py-3 text-left hover:border-brand-500">
                 <span lang="pt-PT" class="block font-medium">{c.pt}</span>
-                {settings.showTranslations && <span class="block text-sm text-stone-500">{c.cs}</span>}
+                {settings.showTranslations && <span class="block text-sm text-muted">{c.cs}</span>}
               </button>
             </li>
           ))}
@@ -165,10 +166,10 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
       )}
 
       {done && (
-        <div class="mt-6 rounded-3xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-900">
+        <div class="mt-6 rounded-3xl border border-line bg-surface p-6 text-center">
           <div class="text-4xl" aria-label={`${result.stars} hvězdy`}>{'⭐'.repeat(result.stars)}</div>
           <h2 class="mt-2 text-2xl font-bold">{Math.round(result.ratio * 100)} %</h2>
-          <p class="text-sm text-stone-600 dark:text-stone-400">
+          <p class="text-sm text-ink-soft">
             {result.ratio >= PASS_RATIO_RP ? 'Scénář splněn! Muito bem!' : 'Zkus to znovu, jde to i lépe.'}
           </p>
           {xp > 0 && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{xp} XP ⭐</p>}
@@ -179,7 +180,7 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
                 {turns.filter((t) => t.choice.quality !== 'good').map((t, i) => {
                   const best = scenario.nodes[t.nodeId]!.choices.find((c) => c.quality === 'good')!;
                   return (
-                    <li key={i} class="rounded-lg bg-stone-50 p-2 dark:bg-stone-800">
+                    <li key={i} class="rounded-lg bg-app p-2">
                       <span class="text-red-600 line-through">{t.choice.pt}</span>{' '}
                       <b lang="pt-PT" class="text-green-700 dark:text-green-400">{best.pt}</b>
                     </li>
@@ -190,7 +191,7 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
           )}
           <div class="mt-5 flex flex-wrap justify-center gap-3">
             <button type="button" onClick={restart} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Zkusit znovu</button>
-            <a href={href('/roleplay')} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Další scénáře</a>
+            <a href={href('/roleplay')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Další scénáře</a>
           </div>
         </div>
       )}

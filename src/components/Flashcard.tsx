@@ -21,7 +21,7 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
       tabIndex={0}
       aria-label={flipped ? 'Karta otočená' : 'Otočit kartu'}
       onClick={onFlip}
-      class="flex min-h-80 cursor-pointer select-none flex-col items-center justify-center gap-4 rounded-3xl border border-stone-200 bg-white p-6 text-center shadow-sm transition dark:border-stone-800 dark:bg-stone-900"
+      class="flex min-h-80 cursor-pointer select-none flex-col items-center justify-center gap-4 rounded-3xl border border-line bg-surface p-6 text-center shadow-sm transition"
     >
       {/* Přední strana */}
       {ptFirst ? (
@@ -33,11 +33,11 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
         <div class="text-2xl font-semibold sm:text-3xl">{word.cs}</div>
       )}
 
-      {!flipped && <p class="mt-4 text-sm text-stone-400">Klepni nebo stiskni mezerník pro otočení</p>}
+      {!flipped && <p class="mt-4 text-sm text-muted">Klepni nebo stiskni mezerník pro otočení</p>}
 
       {/* Zadní strana */}
       {flipped && (
-        <div class="mt-2 flex w-full flex-col items-center gap-3 border-t border-dashed border-stone-200 pt-5 dark:border-stone-700">
+        <div class="mt-2 flex w-full flex-col items-center gap-3 border-t border-dashed border-line pt-5">
           {ptFirst ? (
             <div class="text-2xl font-semibold">{word.cs}</div>
           ) : (
@@ -46,13 +46,13 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
               <AudioButton text={word.pt} size="md" withSlow />
             </div>
           )}
-          {word.gender && <span class="text-xs text-stone-500">{{ m: 'mužský rod', f: 'ženský rod', 'm/f': 'mužský / ženský rod' }[word.gender]}</span>}
+          {word.gender && <span class="text-xs text-muted">{{ m: 'mužský rod', f: 'ženský rod', 'm/f': 'mužský / ženský rod' }[word.gender]}</span>}
           {word.example && (
             <p class="flex items-center gap-2 text-sm">
               <AudioButton text={word.example.pt} />
               <span class="text-left">
                 <span lang="pt-PT" class="italic">{word.example.pt}</span>
-                <span class="block text-stone-500">{word.example.cs}</span>
+                <span class="block text-muted">{word.example.cs}</span>
               </span>
             </p>
           )}

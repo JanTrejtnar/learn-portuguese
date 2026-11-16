@@ -25,7 +25,7 @@ export const unit7: Unit = {
         w('u7l1-centro', 'o centro comercial', 'obchodní centrum', { pos: 'noun', gender: 'm' }),
         w('u7l1-posso-ajudar', 'Posso ajudar?', 'Mohu pomoci?', { pos: 'phrase' }),
         w('u7l1-so-a-ver', 'Estou só a ver, obrigado / obrigada.', 'Jen se dívám, děkuji.', { pos: 'phrase', note: 'Typická odpověď, když se prodavač ptá, jestli ti může pomoci.' }),
-        w('u7l1-quanto-isto', 'Quanto custa isto?', 'Kolik to stojí?', { pos: 'phrase' }),
+        w('u7l1-quanto-isto', 'Quanto custa isto?', 'Kolik stojí tohle?', { pos: 'phrase' }),
         w('u7l1-caro', 'caro / cara', 'drahý / drahá', { pos: 'adj', example: { pt: 'É muito caro.', cs: 'To je hodně drahé.' } }),
         w('u7l1-barato', 'barato / barata', 'levný / levná', { pos: 'adj' }),
         w('u7l1-experimentar', 'Posso experimentar?', 'Mohu si to vyzkoušet?', { pos: 'phrase' }),

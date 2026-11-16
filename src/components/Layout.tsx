@@ -1,83 +1,107 @@
 import type { ComponentChildren } from 'preact';
 import { href } from '../router';
+import { Icon } from './Icon';
+import { Logo } from './Logo';
+import { ThemeToggle } from './ThemeToggle';
 import { ToastHost } from './ToastHost';
 
 interface NavItem {
   label: string;
-  icon: string;
+  icon: Parameters<typeof Icon>[0]['name'];
   to: string;
-  /** Ještě neimplementováno (další kroky plánu). */
-  soon?: boolean;
   active: (path: string) => boolean;
 }
 
 const nav: NavItem[] = [
-  { label: 'Lekce', icon: '📚', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') },
-  { label: 'Karty', icon: '🃏', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') },
-  { label: 'Testy', icon: '✅', to: '/quiz', active: (p) => p.startsWith('/quiz') },
-  { label: 'Praxe', icon: '🎭', to: '/practice', active: (p) => ['/practice', '/roleplay', '/pairs', '/speak'].some((x) => p.startsWith(x)) },
-  { label: 'Mapa', icon: '🗺️', to: '/map', active: (p) => p.startsWith('/map') },
-  { label: 'Pokrok', icon: '📈', to: '/stats', active: (p) => p.startsWith('/stats') },
+  { label: 'Lekce', icon: 'book', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') },
+  { label: 'Karty', icon: 'cards', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') },
+  { label: 'Testy', icon: 'check', to: '/quiz', active: (p) => p.startsWith('/quiz') },
+  { label: 'Praxe', icon: 'chat', to: '/practice', active: (p) => ['/practice', '/roleplay', '/pairs', '/speak'].some((x) => p.startsWith(x)) },
+  { label: 'Mapa', icon: 'map', to: '/map', active: (p) => p.startsWith('/map') },
+  { label: 'Pokrok', icon: 'chart', to: '/stats', active: (p) => p.startsWith('/stats') },
 ];
 
-const NavLink = ({ item, path, vertical }: { item: NavItem; path: string; vertical: boolean }) => {
-  const active = item.active(path);
-  const base = vertical
-    ? 'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium'
-    : 'flex flex-1 flex-col items-center gap-0.5 py-2 text-xs font-medium';
-  const tone = item.soon
-    ? 'cursor-not-allowed text-stone-400 dark:text-stone-600'
-    : active
-      ? 'text-brand-700 dark:text-brand-100 ' + (vertical ? 'bg-brand-50 dark:bg-brand-900' : '')
-      : 'text-stone-600 hover:text-brand-700 dark:text-stone-400';
-  const content = (
-    <>
-      <span class="text-xl leading-none" aria-hidden="true">{item.icon}</span>
-      <span>{item.label}</span>
-      {item.soon && vertical && <span class="ml-auto rounded bg-stone-200 px-1.5 text-[10px] uppercase dark:bg-stone-800">brzy</span>}
-    </>
+const SideLink = ({ item, path }: { item: NavItem; path: string }) => {
+  const on = item.active(path);
+  return (
+    <a
+      href={href(item.to)}
+      aria-current={on ? 'page' : undefined}
+      class={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold ${on ? 'bg-brand-700 text-white shadow-soft' : 'text-ink-soft hover:bg-surface-2'}`}
+    >
+      <Icon name={item.icon} class="h-5 w-5" />
+      {item.label}
+    </a>
   );
-  return item.soon ? (
-    <span class={`${base} ${tone}`} aria-disabled="true" title="Připravujeme v dalších krocích">{content}</span>
-  ) : (
-    <a href={href(item.to)} class={`${base} ${tone}`} aria-current={active ? 'page' : undefined}>{content}</a>
+};
+
+const TabLink = ({ item, path }: { item: NavItem; path: string }) => {
+  const on = item.active(path);
+  return (
+    <a href={href(item.to)} aria-current={on ? 'page' : undefined} class="flex flex-1 flex-col items-center gap-0.5 pt-2 pb-1.5 text-[11px] font-semibold">
+      <span class={`flex h-8 w-14 items-center justify-center rounded-full ${on ? 'bg-brand-700 text-white' : 'text-muted'}`}>
+        <Icon name={item.icon} class="h-5 w-5" />
+      </span>
+      <span class={on ? 'text-brand-700 dark:text-brand-200' : 'text-muted'}>{item.label}</span>
+    </a>
   );
 };
 
 export const Layout = ({ path, children }: { path: string; children: ComponentChildren }) => (
-  <div class="mx-auto flex min-h-full max-w-5xl flex-col md:flex-row md:gap-6 md:px-6">
-    {/* Desktop: boční panel */}
-    <aside class="hidden w-56 shrink-0 py-8 md:block">
-      <a href={href('/')} class="mb-8 block">
-        <div class="text-2xl font-bold text-brand-700 dark:text-brand-100">Aprender 🇵🇹</div>
-        <div class="text-xs text-stone-500">Evropská portugalština · A1/A2</div>
-      </a>
-      <nav class="flex flex-col gap-1" aria-label="Hlavní navigace">
-        {nav.map((item) => <NavLink key={item.to} item={item} path={path} vertical />)}
-        <a href={href('/settings')} class={`mt-4 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium ${path === '/settings' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900 dark:text-brand-100' : 'text-stone-600 hover:text-brand-700 dark:text-stone-400'}`}>
-          <span class="text-xl leading-none" aria-hidden="true">⚙️</span><span>Nastavení</span>
-        </a>
-      </nav>
-    </aside>
+  <div class="min-h-full">
+    <a href="#obsah" class="skip-link" onClick={(e) => { e.preventDefault(); document.getElementById('obsah')?.focus(); }}>Přeskočit na obsah</a>
+    <div class="flag-stripe fixed inset-x-0 top-0 z-40 h-1" aria-hidden="true" />
 
-    <div class="flex min-w-0 flex-1 flex-col">
-      {/* Mobil: horní lišta */}
-      <header class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-200 bg-stone-50/90 px-4 py-3 backdrop-blur md:hidden dark:border-stone-800 dark:bg-stone-950/90">
-        <a href={href('/')} class="text-lg font-bold text-brand-700 dark:text-brand-100">Aprender 🇵🇹</a>
-        <a href={href('/settings')} aria-label="Nastavení" class="text-xl leading-none">⚙️</a>
-      </header>
+    <div class="mx-auto flex min-h-full max-w-5xl flex-col md:flex-row md:gap-8 md:px-6">
+      {/* Desktop: boční panel */}
+      <aside class="hidden w-56 shrink-0 md:block">
+        <div class="sticky top-0 flex h-screen flex-col py-8">
+          <a href={href('/')} class="mb-8 flex items-center gap-3">
+            <Logo class="h-10 w-10 shrink-0" />
+            <span>
+              <span class="block text-lg font-extrabold leading-tight">Aprender</span>
+              <span class="block text-xs text-muted">Português europeu · A1/A2</span>
+            </span>
+          </a>
+          <nav class="flex flex-col gap-1" aria-label="Hlavní navigace">
+            {nav.map((item) => <SideLink key={item.to} item={item} path={path} />)}
+          </nav>
+          <div class="mt-auto flex items-center gap-1">
+            <ThemeToggle />
+            <a href={href('/settings')} aria-label="Nastavení" aria-current={path === '/settings' ? 'page' : undefined}
+              class={`flex h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold ${path === '/settings' ? 'bg-brand-700 text-white' : 'text-ink-soft hover:bg-surface-2'}`}>
+              <Icon name="sliders" class="h-5 w-5" />Nastavení
+            </a>
+          </div>
+        </div>
+      </aside>
 
-      <main class="flex-1 px-4 py-6 pb-28 md:py-8 md:pb-8">{children}</main>
+      <div class="flex min-w-0 flex-1 flex-col">
+        {/* Mobil: horní lišta */}
+        <header class="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-app/85 px-4 pt-1 backdrop-blur-md md:hidden">
+          <a href={href('/')} class="flex min-h-12 items-center gap-2.5">
+            <Logo class="h-8 w-8" />
+            <span class="text-lg font-extrabold">Aprender</span>
+          </a>
+          <div class="flex items-center">
+            <ThemeToggle />
+            <a href={href('/settings')} aria-label="Nastavení" class="flex h-11 w-11 items-center justify-center rounded-full text-ink-soft hover:bg-surface-2">
+              <Icon name="sliders" class="h-5 w-5" />
+            </a>
+          </div>
+        </header>
+
+        <main id="obsah" tabIndex={-1} class="flex-1 px-4 py-6 pb-32 outline-none md:px-0 md:py-10 md:pb-10">
+          <div key={path} class="page-in">{children}</div>
+        </main>
+      </div>
     </div>
 
     <ToastHost path={path} />
 
     {/* Mobil: spodní navigace */}
-    <nav
-      class="fixed inset-x-0 bottom-0 z-10 flex border-t border-stone-200 bg-stone-50/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-stone-800 dark:bg-stone-950/95"
-      aria-label="Hlavní navigace"
-    >
-      {nav.map((item) => <NavLink key={item.to} item={item} path={path} vertical={false} />)}
+    <nav class="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden" aria-label="Hlavní navigace">
+      {nav.map((item) => <TabLink key={item.to} item={item} path={path} />)}
     </nav>
   </div>
 );

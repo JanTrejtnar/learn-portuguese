@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks';
+import { Loading } from '../components/Loading';
 import { unitCode, units, unitUnlocked } from '../content';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
@@ -24,7 +25,7 @@ const LEVEL_TABS = ['A1', 'A2'] as const;
 export const MapPage = () => {
   const progress = useProgress();
   const [chosen, setChosen] = useState<(typeof LEVEL_TABS)[number] | null>(null);
-  if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
+  if (!progress) return <Loading />;
 
   // Výchozí záložka = úroveň, ve které právě jsi (první nesplněná odemčená jednotka).
   const current = units.find((u) => u.city && !progress.tests.get(u.id)?.passed && unitUnlocked(u.id, progress.tests));
@@ -42,23 +43,23 @@ export const MapPage = () => {
   const labelLeft = (name: string) => ['Sintra', 'Porto', 'Óbidos'].includes(name);
 
   const colors: Record<State, { fill: string; stroke: string }> = {
-    done: { fill: '#16a34a', stroke: '#14532d' },
-    current: { fill: '#0d9488', stroke: '#134e4a' },
-    open: { fill: '#0d9488', stroke: '#134e4a' },
-    locked: { fill: '#a8a29e', stroke: '#57534e' },
+    done: { fill: 'var(--color-brand-600)', stroke: 'var(--color-brand-900)' },
+    current: { fill: 'var(--color-flag-600)', stroke: 'var(--color-flag-900)' },
+    open: { fill: 'var(--color-brand-600)', stroke: 'var(--color-brand-900)' },
+    locked: { fill: 'var(--line-strong)', stroke: 'var(--muted)' },
   };
 
   return (
     <div>
       <h1 class="text-2xl font-bold">Cesta Portugalskem 🇵🇹</h1>
-      <p class="mt-1 text-stone-600 dark:text-stone-400">
+      <p class="mt-1 text-ink-soft">
         Každá jednotka je jedno město. Splň test jednotky a cesta pokračuje dál. Hotovo ({level}): <b>{doneCount} / {mapped.length}</b>.
       </p>
 
       <div class="mt-4 flex gap-2" role="tablist" aria-label="Úroveň">
         {LEVEL_TABS.map((l) => (
           <button key={l} type="button" role="tab" aria-selected={level === l} onClick={() => setChosen(l)}
-            class={`rounded-xl px-4 py-2 font-semibold ${level === l ? 'bg-brand-700 text-white' : 'border border-stone-300 dark:border-stone-700'}`}>
+            class={`rounded-xl px-4 py-2 font-semibold ${level === l ? 'bg-brand-700 text-white' : 'border border-line-strong'}`}>
             {l}
           </button>
         ))}
@@ -70,13 +71,13 @@ export const MapPage = () => {
             <span class="block text-sm opacity-80">Právě jsi v městě</span>
             <span class="block text-lg font-bold">📍 {firstOpen.city!.name} · {firstOpen.title}</span>
           </span>
-          <span class="shrink-0 rounded-xl bg-white px-3 py-1.5 text-sm font-semibold text-brand-700">Pokračovat</span>
+          <span class="shrink-0 rounded-xl bg-surface px-3 py-1.5 text-sm font-semibold text-brand-700">Pokračovat</span>
         </a>
       )}
 
-      <div class="mx-auto mt-6 max-w-sm rounded-3xl border border-stone-200 bg-sky-50 p-3 dark:border-stone-800 dark:bg-stone-900">
+      <div class="mx-auto mt-6 max-w-sm rounded-3xl border border-line bg-surface-2 p-3 shadow-soft">
         <svg viewBox={`-50 0 ${W + 50} ${H}`} class="h-auto w-full" role="img" aria-label="Mapa Portugalska s městy jednotek">
-          <path d={outlinePath} fill="#ecfccb" stroke="#84cc16" stroke-width="1.5" stroke-linejoin="round" class="dark:opacity-80" />
+          <path d={outlinePath} stroke-width="1.5" stroke-linejoin="round" class="fill-brand-100 stroke-brand-400 dark:fill-brand-900 dark:stroke-brand-700" />
           {/* trasa */}
           {pts.slice(0, -1).map(({ u, p }, i) => {
             const next = pts[i + 1]!;
@@ -86,7 +87,7 @@ export const MapPage = () => {
             const d = long
               ? `M${p[0]} ${p[1]} Q${Math.max(p[0], next.p[0]) + 95} ${(p[1] + next.p[1]) / 2} ${next.p[0]} ${next.p[1]}`
               : `M${p[0]} ${p[1]} L${next.p[0]} ${next.p[1]}`;
-            return <path key={u.id} d={d} fill="none" stroke={done ? '#16a34a' : '#a8a29e'} stroke-width="2.5" stroke-dasharray={done ? undefined : '5 5'} stroke-linecap="round" />;
+            return <path key={u.id} d={d} fill="none" stroke={done ? 'var(--color-brand-600)' : 'var(--line-strong)'} stroke-width="2.5" stroke-dasharray={done ? undefined : '5 5'} stroke-linecap="round" />;
           })}
           {pts.map(({ u, p }) => {
             const st = state(u.id);
@@ -97,7 +98,7 @@ export const MapPage = () => {
                 {st === 'current' && <circle cx={p[0]} cy={p[1]} r="14" fill={col.fill} opacity="0.25"><animate attributeName="r" values="9;17;9" dur="2s" repeatCount="indefinite" /></circle>}
                 <circle cx={p[0]} cy={p[1]} r="9" fill={col.fill} stroke={col.stroke} stroke-width="1.5" />
                 <text x={p[0]} y={p[1] + 3.5} text-anchor="middle" font-size="10" font-weight="700" fill="#fff">{st === 'done' ? '✓' : st === 'locked' ? '🔒' : u.order}</text>
-                <text x={p[0] + (left ? -13 : 13)} y={p[1] + 4} text-anchor={left ? 'end' : 'start'} font-size="11" font-weight="600" fill={st === 'locked' ? '#78716c' : '#134e4a'}>{u.city!.name}</text>
+                <text x={p[0] + (left ? -13 : 13)} y={p[1] + 4} text-anchor={left ? 'end' : 'start'} font-size="11" font-weight="600" fill={st === 'locked' ? 'var(--muted)' : 'var(--ink)'}>{u.city!.name}</text>
               </a>
             );
           })}
@@ -109,11 +110,11 @@ export const MapPage = () => {
           const st = state(u.id);
           return (
             <li key={u.id}>
-              <a href={href(`/unit/${u.id}`)} class="flex items-center gap-3 rounded-2xl border border-stone-200 bg-white p-3 dark:border-stone-800 dark:bg-stone-900">
+              <a href={href(`/unit/${u.id}`)} class="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3">
                 <span class="text-2xl" aria-hidden="true">{st === 'done' ? '✅' : st === 'locked' ? '🔒' : '📍'}</span>
                 <span class="min-w-0">
                   <span class="block font-semibold">{u.city!.name}</span>
-                  <span class="block text-sm text-stone-600 dark:text-stone-400">Jednotka {unitCode(u)}: {u.title}</span>
+                  <span class="block text-sm text-ink-soft">Jednotka {unitCode(u)}: {u.title}</span>
                 </span>
               </a>
             </li>

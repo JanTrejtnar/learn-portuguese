@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { Loading } from '../components/Loading';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { Flashcard } from '../components/Flashcard';
 import { VoiceWarning } from '../components/VoiceWarning';
@@ -17,10 +18,10 @@ import type { Word } from '../types';
 import { NotFoundPage } from './NotFoundPage';
 
 const ratings: { id: Rating; label: string; key: string; tone: string }[] = [
-  { id: 'again', label: 'Znovu', key: '1', tone: 'bg-red-600 hover:bg-red-500' },
-  { id: 'hard', label: 'Těžké', key: '2', tone: 'bg-amber-600 hover:bg-amber-500' },
-  { id: 'good', label: 'Dobře', key: '3', tone: 'bg-brand-600 hover:bg-brand-500' },
-  { id: 'easy', label: 'Snadno', key: '4', tone: 'bg-sky-600 hover:bg-sky-500' },
+  { id: 'again', label: 'Znovu', key: '1', tone: 'bg-flag-600 text-white hover:bg-flag-500' },
+  { id: 'hard', label: 'Těžké', key: '2', tone: 'bg-gold-400 text-brand-950 hover:bg-gold-300' },
+  { id: 'good', label: 'Dobře', key: '3', tone: 'bg-brand-600 text-white hover:bg-brand-500' },
+  { id: 'easy', label: 'Snadno', key: '4', tone: 'bg-brand-800 text-white hover:bg-brand-700' },
 ];
 
 const Toggle = ({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) => (
@@ -34,7 +35,7 @@ export const StudyPage = ({ deckId, mode }: { deckId: string; mode: 'srs' | 'fre
   const deck = getDeck(deckId);
   const progress = useProgress();
   if (!deck) return <NotFoundPage />;
-  if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
+  if (!progress) return <Loading />;
   return <Session key={`${mode}-${deckId}`} title={deck.title} deckId={deckId} words={deckId === 'all' ? unlockedWords(progress.tests) : deck.words} mode={mode} progress={progress} />;
 };
 
@@ -141,12 +142,12 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
       <Breadcrumb items={[{ label: 'Kartičky', to: '/cards' }, { label: title }]} />
       <VoiceWarning />
 
-      {!srs && <p class="mb-3 rounded-lg bg-stone-100 px-3 py-2 text-xs text-stone-600 dark:bg-stone-800 dark:text-stone-300">Volné procvičování: pokrok se neukládá.</p>}
+      {!srs && <p class="mb-3 rounded-lg bg-surface-2 px-3 py-2 text-xs text-ink-soft">Volné procvičování: pokrok se neukládá.</p>}
 
       <div class="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2">
         <button
           type="button"
-          class="rounded-lg border border-stone-300 px-3 py-1 text-sm hover:border-brand-500 dark:border-stone-700"
+          class="rounded-lg border border-line-strong px-3 py-1 text-sm hover:border-brand-500"
           onClick={() => update({ direction: settings.direction === 'pt-cs' ? 'cs-pt' : 'pt-cs' })}
         >
           ⇄ {settings.direction === 'pt-cs' ? 'PT → CZ' : 'CZ → PT'}
@@ -156,17 +157,17 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
       </div>
 
       {srs && total > 0 && (
-        <p class="mb-3 text-sm text-stone-600 dark:text-stone-400">
+        <p class="mb-3 text-sm text-ink-soft">
           K opakování: <b>{init.dueCount}</b> · nové: <b>{init.newCount}</b>
         </p>
       )}
 
       {total > 0 && (
         <div class="mb-4" aria-label={`Hotovo ${done} z ${total}`}>
-          <div class="h-2 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
+          <div class="h-2 overflow-hidden rounded-full bg-track">
             <div class="h-full bg-brand-500 transition-all" style={{ width: `${(done / total) * 100}%` }} />
           </div>
-          <p class="mt-1 text-right text-xs text-stone-500">{done} / {total}</p>
+          <p class="mt-1 text-right text-xs text-muted">{done} / {total}</p>
         </div>
       )}
 
@@ -176,7 +177,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
           {flipped ? (
             <div class="mt-4 grid grid-cols-4 gap-2">
               {ratings.map((r) => (
-                <button key={r.id} type="button" onClick={() => rate(r.id)} class={`rounded-xl px-2 py-3 text-sm font-semibold text-white ${r.tone}`}>
+                <button key={r.id} type="button" onClick={() => rate(r.id)} class={`min-h-14 rounded-xl px-2 py-3 text-sm font-bold shadow-soft ${r.tone}`}>
                   {r.label}
                   <span class="block text-[10px] font-normal opacity-80">{intervals ? intervals[r.id] : `[${r.key}]`}</span>
                 </button>
@@ -187,20 +188,20 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
               Otočit
             </button>
           )}
-          <p class="mt-3 hidden text-center text-xs text-stone-400 md:block">Mezerník = otočit · 1–4 = hodnocení · P = přehrát</p>
+          <p class="mt-3 hidden text-center text-xs text-muted md:block">Mezerník = otočit · 1–4 = hodnocení · P = přehrát</p>
         </>
       )}
 
       {(sessionDone || nothingToDo) && (
-        <div class="rounded-3xl border border-stone-200 bg-white p-8 text-center dark:border-stone-800 dark:bg-stone-900">
+        <div class="rounded-3xl border border-line bg-surface p-8 text-center">
           <div class="text-5xl" aria-hidden="true">{sessionDone ? '🎉' : '✅'}</div>
           <h2 class="mt-3 text-xl font-bold">{sessionDone ? 'Hotovo! Muito bem!' : 'Na dnes máš splněno'}</h2>
           {sessionDone ? (
-            <p class="mt-2 text-sm text-stone-600 dark:text-stone-400">
+            <p class="mt-2 text-sm text-ink-soft">
               Znovu: {counts.again} · Těžké: {counts.hard} · Dobře: {counts.good} · Snadno: {counts.easy}
             </p>
           ) : (
-            <p class="mt-2 text-sm text-stone-600 dark:text-stone-400">V tomto balíčku není nic k opakování a denní limit nových karet je vyčerpán.</p>
+            <p class="mt-2 text-sm text-ink-soft">V tomto balíčku není nic k opakování a denní limit nových karet je vyčerpán.</p>
           )}
           {srs && sessionXp > 0 && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{sessionXp} XP ⭐</p>}
           <div class="mt-6 flex flex-wrap justify-center gap-3">
@@ -213,9 +214,9 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
               <button type="button" onClick={() => restart()} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Znovu celý balíček</button>
             )}
             {srs && (
-              <a href={href(`/free/${deckId}`)} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Volně procvičit</a>
+              <a href={href(`/free/${deckId}`)} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Volně procvičit</a>
             )}
-            <a href={href('/stats')} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Můj pokrok</a>
+            <a href={href('/stats')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Můj pokrok</a>
           </div>
         </div>
       )}

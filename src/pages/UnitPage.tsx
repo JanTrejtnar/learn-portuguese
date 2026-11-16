@@ -30,12 +30,12 @@ export const UnitPage = ({ id }: { id: string }) => {
         <div class="py-10 text-center">
           <div class="text-5xl" aria-hidden="true">🔒</div>
           <h1 class="mt-3 text-xl font-bold">{unit.title} je zamčená</h1>
-          <p class="mx-auto mt-2 max-w-sm text-stone-600 dark:text-stone-400">
+          <p class="mx-auto mt-2 max-w-sm text-ink-soft">
             Odemkneš ji splněním testu jednotky „{prev.title}“ (aspoň 80 %).
           </p>
           <div class="mt-6 flex flex-wrap justify-center gap-3">
             <a href={href(`/quiz/${prev.id}`)} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Spustit test</a>
-            <button type="button" onClick={unlock} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Už to umím, odemknout</button>
+            <button type="button" onClick={unlock} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Už to umím, odemknout</button>
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@ export const UnitPage = ({ id }: { id: string }) => {
         <span class="text-4xl" aria-hidden="true">{unit.emoji}</span>
         <div>
           <h1 class="text-2xl font-bold">{unit.title}</h1>
-          <p class="text-stone-600 dark:text-stone-400">{unit.subtitle}</p>
+          <p class="text-ink-soft">{unit.subtitle}</p>
         </div>
       </div>
 
@@ -66,12 +66,12 @@ export const UnitPage = ({ id }: { id: string }) => {
           <li key={l.id}>
             <a
               href={href(`/lesson/${l.id}`)}
-              class="flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-4 hover:border-brand-500 dark:border-stone-800 dark:bg-stone-900"
+              class="flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 hover:border-brand-500"
             >
               <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 font-bold text-brand-700">{i + 1}</span>
               <span class="min-w-0">
                 <span class="block font-semibold">{l.title}</span>
-                <span class="block text-sm text-stone-600 dark:text-stone-400">{l.subtitle} · {l.words.length} slov</span>
+                <span class="block text-sm text-ink-soft">{l.subtitle} · {l.words.length} slov</span>
               </span>
             </a>
           </li>

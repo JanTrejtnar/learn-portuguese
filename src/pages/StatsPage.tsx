@@ -1,4 +1,5 @@
 import { allWords } from '../content';
+import { Loading } from '../components/Loading';
 import { DAY, dateKey, dayStart, maturity, type Maturity } from '../lib/srs';
 import { useProgress } from '../lib/useProgress';
 import { Breadcrumb } from '../components/Breadcrumb';
@@ -9,20 +10,20 @@ import { streakOf } from '../lib/stats';
 import { GOAL_OPTIONS, levelInfo, totalXp, xpToday } from '../lib/xp';
 
 const Tile = ({ label, value, hint }: { label: string; value: string | number; hint?: string }) => (
-  <div class="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+  <div class="rounded-2xl border border-line bg-surface p-4">
     <div class="text-2xl font-bold text-brand-700 dark:text-brand-100">{value}</div>
     <div class="text-sm">{label}</div>
-    {hint && <div class="text-xs text-stone-500">{hint}</div>}
+    {hint && <div class="text-xs text-muted">{hint}</div>}
   </div>
 );
 
 const labels: Record<Maturity, string> = { new: 'Nové', learning: 'Učím se', young: 'Mladé (< 21 d)', mature: 'Zvládnuté (≥ 21 d)' };
-const bar: Record<Maturity, string> = { new: 'bg-stone-300 dark:bg-stone-700', learning: 'bg-amber-500', young: 'bg-sky-500', mature: 'bg-brand-600' };
+const bar: Record<Maturity, string> = { new: 'bg-line-strong', learning: 'bg-gold-500', young: 'bg-brand-300', mature: 'bg-brand-700' };
 
 export const StatsPage = () => {
   const progress = useProgress();
   const [settings, update] = useStudySettings();
-  if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
+  if (!progress) return <Loading />;
 
   const now = Date.now();
   const words = allWords();
@@ -69,17 +70,17 @@ export const StatsPage = () => {
           <div class="text-xl font-bold">Úroveň {lvl.level} · {lvl.name}</div>
           <div class="text-sm opacity-80">{xp} XP</div>
         </div>
-        <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-white/25"><div class="h-full bg-white" style={{ width: `${(lvl.into / lvl.span) * 100}%` }} /></div>
+        <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-white/25"><div class="h-full bg-surface" style={{ width: `${(lvl.into / lvl.span) * 100}%` }} /></div>
         <div class="mt-1 text-xs opacity-80">{lvl.span - lvl.into} XP do další úrovně</div>
       </div>
 
-      <div class="mt-4 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+      <div class="mt-4 rounded-2xl border border-line bg-surface p-4">
         <div class="font-semibold">Denní cíl: {xpToday(progress.days, now)} / {settings.dailyGoal} XP</div>
         <div class="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Denní cíl">
           {GOAL_OPTIONS.map((g) => (
             <button key={g.xp} type="button" role="radio" aria-checked={settings.dailyGoal === g.xp} onClick={() => update({ dailyGoal: g.xp })}
-              class={`rounded-xl border-2 px-3 py-2 text-left text-sm ${settings.dailyGoal === g.xp ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-stone-200 dark:border-stone-700'}`}>
-              <b>{g.label}</b> · {g.xp} XP<span class="block text-xs text-stone-500">{g.hint}</span>
+              class={`rounded-xl border-2 px-3 py-2 text-left text-sm ${settings.dailyGoal === g.xp ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-line'}`}>
+              <b>{g.label}</b> · {g.xp} XP<span class="block text-xs text-muted">{g.hint}</span>
             </button>
           ))}
         </div>
@@ -93,7 +94,7 @@ export const StatsPage = () => {
       </div>
 
       <h2 class="mt-8 mb-3 text-lg font-semibold">Slovní zásoba ({words.length} karet)</h2>
-      <div class="flex h-4 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800" role="img" aria-label="Rozložení karet podle zralosti">
+      <div class="flex h-4 overflow-hidden rounded-full bg-track" role="img" aria-label="Rozložení karet podle zralosti">
         {(Object.keys(counts) as Maturity[]).map((m) => <div key={m} class={bar[m]} style={{ width: `${(counts[m] / words.length) * 100}%` }} />)}
       </div>
       <ul class="mt-3 grid grid-cols-2 gap-2 text-sm">
@@ -106,7 +107,7 @@ export const StatsPage = () => {
       </ul>
 
       <h2 class="mt-8 mb-3 text-lg font-semibold">Posledních 30 dní</h2>
-      <div class="flex h-28 items-end gap-0.5 rounded-2xl border border-stone-200 bg-white p-3 dark:border-stone-800 dark:bg-stone-900" role="img" aria-label="Počet hodnocení za den">
+      <div class="flex h-28 items-end gap-0.5 rounded-2xl border border-line bg-surface p-3" role="img" aria-label="Počet hodnocení za den">
         {last30.map((d) => (
           <div key={d.key} class="flex-1 rounded-t bg-brand-500" title={`${d.key}: ${d.reviews}`} style={{ height: `${d.reviews === 0 ? 2 : Math.max(6, (d.reviews / maxReviews) * 100)}%`, opacity: d.reviews === 0 ? 0.25 : 1 }} />
         ))}
@@ -115,9 +116,9 @@ export const StatsPage = () => {
       <h2 class="mt-8 mb-3 text-lg font-semibold">Předpověď na týden</h2>
       <div class="grid grid-cols-7 gap-1 text-center text-xs">
         {forecast.map((n, i) => (
-          <div key={i} class="rounded-lg border border-stone-200 bg-white p-2 dark:border-stone-800 dark:bg-stone-900">
+          <div key={i} class="rounded-lg border border-line bg-surface p-2">
             <div class="text-base font-bold">{n}</div>
-            <div class="text-stone-500">{wd[i]}</div>
+            <div class="text-muted">{wd[i]}</div>
           </div>
         ))}
       </div>
@@ -127,10 +128,10 @@ export const StatsPage = () => {
         {BADGES.map((b) => {
           const got = earned.has(b.id);
           return (
-            <li key={b.id} class={`rounded-2xl border p-3 text-center ${got ? 'border-brand-500 bg-white dark:bg-stone-900' : 'border-stone-200 opacity-50 dark:border-stone-800'}`} title={b.desc}>
+            <li key={b.id} class={`rounded-2xl border p-3 text-center ${got ? 'border-brand-500 bg-surface' : 'border-line opacity-50'}`} title={b.desc}>
               <div class={`text-3xl ${got ? '' : 'grayscale'}`} aria-hidden="true">{got ? b.emoji : '🔒'}</div>
               <div class="mt-1 text-sm font-semibold">{b.title}</div>
-              <div class="text-xs text-stone-500">{b.desc}</div>
+              <div class="text-xs text-muted">{b.desc}</div>
             </li>
           );
         })}
@@ -141,9 +142,9 @@ export const StatsPage = () => {
           <h2 class="mt-8 mb-3 text-lg font-semibold">Nejtěžší slovíčka</h2>
           <ul class="space-y-1 text-sm">
             {hardest.map(({ w, lapses }) => (
-              <li key={w.id} class="flex justify-between rounded-lg bg-white px-3 py-2 dark:bg-stone-900">
+              <li key={w.id} class="flex justify-between rounded-lg bg-surface px-3 py-2">
                 <span lang="pt-PT" class="font-medium">{w.pt}</span>
-                <span class="text-stone-500">{w.cs} · zapomenuto {lapses}×</span>
+                <span class="text-muted">{w.cs} · zapomenuto {lapses}×</span>
               </li>
             ))}
           </ul>
