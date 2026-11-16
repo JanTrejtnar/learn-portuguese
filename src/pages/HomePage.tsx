@@ -7,6 +7,8 @@ import { xpToday } from '../lib/xp';
 import { Icon } from '../components/Icon';
 import { PlayerStrip } from '../components/PlayerStrip';
 import { href } from '../router';
+import { useEffect } from 'preact/hooks';
+import { isOnboarded } from './WelcomePage';
 
 const LEVELS = [
   { level: 'A1', title: 'A1 — Začátečník' },
@@ -34,9 +36,10 @@ const TodayCard = ({ progress }: { progress: Progress }) => {
       <div class="pointer-events-none absolute -bottom-9 -right-3 h-24 w-24 rounded-full border-[10px] border-flag-600/55" aria-hidden="true" />
       <div class="relative">
         <div class="text-sm font-semibold uppercase tracking-wide text-brand-100">Dnešní plán</div>
-        <div class="mt-1 text-2xl font-extrabold">{todo > 0 ? `${due} k opakování · ${fresh} nových` : 'Na dnes hotovo 🎉'}</div>
+        <div class="mt-1 text-2xl font-extrabold">{fresh > 0 && progress.cards.size === 0 ? 'Začni první lekcí' : todo > 0 ? `${due} k opakování · ${fresh} nových` : 'Na dnes hotovo 🎉'}</div>
         <div class="mt-4 flex flex-wrap gap-3">
-          {todo > 0 && <a href={href('/cards/all')} class={btn}>Začít<Icon name="arrow" class="h-5 w-5" /></a>}
+          {progress.cards.size === 0 && <a href={href('/lesson/a1-u1-l1')} class={btn}>Otevřít lekci<Icon name="arrow" class="h-5 w-5" /></a>}
+          {progress.cards.size > 0 && todo > 0 && <a href={href('/cards/all')} class={btn}>Začít<Icon name="arrow" class="h-5 w-5" /></a>}
           {todo === 0 && goalMissing && <a href={href('/quiz/quick')} class={btn}>⚡ Rychlý kvíz za XP</a>}
           {todo === 0 && !goalMissing && <a href={href('/roleplay')} class={btn}>🎭 Zkus scénář<Icon name="arrow" class="h-5 w-5" /></a>}
         </div>
@@ -60,6 +63,9 @@ const quick = [
 export const HomePage = () => {
   const progress = useProgress();
   const g = greeting();
+  useEffect(() => {
+    if (progress && progress.cards.size === 0 && progress.days.size === 0 && !isOnboarded()) window.location.hash = '#/welcome';
+  }, [progress]);
   // První odemčená a nesplněná jednotka = „další krok“
   const current = progress ? units.find((u) => unitUnlocked(u.id, progress.tests) && !progress.tests.get(u.id)?.passed) : undefined;
   return (
@@ -111,9 +117,6 @@ export const HomePage = () => {
       </section>
     ))}
 
-    <p class="mt-8 rounded-2xl bg-brand-50 p-4 text-sm text-brand-900 dark:bg-brand-900/50 dark:text-brand-100">
-      🛠️ Úroveň A2 se postupně doplňuje, další jednotky přibývají.
-    </p>
   </div>
   );
 };

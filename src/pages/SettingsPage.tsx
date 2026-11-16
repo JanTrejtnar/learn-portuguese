@@ -4,6 +4,7 @@ import { BACKUP_VERSION, backupFilename, buildBackup, parseBackup, sanitizeSetti
 import { clearProgress, loadProgress, replaceProgress } from '../lib/db';
 import { useInstall } from '../lib/install';
 import { loadJson, saveJson } from '../lib/storage';
+import { LearningSettings } from '../components/LearningSettings';
 import { useTheme, type Theme } from '../lib/theme';
 
 const STUDY_KEY = 'ap:study-settings';
@@ -92,6 +93,10 @@ export const SettingsPage = () => {
             </button>
           ))}
         </div>
+      </Card>
+
+      <Card title="Učení">
+        <LearningSettings />
       </Card>
 
       <Card title="Aplikace a offline">

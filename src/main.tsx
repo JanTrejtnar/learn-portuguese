@@ -14,6 +14,10 @@ initInstallCapture();
 registerSW({
   immediate: true,
   onOfflineReady() {
+    try {
+      if (localStorage.getItem('ap:offline-told')) return;
+      localStorage.setItem('ap:offline-told', '1');
+    } catch { /* bez úložiště ukážeme oznámení vždy */ }
     toast({ emoji: '📴', title: 'Připraveno offline', text: 'Aplikace teď funguje i bez připojení k internetu.' });
   },
 });

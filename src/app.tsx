@@ -14,6 +14,7 @@ import { QuizHubPage } from './pages/QuizHubPage';
 import { QuizPage } from './pages/QuizPage';
 import { StatsPage } from './pages/StatsPage';
 import { StudyPage } from './pages/StudyPage';
+import { WelcomePage } from './pages/WelcomePage';
 import { UnitPage } from './pages/UnitPage';
 import { matchRoute, usePath } from './router';
 
@@ -39,6 +40,7 @@ export const App = () => {
       {route.name === 'speak' && <SpeakPage />}
       {route.name === 'map' && <MapPage />}
       {route.name === 'stats' && <StatsPage />}
+      {route.name === 'welcome' && <WelcomePage />}
       {route.name === 'notFound' && <NotFoundPage />}
     </Layout>
   );

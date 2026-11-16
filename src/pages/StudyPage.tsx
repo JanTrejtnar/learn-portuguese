@@ -71,9 +71,12 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
   const [init, setInit] = useState(() => initialQueue(0));
   const [queue, setQueue] = useState<Word[]>(init.queue);
   const [flipped, setFlipped] = useState(false);
+  const introduced = useRef(new Set<string>()); // nové karty, které už uživatel viděl v „učím se“ kroku
   const [counts, setCounts] = useState<Record<Rating, number>>({ again: 0, hard: 0, good: 0, easy: 0 });
   const total = init.queue.length;
   const current = queue[0];
+  // Nová karta se nejdřív jen ukáže (bez hodnocení); po prohlédnutí se vrátí na konec fronty už jako zkouška.
+  const learning = srs && !!current && !cards.current.has(current.id) && !introduced.current.has(current.id);
   const done = useMemo(() => total - new Set(queue.map((w) => w.id)).size, [queue, total]);
   const unseenLeft = words.filter((w) => !cards.current.has(w.id)).length;
 
@@ -114,6 +117,13 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     setFlipped(false);
   };
 
+  const learnNext = () => {
+    if (!current) return;
+    introduced.current.add(current.id);
+    setQueue((q) => [...q.slice(1), q[0]!]);
+    setFlipped(false);
+  };
+
   const restart = (bonus = bonusNew) => {
     const next = initialQueue(bonus);
     setInit(next);
@@ -121,6 +131,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     setFlipped(false);
     setCounts({ again: 0, hard: 0, good: 0, easy: 0 });
     setSessionXp(0);
+    introduced.current = new Set();
   };
 
   const learnMore = () => {
@@ -133,9 +144,10 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.metaKey || e.ctrlKey) return;
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
+      if (learning) { learnNext(); return; }
       setFlipped((f) => (current ? !f : f));
     } else if (['1', '2', '3', '4'].includes(e.key)) {
-      if (flipped) {
+      if (flipped && !learning) {
         const r = ratings[Number(e.key) - 1];
         if (r) rate(r.id);
       }
@@ -184,8 +196,13 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
 
       {current && (
         <>
-          <Flashcard key={current.id} word={current} flipped={flipped} direction={settings.direction} onFlip={() => setFlipped((f) => !f)} />
-          {flipped ? (
+          <Flashcard key={current.id + (learning ? '-new' : '')} word={current} flipped={flipped || learning} direction={settings.direction} onFlip={() => setFlipped((f) => !f)} />
+          {learning ? (
+            <div class="mt-4">
+              <p class="mb-2 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm"><b>Nové slovíčko.</b> Prohlédni si ho a poslechni výslovnost. Za chvíli se tě na něj zeptám.</p>
+              <button type="button" onClick={learnNext} class="w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">Rozumím, dál</button>
+            </div>
+          ) : flipped ? (
             <div class="mt-4">
               {srs && !settings.ratingHelpSeen && (
                 <div class="mb-3 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm">
@@ -222,7 +239,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
           <h2 class="mt-3 text-xl font-bold">{sessionDone ? 'Hotovo! Muito bem!' : 'Na dnes máš splněno'}</h2>
           {sessionDone ? (
             <p class="mt-2 text-sm text-ink-soft">
-              Znovu: {counts.again} · Těžké: {counts.hard} · Dobře: {counts.good} · Snadno: {counts.easy}
+              {[['Znovu', counts.again], ['Těžké', counts.hard], ['Dobře', counts.good], ['Snadno', counts.easy]].filter(([, n]) => n).map(([l, n]) => `${l}: ${n}`).join(' · ') || 'Žádné hodnocení'}
             </p>
           ) : (
             <p class="mt-2 text-sm text-ink-soft">V tomto balíčku není nic k opakování a denní limit nových karet je vyčerpán.</p>

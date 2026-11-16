@@ -15,6 +15,7 @@ export const WordInfo = ({ word }: { word: Word }) => (
       </p>
     )}
     {word.usage && <p class={word.literal ? 'mt-2' : ''}>{word.usage}</p>}
+    <p class="mt-2 text-xs text-muted">Vysvětlení zatím nezkontroloval rodilý mluvčí.</p>
     {word.register && (
       <p class="mt-2">
         <span class="rounded-full bg-gold-400/20 px-2 py-0.5 text-xs font-semibold">{registerLabel[word.register]}</span>

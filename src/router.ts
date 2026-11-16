@@ -22,7 +22,7 @@ export const usePath = (): string => {
 export const href = (path: string): string => `#${path}`;
 
 export interface Match {
-  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'map' | 'practice' | 'roleplayHub' | 'roleplay' | 'pairs' | 'speak' | 'settings' | 'notFound';
+  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'map' | 'practice' | 'roleplayHub' | 'roleplay' | 'pairs' | 'speak' | 'settings' | 'welcome' | 'notFound';
   params: Record<string, string>;
 }
 
@@ -45,6 +45,7 @@ export const matchRoute = (path: string): Match => {
   const rp = /^\/roleplay\/([\w-]+)$/.exec(path);
   if (rp) return { name: 'roleplay', params: { id: rp[1]! } };
   if (path === '/pairs') return { name: 'pairs', params: {} };
+  if (path === '/welcome') return { name: 'welcome', params: {} };
   if (path === '/settings') return { name: 'settings', params: {} };
   if (path === '/speak') return { name: 'speak', params: {} };
   if (path === '/map') return { name: 'map', params: {} };
