@@ -22,7 +22,7 @@ export const unit8: Unit = {
         w('a2u8l1-na-minha', 'Na minha opinião…', 'Podle mého názoru…', { pos: 'phrase' }),
         w('a2u8l1-concordo', 'Concordo.', 'Souhlasím.', { pos: 'phrase' }),
         w('a2u8l1-nao-concordo', 'Não concordo.', 'Nesouhlasím.', { pos: 'phrase' }),
-        w('a2u8l1-estou-de-acordo', 'Estou de acordo.', 'Jsem srozuměn(a).', { pos: 'phrase' }),
+        w('a2u8l1-estou-de-acordo', 'Estou de acordo.', 'Souhlasím.', { pos: 'phrase' }),
         w('a2u8l1-tens-razao', 'Tens razão.', 'Máš pravdu.', { pos: 'phrase', note: 'Zdvořile: „Tem razão.“' }),
         w('a2u8l1-claro-que-sim', 'Claro que sim.', 'Jistě, že ano.', { pos: 'phrase' }),
         w('a2u8l1-claro-que-nao', 'Claro que não.', 'Samozřejmě, že ne.', { pos: 'phrase' }),
@@ -70,7 +70,7 @@ export const unit8: Unit = {
       words: [
         w('a2u8l2-porque-e-que', 'Porque é que…?', 'Proč…?', { pos: 'phrase', example: { pt: 'Porque é que estás triste?', cs: 'Proč jsi smutný?' } }),
         w('a2u8l2-porque', 'porque', 'protože', { pos: 'adv', example: { pt: 'Estou cansado porque trabalhei muito.', cs: 'Jsem unavený, protože jsem hodně pracoval.' } }),
-        w('a2u8l2-porque-acento', 'Porquê?', 'Proč? (samostatně)', { pos: 'adv', note: 'Samostatné „porquê“ má čárku.' }),
+        w('a2u8l2-porque-acento', 'Porquê?', 'Proč? (samostatně)', { pos: 'adv', note: 'Samostatné „porquê“ má stříšku (ê).' }),
         w('a2u8l2-por-isso', 'por isso', 'proto', { pos: 'phrase' }),
         w('a2u8l2-alem-disso', 'além disso', 'kromě toho', { pos: 'phrase' }),
         w('a2u8l2-por-exemplo', 'por exemplo', 'například', { pos: 'phrase' }),
@@ -85,7 +85,7 @@ export const unit8: Unit = {
       grammar: {
         title: 'Porque, porquê, por isso',
         body: [
-          'Otázka „Proč?“ je v mluvě nejčastěji „Porque é que…?“: „Porque é que chegaste tarde?“ Samotné „Proč?“ je „Porquê?“ (s čárkou). Odpověď: „Porque…“ (protože) bez čárky.',
+          'Otázka „Proč?“ je v mluvě nejčastěji „Porque é que…?“: „Porque é que chegaste tarde?“ Samotné „Proč?“ je „Porquê?“ (se stříškou). Odpověď: „Porque…“ (protože) bez stříšky.',
           'Následek vyjádříš „por isso“ (proto): „Choveu, por isso fiquei em casa.“ Další spojovací výrazy: além disso (kromě toho), por exemplo (například), no entanto (nicméně).',
         ],
         table: {
@@ -148,7 +148,7 @@ export const unit8: Unit = {
       cloze: [
         c('Ultimamente eu ___ trabalhado muito.', 'V poslední době hodně pracuji.', 'tenho', ['tive', 'tinha']),
         c('Tu ___ estado doente?', 'Poslední dobou jsi nemocný?', 'tens', ['tiveste', 'tinhas']),
-        c('Eles têm ___ muito.', 'Hodně cestovali (poslední dobou).', 'viajado', ['viajar', 'viajam']),
+        c('Eles têm ___ muito.', 'Poslední dobou hodně cestují.', 'viajado', ['viajar', 'viajam']),
         c('Tenho ___ o jantar todos os dias.', 'Poslední dobou vařím večeři každý den.', 'feito', ['fazer', 'fiz']),
         c('Temos ___ muitos filmes.', 'Poslední dobou jsme viděli hodně filmů.', 'visto', ['ver', 'vi']),
         c('Boa ___ no exame!', 'Hodně štěstí u zkoušky!', 'sorte', ['sorteio', 'sortes']),

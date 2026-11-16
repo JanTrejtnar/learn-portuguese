@@ -49,7 +49,7 @@ export const unit6: Unit = {
       cloze: [
         c('Amanhã eu ___ ao cinema.', 'Zítra půjdu do kina.', 'vou', ['fui', 'ia']),
         c('Para a semana nós ___ viajar para o Porto.', 'Příští týden pojedeme do Porta.', 'vamos', ['fomos', 'íamos']),
-        c('Eles ___ visitar a avó.', 'Navštíví babičku.', 'vão', ['foram', 'iam']),
+        c('Amanhã eles ___ visitar a avó.', 'Zítra navštíví babičku.', 'vão', ['foram', 'iam']),
         c('Vemo-nos daqui ___ pouco.', 'Uvidíme se za chvíli.', 'a', ['de', 'em']),
         c('Penso ___ no verão.', 'Plánuji cestovat v létě.', 'viajar', ['viajo', 'viajei']),
       ],

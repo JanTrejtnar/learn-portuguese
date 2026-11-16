@@ -8,5 +8,8 @@ Všech 18 nálezů označených „chyba“ a většina „pochybných“ s vyso
 ## A1: ponecháno bez změny (čeká na rodilého mluvčího)
 Nálezy se stylem a s nízkou jistotou, např. oslovení „minha senhora“, „cais × linha“, přejmenování id `u5l1-ouvir`, logika replik v dialozích, DPH na ostrovech, „carcaça × papo-seco × molete“, rozšíření významu „muito“, „dois filhos“ a podobně. Jsou pořád v souborech `A1-*.md`.
 
-## A2 a B1
-Zpráva o kontrole je v `A2-*.md` a `B1-*.md`. Opravy zatím nejsou provedeny.
+## A2 a B1: uplatněno
+Nálezy „chyba“ s vysokou jistotou, zejména: překlady (daruji, souhlasím, 3+1), „stříška“ místo „čárka“ u porquê, nepravidelná slovesa v imperfeitu (pôr místo ir), „mais pequeno“, „à penicilina“, „se estiver sol“, tvary v tabulce zájmen a doplňování, kde „špatná“ možnost byla také správná (přidán časový údaj nebo vyměněn distraktor).
+
+## A2 a B1: ponecháno
+Pochybné a stylové nálezy, nízká jistota a zbylá doplňování s více správnými odpověďmi mimo „chyby“. Zůstávají v souborech `A2-*.md` a `B1-*.md` pro rodilého mluvčího. B1.1–2 se zpracovává, jakmile je zpráva hotová.

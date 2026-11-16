@@ -75,7 +75,7 @@ export const unit3: Unit = {
         w('a2u3l2-melhor', 'melhor', 'lepší / lépe', { pos: 'adj', note: 'Nepravidelné: bom → melhor (ne „mais bom“).' }),
         w('a2u3l2-pior', 'pior', 'horší / hůř', { pos: 'adj', note: 'Nepravidelné: mau → pior.' }),
         w('a2u3l2-maior', 'maior', 'větší', { pos: 'adj', note: 'Nepravidelné: grande → maior.' }),
-        w('a2u3l2-menor', 'menor', 'menší', { pos: 'adj', note: 'Nepravidelné: pequeno → menor.' }),
+        w('a2u3l2-menor', 'menor', 'menší', { pos: 'adj', note: 'Nepravidelné: pequeno → menor. V běžné řeči se ale často říká „mais pequeno“; „menor“ je formálnější.' }),
         w('a2u3l2-o-mais', 'o mais… de', 'nejvíc… z', { pos: 'phrase', example: { pt: 'É o hotel mais barato da cidade.', cs: 'Je to nejlevnější hotel ve městě.' } }),
         w('a2u3l2-o-melhor', 'o melhor', 'nejlepší', { pos: 'adj' }),
         w('a2u3l2-silencioso', 'silencioso / silenciosa', 'tichý / tichá', { pos: 'adj' }),
@@ -88,7 +88,7 @@ export const unit3: Unit = {
         title: 'Stupňování přídavných jmen',
         body: [
           'Většinu přídavných jmen srovnáme se „mais… do que“ (víc než), „menos… do que“ (méně než) a „tão… como“ (stejně jako). Nejvyšší stupeň: „o mais…“.',
-          'Čtyři nepravidelná: bom → melhor, mau → pior, grande → maior, pequeno → menor. Řekni „melhor“, ne „mais bom“.',
+          'Čtyři nepravidelná: bom → melhor, mau → pior, grande → maior, pequeno → menor. Řekni „melhor“, ne „mais bom“. U „pequeno“ je ale běžné i „mais pequeno“ (menor je formálnější).',
         ],
         table: {
           headers: ['Základní', 'Vyšší', 'Nejvyšší'],

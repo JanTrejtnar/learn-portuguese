@@ -52,7 +52,7 @@ export const unit1: Unit = {
         c('Ontem eu ___ o museu.', 'Včera jsem navštívil(a) muzeum.', 'visitei', ['visito', 'visitou']),
         c('Tu ___ com a Ana?', 'Mluvil jsi s Anou?', 'falaste', ['falei', 'falou']),
         c('Ela ___ um pastel de nata.', 'Ona snědla pastel de nata.', 'comeu', ['comi', 'come']),
-        c('Nós ___ com os amigos.', 'Mluvili jsme s přáteli.', 'falámos', ['falamos', 'falaram']),
+        c('Ontem nós ___ com os amigos.', 'Včera jsme mluvili s přáteli.', 'falámos', ['falamos', 'falaram']),
         c('Eles ___ às oito.', 'Odjeli v osm.', 'partiram', ['partiu', 'partimos']),
         c('Eu ___ uma carta ontem.', 'Včera jsem napsal(a) dopis.', 'escrevi', ['escreve', 'escreveste']),
       ],

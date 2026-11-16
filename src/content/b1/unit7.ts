@@ -144,7 +144,7 @@ export const unit7: Unit = {
         c('Acho que ela ___ razão.', 'Myslím, že má pravdu.', 'tem', ['tenha', 'ter']),
         c('Não acho que ele ___ razão.', 'Nemyslím si, že má pravdu.', 'tenha', ['tem', 'teve']),
         c('___ do frio, fomos à praia.', 'Navzdory zimě jsme šli na pláž.', 'Apesar', ['Embora', 'Porque']),
-        c('Concordo ___.', 'Souhlasím s tebou.', 'contigo', ['com ti', 'consigo']),
+        c('Concordo ___.', 'Souhlasím s tebou.', 'contigo', ['com ti', 'connosco']),
         c('___ chova, vamos passear.', 'I když prší, půjdeme na procházku.', 'Embora', ['Porque', 'Quando']),
       ],
       dialogue: [

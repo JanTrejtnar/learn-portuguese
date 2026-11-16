@@ -17,7 +17,7 @@ export const unit6: Unit = {
       reviewed: false,
       words: [
         wx('b1u6l1-alojamento', 'o alojamento', 'ubytování', 'noun', 'Estou à procura de alojamento no Funchal.', 'Hledám ubytování ve Funchalu.', { gender: 'm' }),
-        wx('b1u6l1-pousada', 'a pousada', 'penzion, historický hotel', 'noun', 'Ficámos numa pousada antiga.', 'Bydleli jsme v starém penzionu.', { gender: 'f' }),
+        wx('b1u6l1-pousada', 'a pousada', 'penzion, historický hotel', 'noun', 'Ficámos numa pousada antiga.', 'Bydleli jsme ve starém penzionu.', { gender: 'f' }),
         wx('b1u6l1-reserva', 'a reserva', 'rezervace', 'noun', 'Tenho uma reserva em nome de Novak.', 'Mám rezervaci na jméno Novák.', { gender: 'f' }),
         wx('b1u6l1-reservar', 'reservar', 'rezervovat', 'verb', 'Quero reservar um quarto duplo.', 'Chci rezervovat dvoulůžkový pokoj.'),
         wx('b1u6l1-quarto-duplo', 'o quarto duplo', 'dvoulůžkový pokoj', 'noun', 'Há um quarto duplo disponível?', 'Je volný dvoulůžkový pokoj?', { gender: 'm' }),
@@ -150,7 +150,7 @@ export const unit6: Unit = {
         c('Compre os bilhetes ___ antecedência.', 'Kupte lístky s předstihem.', 'com', ['sem', 'em']),
       ],
       dialogue: [
-        { speaker: 'Turista', pt: 'Boa tarde. Quanto tempo vamos ficar no Funchal? O que recomenda?', cs: 'Dobrý den. Jak dlouho zůstaneme ve Funchalu? Co doporučujete?' },
+        { speaker: 'Turista', pt: 'Boa tarde. Vamos ficar três dias no Funchal. O que recomenda?', cs: 'Dobrý den. Zůstaneme ve Funchalu tři dny. Co doporučujete?' },
         { speaker: 'Rececionista', pt: 'Sugiro que visite o Monte de teleférico e não deixe de provar o bolo do caco.', cs: 'Navrhuji, abyste navštívil(a) Monte lanovkou a určitě ochutnejte bolo do caco.' },
         { speaker: 'Turista', pt: 'E para as levadas? Preciso de alguma coisa?', cs: 'A na levady? Potřebuji něco?' },
         { speaker: 'Rececionista', pt: 'Leve água, um casaco e tenha cuidado com o chão molhado. Boa caminhada!', cs: 'Vezměte si vodu, bundu a dávejte pozor na mokrou zem. Příjemnou túru!' },

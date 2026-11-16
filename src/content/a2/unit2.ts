@@ -34,7 +34,7 @@ export const unit2: Unit = {
         title: 'Pretérito imperfeito',
         body: [
           'Imperfeito popisuje, jak věci BYLY nebo co se v minulosti OPAKOVALO: zvyky, vlastnosti, pozadí příběhu. Ve větě si často všimneš slov jako „antigamente“, „todos os dias“, „sempre“, „muitas vezes“.',
-          'Pravidelná slovesa mají koncovky -ava (na -ar) a -ia (na -er, -ir). Pozor na „nós“ s čárkou: falávamos, comíamos. Nepravidelná jsou jen čtyři: ser (era), ter (tinha), ir (ia), vir (vinha).',
+          'Pravidelná slovesa mají koncovky -ava (na -ar) a -ia (na -er, -ir). Pozor na „nós“ s čárkou: falávamos, comíamos. Nepravidelná jsou jen čtyři: ser (era), ter (tinha), vir (vinha), pôr (punha). Sloveso „ir“ má tvar „ia“, který vypadá neobvykle, ale časuje se pravidelně.',
         ],
         table: {
           headers: ['Osoba', 'falar', 'comer', 'ser', 'ter'],
@@ -52,7 +52,7 @@ export const unit2: Unit = {
         c('Ela ___ muitos amigos.', 'Měla spoustu kamarádů.', 'tinha', ['teve', 'tem']),
         c('Nós ___ à praia todos os verões.', 'Každé léto jsme chodili na pláž.', 'íamos', ['fomos', 'vamos']),
         c('Eles acordavam ___ cedo.', 'Vstávali vždy brzy.', 'sempre', ['ontem', 'anteontem']),
-        c('Eu ___ muito café.', 'Pil(a) jsem hodně kávy.', 'bebia', ['bebi', 'bebo']),
+        c('Antigamente eu ___ muito café.', 'Dříve jsem pil(a) hodně kávy.', 'bebia', ['bebi', 'bebo']),
         c('Tu ___ pequeno.', 'Byl jsi malý.', 'eras', ['foste', 'és']),
       ],
     },
@@ -94,7 +94,7 @@ export const unit2: Unit = {
         c('Morava ___ aldeia pequena.', 'Bydlel(a) jsem v malé vesnici.', 'numa', ['num', 'nuns']),
         c('Vivia ___ apartamento.', 'Žil(a) jsem v bytě.', 'num', ['numa', 'numas']),
         c('Costumava ___ à praia.', 'Chodíval(a) jsem na pláž.', 'ir', ['ia', 'vou']),
-        c('Eu ___ brincar na rua.', 'Zvykl(a) jsem si hrát na ulici.', 'costumava', ['costumo', 'costumei']),
+        c('Eu ___ brincar na rua.', 'Hrával(a) jsem si na ulici.', 'costumava', ['costumo', 'costumei']),
         c('Eles eram muito ___.', 'Byli velmi šťastní.', 'felizes', ['feliz', 'felizs']),
       ],
       dialogue: [

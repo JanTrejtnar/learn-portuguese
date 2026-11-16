@@ -52,7 +52,7 @@ export const unit4: Unit = {
         c('É importante nós ___ cedo.', 'Je důležité, abychom přišli brzy.', 'chegarmos', ['chegar', 'chegamos']),
         c('Pedi ao chefe para eu ___ mais cedo.', 'Požádal(a) jsem šéfa, abych mohl(a) odejít dřív.', 'sair', ['saio', 'saímos']),
         c('Ao ___ à empresa, falei com a secretária.', 'Když jsem přišel (přišla) do firmy, mluvil(a) jsem se sekretářkou.', 'chegar', ['chegares', 'chegamos']),
-        c('Eles saíram sem ___ nada.', 'Odešli, aniž by něco řekli.', 'dizerem', ['dizer', 'dizem']),
+        c('Eles saíram sem ___ nada.', 'Odešli, aniž by něco řekli.', 'dizerem', ['dizem', 'disseram']),
         c('É melhor tu ___ o currículo.', 'Je lepší, abys poslal(a) životopis.', 'enviares', ['enviar', 'envias']),
         c('Para vocês ___ bem, têm de estudar.', 'Aby se vám dařilo, musíte se učit.', 'estarem', ['estar', 'estão']),
       ],
@@ -82,7 +82,7 @@ export const unit4: Unit = {
         title: 'Vztažné věty: que, quem, onde',
         body: [
           '„Que“ je nejčastější vztažné zájmeno (osoba i věc): „O curso que escolhi é difícil.“ Po předložce se pro osoby používá „quem“: „O professor com quem falei.“ Pro místo je „onde“: „A cidade onde estudo.“',
-          'Pro „jehož“ se používá „cujo/cuja/cujos/cujas“, shodné s tím, co patří: „O aluno cuja nota é alta.“ Pro věc po předložce: „o qual / a qual“: „O curso para o qual me inscrevi.“',
+          'Pro „jehož“ se používá „cujo/cuja/cujos/cujas“, shodné s tím, co patří: „O aluno cuja nota é alta.“ Pro věc po předložce: „o qual / a qual“: „O curso no qual me inscrevi.“',
         ],
         table: {
           headers: ['Zájmeno', 'Význam', 'Příklad'],
@@ -129,7 +129,7 @@ export const unit4: Unit = {
         title: 'Infinitivo pessoal po předložkách',
         body: [
           'Po předložkách a výrazech jako „para, sem, ao, antes de, depois de, em vez de, por“ dává infinitivo pessoal smysl, když podmět patří jinému než hlavní větě: „Trabalhámos muito para eles ficarem contentes.“',
-          'Je-li podmět stejný, použije se obyčejný infinitiv: „Estudo para passar.“ A pozor: „ao“ + infinitiv = „když / jakmile“: „Ao sair, fecha a porta.“',
+          'Je-li podmět stejný, obvykle stačí obyčejný infinitiv (ohnutý tvar je možný, zejména před hlavní větou): „Estudo para passar.“ A pozor: „ao“ + infinitiv = „když / jakmile“: „Ao sair, fecha a porta.“',
         ],
         table: {
           headers: ['Stejný podmět', 'Jiný podmět'],
