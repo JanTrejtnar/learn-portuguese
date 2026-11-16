@@ -65,3 +65,16 @@ test('odznaky se odvozují z pokroku', () => {
   assert.ok(!earned.includes('a1-done') && !earned.includes('words-10'));
   assert.equal(new Set(BADGES.map((b) => b.id)).size, BADGES.length);
 });
+
+test('A2 Completo vyžaduje všech 8 jednotek A2, A1 Completo jen A1', () => {
+  const a1 = Array.from({ length: 8 }, (_, i) => ({ id: `a1-u${i + 1}`, level: 'A1' }));
+  const a2 = Array.from({ length: 8 }, (_, i) => ({ id: `a2-u${i + 1}`, level: 'A2' }));
+  const passed = (ids: string[]) => new Map(ids.map((id) => [id, { id, passed: true, best: 0.9, attempts: 1, last: 1 }]));
+  const prog = (ids: string[]): any => ({ cards: new Map(), days: new Map(), tests: passed(ids) });
+  const earned = (ids: string[]) => BADGES.filter((b) => b.earned(badgeContext(prog(ids), [...a1, ...a2]))).map((b) => b.id);
+  assert.ok(earned(a1.map((u) => u.id)).includes('a1-done'));
+  assert.ok(!earned(a1.map((u) => u.id)).includes('a2-done'));
+  assert.ok(!earned([...a1, ...a2.slice(0, 7)].map((u) => u.id)).includes('a2-done'));
+  assert.ok(earned([...a1, ...a2].map((u) => u.id)).includes('a2-done'));
+  assert.ok(!earned(a2.map((u) => u.id)).includes('a1-done'));
+});

@@ -188,7 +188,19 @@ export const generateQuiz = (opts: GenerateOptions): Question[] => {
   const nextId = () => `q${n++}`;
 
   // 1× přiřazování párů
-  const matchWords = shuffle(words.filter(isMatchable), rng).slice(0, 5);
+  // Páry musí být jednoznačné: žádné dvě stejné portugalské ani české strany.
+  const matchWords: Word[] = [];
+  const usedPt = new Set<string>();
+  const usedCs = new Set<string>();
+  for (const word of shuffle(words.filter(isMatchable), rng)) {
+    const pt = word.pt.toLowerCase();
+    const cs = word.cs.toLowerCase();
+    if (usedPt.has(pt) || usedCs.has(cs)) continue;
+    usedPt.add(pt);
+    usedCs.add(cs);
+    matchWords.push(word);
+    if (matchWords.length === 5) break;
+  }
   if (matchWords.length >= 4) {
     questions.push({ id: nextId(), kind: 'match', wordIds: matchWords.map((w) => w.id), pairs: matchWords.map((w) => ({ id: w.id, pt: w.pt, cs: w.cs })) });
   }

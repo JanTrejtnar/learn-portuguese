@@ -69,3 +69,17 @@ test('cloze: otázky vznikají z cvičení a správná odpověď sedí', () => {
     }
   }
 });
+
+test('přiřazování: páry mají unikátní obě strany i při duplicitních překladech', () => {
+  const dup = [
+    W('a', 'ultimamente', 'v poslední době'), W('b', 'nos últimos tempos', 'v poslední době'),
+    W('c', 'amanhã', 'zítra'), W('d', 'depois', 'potom'), W('e', 'ontem', 'včera'), W('f', 'hoje', 'dnes'),
+  ];
+  for (let i = 0; i < 100; i++) {
+    const qs = generateQuiz({ words: dup, pool: dup, sentences: [], count: 6, audio: true });
+    for (const q of qs) if (q.kind === 'match') {
+      assert.equal(new Set(q.pairs.map((p) => p.cs)).size, q.pairs.length);
+      assert.equal(new Set(q.pairs.map((p) => p.pt)).size, q.pairs.length);
+    }
+  }
+});

@@ -38,4 +38,4 @@ Statický build (`npm run build` → `dist/`) lze nahrát kamkoli. Workflow `.gi
 3. ✅ SRS + IndexedDB
 4. ✅ Kvízy a testy
 5. ✅ Kompletní A1 (jednotky 1–8) + gramatická cvičení (doplňování vět)
-6. ✅ Gamifikace (XP, úrovně, denní cíl, odznaky, mapa) · 7. ✅ Roleplay, minimální páry a mluvení · 8. ✅ PWA/offline, záloha, nasazení · 9. 🔄 A2 (hotové jednotky 1–6, zbývá 7–8) · 10. AI konverzace
+6. ✅ Gamifikace (XP, úrovně, denní cíl, odznaky, mapa) · 7. ✅ Roleplay, minimální páry a mluvení · 8. ✅ PWA/offline, záloha, nasazení · 9. ✅ Kompletní A2 (jednotky 1–8) · 10. AI konverzace
