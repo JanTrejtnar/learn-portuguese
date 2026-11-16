@@ -1,7 +1,8 @@
 import { useState } from 'preact/hooks';
 import type { Word } from '../types';
 import { AudioButton } from './AudioButton';
-import { hasInfo, WordInfo } from './WordInfo';
+import { InfoDialog } from './InfoDialog';
+import { hasInfo } from './WordInfo';
 
 const genderLabel: Record<string, string> = { m: 'm.', f: 'ž.', 'm/f': 'm./ž.' };
 
@@ -17,12 +18,12 @@ export const WordRow = ({ word }: { word: Word }) => {
       <span class="flex items-center gap-2 text-ink-soft">
         {word.cs}
         {hasInfo(word) && (
-          <button type="button" aria-expanded={info} aria-label="Jak se to používá?" onClick={() => setInfo((v) => !v)}
+          <button type="button" aria-haspopup="dialog" aria-label="Jak se to používá?" onClick={() => setInfo((v) => !v)}
             class={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold-400 text-sm font-bold ${info ? 'bg-gold-400/40' : 'bg-gold-400/15'}`}>ⓘ</button>
         )}
       </span>
     </div>
-    {info && hasInfo(word) && <div class="mt-2"><WordInfo word={word} /></div>}
+    {info && hasInfo(word) && <InfoDialog word={word} onClose={() => setInfo(false)} />}
     {word.gender && <span class="mt-1 inline-block text-xs text-muted">{genderLabel[word.gender]}</span>}
     {word.example && (
       <p class="mt-2 flex items-center gap-2 text-sm">

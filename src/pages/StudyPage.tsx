@@ -84,7 +84,7 @@ const Session = ({ deckId, words, mode, progress }: SessionProps) => {
   const unseenLeft = words.filter((w) => !cards.current.has(w.id)).length;
 
   // Výslovnost se přehraje jednou, když se portugalština poprvé objeví (otočení karty ji nepouští znovu).
-  const ptVisible = settings.direction === 'pt-cs' || flipped;
+  const ptVisible = settings.direction === 'pt-cs' || flipped || learning;
   useEffect(() => {
     if (current && !variant && ptVisible) speak(current.pt);
     // eslint-disable-next-line react-hooks/exhaustive-deps

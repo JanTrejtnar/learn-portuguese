@@ -1,7 +1,8 @@
 import { useState } from 'preact/hooks';
 import type { Word } from '../types';
 import { useKeydown } from '../lib/useKeydown';
-import { hasInfo, WordInfo } from './WordInfo';
+import { InfoDialog } from './InfoDialog';
+import { hasInfo } from './WordInfo';
 import { AudioButton } from './AudioButton';
 
 interface Props {
@@ -31,7 +32,7 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
       {flipped && hasInfo(word) && (
         <button
           type="button"
-          aria-expanded={info}
+          aria-haspopup="dialog"
           aria-label="Jak se to používá?"
           title="Jak se to používá?"
           onClick={(e) => { e.stopPropagation(); setInfo((v) => !v); }}
@@ -64,7 +65,7 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
               <AudioButton text={word.pt} size="md" withSlow />
             </div>
           )}
-          {info && hasInfo(word) && <div onClick={(e) => e.stopPropagation()} class="w-full"><div class="mx-auto w-full max-w-md"><WordInfo word={word} /></div></div>}
+          {info && hasInfo(word) && <InfoDialog word={word} onClose={() => setInfo(false)} />}
           {word.gender && <span class="text-xs text-muted">{{ m: 'mužský rod', f: 'ženský rod', 'm/f': 'mužský / ženský rod' }[word.gender]}</span>}
           {word.example && (
             <p class="flex items-center gap-2 text-sm">

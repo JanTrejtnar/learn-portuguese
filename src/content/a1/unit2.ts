@@ -128,7 +128,7 @@ export const unit2: Unit = {
         w('u2l3-ingles', 'inglês / inglesa', 'anglický / anglická', { pos: 'adj' }),
         w('u2l3-alemao', 'alemão / alemã', 'německý / německá', { pos: 'adj' }),
         w('u2l3-profissao', 'a profissão', 'povolání', { pos: 'noun', gender: 'f', example: { pt: 'Qual é a tua profissão?', cs: 'Jaké je tvoje povolání?' } }),
-        w('u2l3-estudante', 'o estudante / a estudante', 'student / studentka', { pos: 'noun', gender: 'm/f', note: 'Jeden tvar pro oba rody, mění se jen člen.' }),
+        w('u2l3-estudante', 'o/a estudante', 'student / studentka', { pos: 'noun', gender: 'm/f', note: 'Jeden tvar pro oba rody, mění se jen člen.' }),
         w('u2l3-professor', 'o professor / a professora', 'učitel / učitelka', { pos: 'noun', gender: 'm/f' }),
         w('u2l3-medico', 'o médico / a médica', 'lékař / lékařka', { pos: 'noun', gender: 'm/f' }),
         w('u2l3-engenheiro', 'o engenheiro / a engenheira', 'inženýr / inženýrka', { pos: 'noun', gender: 'm/f' }),

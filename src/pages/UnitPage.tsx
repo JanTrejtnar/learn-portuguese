@@ -57,9 +57,11 @@ export const UnitPage = ({ id }: { id: string }) => {
         🃏 Procvičit celou jednotku
       </a>
 
-      <a href={href(`/quiz/${unit.id}`)} class="mt-3 ml-2 inline-flex items-center gap-2 rounded-xl border border-brand-700 px-4 py-2.5 font-semibold text-brand-700 hover:bg-brand-50 dark:text-brand-100">
-        🏆 Dokončit jednotku
-      </a>
+      {!progress?.tests.get(unit.id)?.passed && (
+        <a href={href(`/quiz/${unit.id}`)} class="mt-3 ml-2 inline-flex items-center gap-2 rounded-xl border border-brand-700 px-4 py-2.5 font-semibold text-brand-700 hover:bg-brand-50 dark:text-brand-100">
+          🏆 Dokončit jednotku
+        </a>
+      )}
 
       <ol class="mt-6 space-y-3">
         {unit.lessons.map((l, i) => (

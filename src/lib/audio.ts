@@ -47,6 +47,7 @@ export const useVoiceStatus = (): VoiceStatus => {
 /** Z kartičkového textu rozdělí varianty („Obrigado / Obrigada“) na samostatné úseky; mezi nimi se udělá pauza. */
 export const speechParts = (pt: string): string[] =>
   pt
+    .replace(/^(o|a|os|as)\/(o|a|os|as) /i, '$1 ') // „o/a estudante“ → „o estudante“
     .split(/\s*\/\s*/)
     .map((p) => p.replace(/…/g, '').replace(/\s+/g, ' ').trim())
     .filter(Boolean);
@@ -70,13 +71,14 @@ export const speak = (text: string, opts: { slow?: boolean } = {}): boolean => {
   const status = computeStatus();
   if (status === 'unsupported' || status === 'no-pt-pt') return false;
 
+  const synth = window.speechSynthesis;
+  const busy = synth.speaking || synth.pending;
   stopSpeaking();
   const id = playId;
-  const synth = window.speechSynthesis;
-  const voice = findPtPtVoice();
   const parts = speechParts(text);
   const playPart = (i: number) => {
     if (id !== playId || i >= parts.length) return;
+    const voice = findPtPtVoice();
     const u = new SpeechSynthesisUtterance(parts[i]);
     u.lang = 'pt-PT';
     if (voice) u.voice = voice;
@@ -91,6 +93,19 @@ export const speak = (text: string, opts: { slow?: boolean } = {}): boolean => {
     }
     synth.speak(u);
   };
-  playPart(0);
+  // Hned po cancel() nebo při úplně prvním použití by prohlížeč první větu občas spolkl:
+  // počkáme na načtení hlasů (nejvýš 600 ms) a kratičkou chvíli po zrušení předchozího čtení.
+  const start = () => {
+    if (id !== playId) return;
+    if (busy) pauseTimer = window.setTimeout(() => playPart(0), 60);
+    else playPart(0);
+  };
+  if (synth.getVoices().length > 0) start();
+  else {
+    let started = false;
+    const go = () => { if (started) return; started = true; synth.removeEventListener('voiceschanged', go); start(); };
+    synth.addEventListener('voiceschanged', go);
+    window.setTimeout(go, 600);
+  }
   return true;
 };

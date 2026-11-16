@@ -29,7 +29,8 @@ export const SessionBar = ({ exitTo, note = 'Rozdělané cvičení se nedokonč�
 
   const leave = () => { window.location.hash = exitTo; };
   return (
-    <div class="mb-4 flex items-center gap-3">
+    <>
+    <div class="sticky top-0 z-20 -mx-4 mb-3 flex items-center gap-3 bg-app/90 px-4 py-2 backdrop-blur-md">
       {confirm ? (
         <button type="button" aria-label="Opustit cvičení" onClick={() => setOpen(true)} class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink-soft hover:bg-surface-2">
           <Icon name="close" class="h-6 w-6" />
@@ -48,18 +49,19 @@ export const SessionBar = ({ exitTo, note = 'Rozdělané cvičení se nedokonč�
       )}
       {counter && <span class="shrink-0 text-xs font-semibold text-muted">{counter}</span>}
 
-      {open && (
-        <div class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 md:items-center" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
-          <section role="dialog" aria-modal="true" aria-labelledby="leave-title" class="pop w-full max-w-sm rounded-3xl border border-line bg-surface p-5 shadow-lift">
-            <h2 id="leave-title" class="text-xl font-extrabold">Opravdu chceš odejít?</h2>
-            <p class="mt-1 text-ink-soft">{note}</p>
-            <div class="mt-4 grid gap-2">
-              <button ref={stay} type="button" onClick={() => setOpen(false)} class="min-h-12 rounded-xl bg-brand-700 px-4 py-3 font-bold text-white shadow-soft hover:bg-brand-600">Zůstat</button>
-              <button type="button" onClick={leave} class="min-h-12 rounded-xl border border-line-strong px-4 py-3 font-bold">Odejít</button>
-            </div>
-          </section>
-        </div>
-      )}
     </div>
+    {open && (
+      <div class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 md:items-center" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="leave-title" class="pop w-full max-w-sm rounded-3xl border border-line bg-surface p-5 shadow-lift">
+          <h2 id="leave-title" class="text-xl font-extrabold">Opravdu chceš odejít?</h2>
+          <p class="mt-1 text-ink-soft">{note}</p>
+          <div class="mt-4 grid gap-2">
+            <button ref={stay} type="button" onClick={() => setOpen(false)} class="min-h-12 rounded-xl bg-brand-700 px-4 py-3 font-bold text-white shadow-soft hover:bg-brand-600">Zůstat</button>
+            <button type="button" onClick={leave} class="min-h-12 rounded-xl border border-line-strong px-4 py-3 font-bold">Odejít</button>
+          </div>
+        </section>
+      </div>
+    )}
+    </>
   );
 };

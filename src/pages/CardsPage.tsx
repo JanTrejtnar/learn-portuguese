@@ -3,7 +3,6 @@ import { unitCode, units, unitUnlocked, unlockedWords } from '../content';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { WordRow } from '../components/WordRow';
 import { useProgress } from '../lib/useProgress';
-import { useStudySettings } from '../lib/settings';
 import { href } from '../router';
 
 const Row = ({ to, title, meta, emoji }: { to: string; title: string; meta: string; emoji: string }) => (
@@ -23,7 +22,6 @@ const norm = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').t
 
 export const CardsPage = () => {
   const [q, setQ] = useState('');
-  const [settings, update] = useStudySettings();
   const progress = useProgress();
   const open = (id: string) => !progress || unitUnlocked(id, progress.tests);
   const needle = norm(q.trim());
@@ -51,16 +49,6 @@ export const CardsPage = () => {
         <ul class="mt-2 space-y-2">{hits.slice(0, 30).map((w) => <WordRow key={w.pt + w.cs} word={w} />)}</ul>
       </div>
     )}
-    <label class="mt-4 flex items-center gap-2 text-sm">
-      Nových slovíček v dávce:
-      <select
-        value={settings.newPerDay}
-        onChange={(e) => update({ newPerDay: Number(e.currentTarget.value) })}
-        class="rounded-lg border border-line-strong bg-surface px-2 py-1"
-      >
-        {[5, 10, 15, 20, 30].map((n) => <option key={n} value={n}>{n}</option>)}
-      </select>
-    </label>
 
     <div class="mt-6 space-y-2">
       <Row to="/grammar" emoji="🧩" title="Gramatika: doplňování vět" meta="Věty s mezerou z lekcí, opakují se chytrým plánem" />

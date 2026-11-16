@@ -58,7 +58,7 @@ const WAVES: [number, number][] = [[-10.1, 38.9], [-10.05, 40.8], [-9.95, 42.0],
 
 // Drobné posuny kvůli čitelnosti u měst, která leží blízko sebe.
 const NUDGE: Record<string, [number, number]> = { Sintra: [-14, -22], Lisboa: [8, 12], Porto: [-4, 6], Braga: [6, -8], 'Setúbal': [-8, 6], Viseu: [-8, -8], Guarda: [16, 16] };
-const LABEL_LEFT = new Set(['Sintra', 'Porto', 'Óbidos', 'Lagos', 'Setúbal', 'Aveiro']);
+const LABEL_LEFT = new Set(['Porto', 'Óbidos', 'Lagos', 'Setúbal', 'Aveiro']);
 
 type State = 'done' | 'current' | 'open' | 'locked';
 const LEVEL_TABS = ['A1', 'A2'] as const;
@@ -128,7 +128,7 @@ export const MapPage = () => {
   });
 
   const fills: Record<State, { fill: string; ring: string }> = {
-    done: { fill: 'var(--color-brand-600)', ring: '#ffe900' },
+    done: { fill: '#ffe900', ring: '#046a38' },
     current: { fill: 'var(--surface)', ring: 'var(--color-flag-600)' },
     open: { fill: 'var(--surface)', ring: 'var(--color-brand-600)' },
     locked: { fill: 'var(--surface-2)', ring: 'var(--line-strong)' },
@@ -169,9 +169,9 @@ export const MapPage = () => {
         <div class="pop mt-2 rounded-2xl bg-gold-400 p-2 text-center text-sm font-extrabold text-brand-950 shadow-lift">🏆 Úroveň {level} dokončena! Parabéns!</div>
       )}
 
-      {/* Mapa se vejde na jednu obrazovku: výšku určuje okno, šířku poměr stran obrázku. */}
-      <div class="mt-3 flex justify-center overflow-hidden rounded-3xl border border-line shadow-lift" style={{ height: 'calc(100dvh - 19rem)', minHeight: '20rem' }}>
-        <svg viewBox="-50 -20 375 590" class="block h-full w-auto max-w-full" role="group" aria-label={`Herní mapa Portugalska, úroveň ${level}`}>
+      {/* Mapa je hlavní prvek obrazovky: plná šířka, bez okrajů; zbytek se případně doscrolluje. */}
+      <div class="-mx-4 mt-3 overflow-hidden border-y border-line shadow-lift md:mx-0 md:rounded-3xl md:border">
+        <svg viewBox="-50 -20 375 590" class="block h-auto w-full" role="group" aria-label={`Herní mapa Portugalska, úroveň ${level}`}>
           <defs>
             <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: var(--sea-1)" /><stop offset="1" style="stop-color: var(--sea-2)" /></linearGradient>
             <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color: var(--land-1)" /><stop offset="1" style="stop-color: var(--land-2)" /></linearGradient>
@@ -211,7 +211,8 @@ export const MapPage = () => {
           {positioned.map(({ u, p, st }) => {
             const left = LABEL_LEFT.has(u.city!.name);
             const name = u.city!.name;
-            const w = name.length * 5.4 + 12;
+            const w = name.length * 5.8 + 14;
+            const off = st === 'current' ? 30 : 20;
             const f = fills[st];
             const isSel = sel?.u.id === u.id;
             const result = progress.tests.get(u.id);
@@ -219,26 +220,34 @@ export const MapPage = () => {
               <g key={u.id} class="map-node" transform={`translate(${p[0]} ${p[1]})`} role="button" tabIndex={0}
                 aria-label={`${name}: ${u.title}, ${st === 'done' ? 'splněno' : st === 'locked' ? 'zamčeno' : 'k dispozici'}`}
                 onClick={() => setSelected(u.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(u.id); } }}>
-                <circle r="26" fill="transparent" />
-                {isSel && <circle r="22" fill="none" stroke="#ffe900" stroke-width="3" stroke-dasharray="6 4" class="map-flow" />}
-                {st === 'current' && <circle r="15" fill="var(--color-flag-600)" class="map-pulse" />}
-                <circle class="map-ring" r="15" fill={f.fill} stroke={f.ring} stroke-width="3.5" />
-                <text y="5.5" font-size="16" text-anchor="middle" opacity={st === 'locked' ? 0.35 : 1} aria-hidden="true">{u.city!.icon ?? u.emoji}</text>
+                <circle r="28" fill="transparent" />
+                {isSel && <circle r="25" fill="none" stroke="#ffe900" stroke-width="3" stroke-dasharray="6 4" class="map-flow" />}
+                {st === 'current' && (
+                  <>
+                    <circle r="17" fill="var(--color-flag-600)" class="map-pulse" />
+                    <circle r="27" fill="none" stroke="var(--color-flag-600)" stroke-width="3.5" stroke-dasharray="7 5" class="map-flow" />
+                    <circle r="22" fill="#ffe900" opacity=".35" class="map-pulse" />
+                  </>
+                )}
+                <g transform={st === 'current' ? 'scale(1.3)' : undefined}>
+                  <circle class="map-ring" r="15" fill={f.fill} stroke={f.ring} stroke-width={st === 'done' ? 4 : 3.5} stroke-dasharray={st === 'locked' ? '4 3' : undefined} />
+                  <text y="5.5" font-size="16" text-anchor="middle" opacity={st === 'locked' ? 0.3 : 1} aria-hidden="true">{u.city!.icon ?? u.emoji}</text>
+                </g>
                 {st === 'locked' && <text x="9" y="14" font-size="10" aria-hidden="true">🔒</text>}
                 {st === 'locked' && <g class="map-drift" aria-hidden="true"><text x="-17" y="-8" font-size="14" opacity=".9">☁️</text></g>}
                 {st === 'done' && (
                   <g aria-hidden="true">
-                    <circle cx="11" cy="-11" r="6" fill="#fff" stroke="var(--color-brand-700)" stroke-width="1.5" />
-                    <path d="M8 -11 l2.2 2.2 l4 -4.2" fill="none" stroke="var(--color-brand-700)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <circle cx="12" cy="-12" r="8" fill="#046a38" stroke="#fff" stroke-width="2" />
+                    <path d="M8 -12 l3 3 l5 -5.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
                   </g>
                 )}
-                {st === 'done' && <g transform="translate(0 25)"><Stars n={starsForResult(result)} size={0.9} /></g>}
-                <g transform={`translate(${left ? -(w + 19) : 19} -8)`} aria-hidden="true">
-                  <rect width={w} height="16" rx="8" fill="var(--surface)" stroke="var(--line)" opacity=".95" />
-                  <text x={w / 2} y="11.5" font-size="9.5" font-weight="800" text-anchor="middle" fill="var(--map-ink)">{name}</text>
+                {st === 'done' && <g transform="translate(0 26)"><Stars n={starsForResult(result)} size={1} /></g>}
+                <g transform={`translate(${left ? -(w + off) : off} -9)`} aria-hidden="true">
+                  <rect width={w} height="18" rx="9" fill={st === 'done' ? '#ffe900' : st === 'current' ? 'var(--color-flag-600)' : 'var(--surface)'} stroke={st === 'done' ? '#046a38' : st === 'current' ? '#fff' : 'var(--line)'} stroke-width={st === 'locked' ? 1 : 1.6} opacity={st === 'locked' ? 0.75 : 1} />
+                  <text x={w / 2} y="12.5" font-size="10" font-weight="800" text-anchor="middle" fill={st === 'done' ? '#14221a' : st === 'current' ? '#fff' : st === 'locked' ? 'var(--muted)' : 'var(--map-ink)'}>{name}</text>
                 </g>
                 {st === 'current' && (
-                  <g transform="translate(0 -34)" aria-hidden="true">
+                  <g transform="translate(0 -42)" aria-hidden="true">
                     <g class="map-bounce">
                       <path d="M-5 9 L0 17 L5 9 Z" fill="#fff" stroke="#ffe900" stroke-width="2" stroke-linejoin="round" />
                       <circle r="11" fill="#fff" stroke="#ffe900" stroke-width="2.5" />
@@ -286,7 +295,7 @@ export const MapPage = () => {
                 <a href={href(`/unit/${sel.u.id}`)} class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-5 py-2.5 font-bold text-white shadow-soft hover:bg-brand-600">
                   {selState === 'done' ? 'Opakovat jednotku' : 'Pokračovat'} →
                 </a>
-                <a href={href(`/quiz/${sel.u.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-5 py-2.5 font-bold hover:border-brand-500">🏆 Dokončit jednotku</a>
+                {selState !== 'done' && <a href={href(`/quiz/${sel.u.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-5 py-2.5 font-bold hover:border-brand-500">🏆 Dokončit jednotku</a>}
               </>
             ) : (
               <>

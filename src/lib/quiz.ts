@@ -96,7 +96,14 @@ export const checkTyped = (input: string, accepted: string[]): TypedVerdict => {
 };
 
 /** Slovíčko s variantami („obrigado / obrigada“): v poslechu a diktátu se použije jen první. */
-export const oneVariant = (pt: string): string => pt.split(/\s*\/\s*/)[0]!.trim();
+export const oneVariant = (pt: string): string => splitVariants(pt)[0]!;
+
+/** Varianty slovíčka: „obrigado / obrigada“ → 2; „o/a estudante“ (stejný tvar pro oba rody) → „o estudante“, „a estudante“. */
+export const splitVariants = (pt: string): string[] => {
+  const shared = /^(o|a|os|as)\/(o|a|os|as) (.+)$/i.exec(pt.trim());
+  if (shared) return [`${shared[1]} ${shared[3]}`, `${shared[2]} ${shared[3]}`];
+  return pt.split(/\s*\/\s*/).map((v) => v.trim()).filter(Boolean);
+};
 
 /** Token do skládání věty: bez interpunkce a bez velkého písmene na začátku (nenapovídá). */
 export const bareToken = (t: string): string => t.replace(/[.,!?…¿¡;:"„“”()]/g, '');
@@ -109,7 +116,7 @@ const ARTICLE = /^(o|a|os|as|um|uma)\s+/i;
 
 /** Všechny přijatelné napsané tvary: varianty oddělené „/“, i bez členu. */
 export const answerVariants = (pt: string): string[] => {
-  const variants = pt.split(/\s*\/\s*/).map((v) => v.trim()).filter(Boolean);
+  const variants = splitVariants(pt);
   const all = new Set<string>([pt, ...variants]);
   for (const v of variants) if (ARTICLE.test(v)) all.add(v.replace(ARTICLE, ''));
   return [...all];

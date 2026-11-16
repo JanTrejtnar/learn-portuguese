@@ -43,15 +43,22 @@ const SOUNDS: Record<string, Note[]> = {
     { f: 523.25, at: 0, len: 0.3 }, { f: 659.25, at: 0.14, len: 0.3 }, { f: 783.99, at: 0.28, len: 0.3 },
     { f: 1046.5, at: 0.42, len: 1.0, vol: 0.55 }, { f: 1318.5, at: 0.42, len: 1.0, vol: 0.25 },
   ],
-  correct: [{ f: 880, at: 0, len: 0.18, vol: 0.6 }, { f: 1318.5, at: 0.1, len: 0.34, vol: 0.6 }],
-  wrong: [{ f: 330, at: 0, len: 0.2, type: 'sine', vol: 0.5 }, { f: 247, at: 0.14, len: 0.36, type: 'sine', vol: 0.5 }],
+  // krátké a jemné: jedno měkké „pop“ místo melodie
+  correct: [{ f: 784, at: 0, len: 0.11, type: 'sine', vol: 0.28 }],
+  wrong: [{ f: 196, at: 0, len: 0.14, type: 'sine', vol: 0.3 }],
 };
 
+let silentUrl: string | undefined;
+const silent = (): string => (silentUrl ??= renderWav([{ f: 440, at: 0, len: 0.05, vol: 0 }]));
+
+const urls = new Map<string, string>();
 const element = (name: string): HTMLAudioElement | undefined => {
   try {
     let a = cache.get(name);
     if (!a) {
-      a = new Audio(renderWav(SOUNDS[name]!));
+      const url = renderWav(SOUNDS[name]!);
+      urls.set(name, url);
+      a = new Audio(url);
       a.preload = 'auto';
       cache.set(name, a);
     }
@@ -61,7 +68,8 @@ const element = (name: string): HTMLAudioElement | undefined => {
   }
 };
 
-/** Prohlížeče pustí zvuk až po prvním dotyku; při první interakci přehrávače „odemkneme“ (tiše). */
+/** iOS dovolí přehrát zvuk jen elementu, který byl „odemčen“ přehráním při dotyku. Odemykáme tichým souborem
+ *  (ztlumené přehrání nestačí) a potom do elementu vrátíme skutečný zvuk. */
 export const unlockAudio = (): void => {
   const go = () => {
     window.removeEventListener('pointerdown', go);
@@ -69,8 +77,12 @@ export const unlockAudio = (): void => {
     for (const name of Object.keys(SOUNDS)) {
       const a = element(name);
       if (!a) continue;
-      a.muted = true;
-      void a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; });
+      const real = urls.get(name)!;
+      const restore = () => { a.pause(); a.src = real; a.load(); };
+      try {
+        a.src = silent();
+        void a.play().then(restore).catch(restore);
+      } catch { restore(); }
     }
   };
   window.addEventListener('pointerdown', go);
