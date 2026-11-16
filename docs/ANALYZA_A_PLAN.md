@@ -277,7 +277,7 @@ Odhad: M1 S, M2 M, M3 L, M4 podle výběru. Navrhuji začít M1 a M2, pak se roz
 - Název aplikace: **Portuglove**.
 - Navigace zredukována na 3 záložky: Lekce · Procvičit (karty, kvíz, gramatika, scénáře, mluvení, páry; testy jsou odkaz dole) · Pokrok. Tmavý režim jen v Nastavení.
 - Karty: bez intervalů „za chvíli / zítra“, jen „Neznal jsem / Znal jsem“; bez popisků kláves; bez přepínačů směru, autoplaye a míchání na stránce (jen v Nastavení); otočení karty nepouští audio znovu; prázdný balíček nabízí „Procvičit znovu“.
-- Audio: pomalé přehrávání je výrazně pomalejší (0,5×), varianty „divertido / divertida“ se čtou s pauzou.
+- Audio: pomalé přehrávání je výrazně pomalejší (0,35×), varianty „divertido / divertida“ se čtou s pauzou.
 - Kvíz: rozdíl jen v interpunkci („Olá!“ × „Olá,“) se nepovažuje za chybu a nevzniká jako past. Poslech lze přeskočit („Nemohu poslouchat“), u mluvení „Teď nemohu mluvit“.
 - Upozornění: malé nenápadné bubliny dole, jen odznak, denní cíl a zmrazení.
 - Šipka zpět místo drobečkové navigace. Zpráva o neověření rodilým mluvčím se uživateli nezobrazuje.

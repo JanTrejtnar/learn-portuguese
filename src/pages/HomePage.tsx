@@ -1,6 +1,5 @@
 import { unitCode, units, unitUnlocked, unlockedWords } from '../content';
 import type { Progress } from '../lib/db';
-import { newIntroducedToday } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
 import { useProgress } from '../lib/useProgress';
 import { xpToday } from '../lib/xp';
@@ -28,7 +27,7 @@ const TodayCard = ({ progress }: { progress: Progress }) => {
   const words = unlockedWords(progress.tests);
   const due = words.filter((w) => (progress.cards.get(w.id)?.due ?? Infinity) <= now).length;
   const unseen = words.filter((w) => !progress.cards.has(w.id)).length;
-  const fresh = Math.min(unseen, Math.max(0, settings.newPerDay - newIntroducedToday(progress.days, now)));
+  const fresh = Math.min(unseen, settings.newPerDay);
   const todo = due + fresh;
   const goalMissing = xpToday(progress.days, now) < settings.dailyGoal;
   const btn = 'inline-flex min-h-11 items-center gap-2 rounded-xl bg-gold-400 px-5 py-2.5 font-bold text-brand-950 shadow-soft hover:bg-gold-300';

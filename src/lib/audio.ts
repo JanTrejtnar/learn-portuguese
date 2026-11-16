@@ -81,7 +81,7 @@ export const speak = (text: string, opts: { slow?: boolean } = {}): boolean => {
     u.lang = 'pt-PT';
     if (voice) u.voice = voice;
     // pomalé přehrání je opravdu znatelně pomalejší
-    u.rate = opts.slow ? 0.5 : 1;
+    u.rate = opts.slow ? 0.35 : 1;
     if (i + 1 < parts.length) {
       const after = () => {
         pauseTimer = window.setTimeout(() => playPart(i + 1), PAUSE_MS);

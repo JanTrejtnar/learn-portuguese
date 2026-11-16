@@ -19,7 +19,7 @@ export const LearningSettings = () => {
         </div>
       </div>
       <label class="flex items-center justify-between gap-3">
-        <span><b class="font-semibold">Nových karet denně</b><span class="block text-xs text-muted">Kolik nových slovíček se ti denně nabídne.</span></span>
+        <span><b class="font-semibold">Nových slovíček v jedné dávce</b><span class="block text-xs text-muted">Kolik nových slovíček se naučíš najednou. Víc jich dostaneš, když projdeš další lekce.</span></span>
         <select value={s.newPerDay} onChange={(e) => update({ newPerDay: Number(e.currentTarget.value) })} class="rounded-lg border border-line-strong bg-surface px-2 py-1">
           {[5, 10, 15, 20, 30].map((n) => <option key={n} value={n}>{n}</option>)}
         </select>

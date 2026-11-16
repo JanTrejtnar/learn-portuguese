@@ -12,7 +12,7 @@ import { speak, stopSpeaking } from '../lib/audio';
 import { saveCard, saveDay, type DayStats, type Progress } from '../lib/db';
 import { typingQuestion } from '../lib/quiz';
 import { recallVariant } from '../lib/recall';
-import { buildQueue, newIntroducedToday, shuffled } from '../lib/queue';
+import { buildQueue, shuffled } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
 import { dateKey, schedule, type Rating } from '../lib/srs';
 import { useKeydown } from '../lib/useKeydown';
@@ -59,8 +59,8 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
   const initialQueue = (bonus: number): { queue: Word[]; dueCount: number; newCount: number } => {
     const now = Date.now();
     if (!srs) return { queue: settings.shuffle ? shuffled(words) : [...words], dueCount: 0, newCount: 0 };
-    // Denní limit platí pro „Karty na dnes“. Když si uživatel sám vybere lekci nebo jednotku, dostane nové karty vždy (po dávkách).
-    const allowance = (deckId === 'all' ? Math.max(0, settings.newPerDay - newIntroducedToday(days.current, now)) : settings.newPerDay) + bonus;
+    // Žádný denní limit: nová slova se nabízejí po dávkách, dokud nějaká zbývají.
+    const allowance = settings.newPerDay + bonus;
     const { due, fresh } = buildQueue(words, cards.current, allowance, now, settings.shuffle);
     return { queue: [...due, ...fresh], dueCount: due.length, newCount: fresh.length };
   };

@@ -52,7 +52,7 @@ export const CardsPage = () => {
       </div>
     )}
     <label class="mt-4 flex items-center gap-2 text-sm">
-      Nových karet denně:
+      Nových slovíček v dávce:
       <select
         value={settings.newPerDay}
         onChange={(e) => update({ newPerDay: Number(e.currentTarget.value) })}
