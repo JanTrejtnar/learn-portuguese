@@ -12,7 +12,7 @@ Stav k 16. 11. 2026. Doplňuje `docs/IMPROVEMENTS.md` (ten je široký katalog n
 
 **Také hotovo (rozhodnutí o navigaci):** N1 jsem neprovedl jako sloučení na čtyři záložky. Mapa a seznam jednotek jsou nyní dva pohledy přepínané tlačítky Seznam / Mapa pod záložkou „Lekce“ (záložek je 5, mapu uživatel oceňuje, tak zůstala). N2: testy jednotlivých lekcí jsou sbalené. P2: jeden vynechaný den se v sérii odpustí (nejvýš jednou za 7 dní) a Domů ukáže „Série je v ohrožení“. T2 už existovalo (výpis chyb po testu).
 
-**Zbývá:** T1 (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
+**Zbývá:** M1–M4 (mince a avatar, viz kap. 6), T1 (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
 
 ## 0. Shrnutí v jedné stránce
 
@@ -196,3 +196,66 @@ Cíl: odstranit nejviditelnější nedostatky bez velkých změn.
 2. Mám sloučit navigaci na 4 záložky (N1), nebo ji ponechat a jen odstranit duplicity?
 3. Chceš příkladové věty u všech slovíček (C3), i za cenu delší přípravy obsahu?
 4. Zvolit pro audio předgenerované soubory, nebo spoléhat na hlas zařízení?
+
+## 6. Návrh: mince a avatar (ekonomika odměn)
+
+Nápad od uživatele: za každý odemčený odznak dostat určitý počet mincí a mince utrácet; jedna z variant je vlastní avatar, který se postupně vylepšuje. Aplikace dnes má 19 odznaků, XP, úrovně (Turista … Mestre) a denní cíl, ale nemá nic, na co by se odměna dala „použít“.
+
+### 6.1 Zdroje mincí
+
+| Zdroj | Mince | Poznámka |
+|---|---|---|
+| Odznak (běžný / vzácný / velký) | 10 / 25 / 50 | Hodnota je v definici odznaku; zpětně se dopočítá z už získaných. |
+| Splněný denní cíl | 5 | Ne za každé opakování, jinak se vyplatí „klikat“. |
+| Úroveň navíc | 20 | Při přechodu na vyšší úroveň. |
+| Test jednotky poprvé | 15 | Opakované splnění nic. |
+| Týdenní série (7 dní) | 15 | Podpora pravidelnosti. |
+
+Zásady: mince se **nepočítají z počtu kliknutí**, ale z opravdového pokroku. Stav mincí se odvozuje (zisky − výdaje), aby šel pokrok zálohovat a nešlo ho rozbít. Denní strop (např. 30) brání „farmení“.
+
+### 6.2 Na co mince utrácet (varianty)
+
+1. **Avatar a jeho vylepšování** (hlavní návrh, viz 6.3).
+2. **Zmrazení série** – koupit si další odpuštění vynechaného dne nad rámec 1× týdně (cena např. 30). Přímo podporuje učení a dává mincím smysl.
+3. **Motivy a vzhled aplikace** – barevné motivy (Azulejo, Atlantik, Pastel de nata), pozadí karet, styl mapy.
+4. **Tipy a nápovědy** – v testech odkrýt první písmeno nebo vyřadit dvě špatné možnosti (jen s malou cenou, ať se nepokazí učení).
+5. **Bonusový obsah** – odemykání „kulturních kapitol“: krátké příběhy, gastro slovník, fráze na cesty, lisabonský slang; odemyká se mincemi místo hotového volného přístupu.
+6. **Sbírka** – kolekce karet z Portugalska (azulejo, kohout z Barcela, tramvaj 28, pastel de nata…); za mince balíček, uvnitř náhodný kousek s krátkou zajímavostí. Pozor na „loot box“ pocit: bez duplicit, vždy něco nového.
+7. **Dárek nebo výzva** – vyzvat známého k týdennímu souboji o XP, vítěz dostane mince (vyžaduje server, až v pozdější fázi).
+8. **Dobrovolné „charitativní“ utrácení** – symbolický dar (strom, projekt); bez skutečných plateb, jen příběh. Nízká priorita.
+
+**Doporučení:** začít variantami 1 + 2 + 3. Jsou malé, nepotřebují server a nemění učební tok. Varianty 4 a 6 přidat později, až bude jasné, jak se mince chovají (inflace, nuda).
+
+### 6.3 Avatar (podrobněji)
+
+- **Základ:** postavička v SVG vykreslená z vrstev (tělo, obličej, vlasy, oblečení, doplněk, pozadí). Žádné obrázky navíc, vejde se do offline cache.
+- **Vývoj podle úrovně:** každá úroveň (Turista → Mestre) odemkne jednu „kategorii“ nebo vyšší stupeň vybavení: Turista s mapou a kšiltovkou → Lisboeta s tramvají 28 → Mestre s vlastním azulejo pláštěm.
+- **Obchod:** položky stojí mince (např. 20–200), některé jsou vázané na úroveň nebo odznak (nejde je koupit, jen získat).
+- **Sloty:** pokrývka hlavy, oblečení, doplněk (kytara, kohout, káva), pozadí (Lisabon, Porto, Algarve), mazlíček.
+- **Zobrazení:** malý avatar v hlavičce a na stránce Domů; velký v nové záložce/podstránce „Můj avatar“ pod Pokrok.
+- **Emoce:** avatar reaguje na splněný cíl (jásá), na ohroženou sérii (starostlivý).
+- **Ukládání:** `avatar: { owned: string[], equipped: Record<slot,string> }` v IndexedDB vedle pokroku; zahrnout do zálohy.
+
+### 6.4 Rizika a pojistky
+
+- **Vnější motivace potlačí vnitřní:** mince nesmí být důvod učit se „k odznaku“. Proto odměny za skutečný pokrok, ne za čas v aplikaci.
+- **Inflace a nuda:** jakmile je vše koupeno, mince nemají smysl. Proto průběžně přidávat položky a mít „drahé“ cíle.
+- **Rozsah:** vykreslování avataru a obchod je větší práce (návrh grafiky, nové uložení, UI). Kreslení lze zjednodušit na emoji/SVG sady.
+- **Spravedlnost:** zpětně započítat odznaky už získané, ať nikdo nezačíná „od nuly“.
+- **Žádné reálné peníze.** Mince jsou jen herní měna.
+
+### 6.5 Postup (návrh fází)
+
+1. **M1 – ekonomika:** mince u odznaků, denní cíl, úroveň; zobrazení zůstatku, historie zisků; testy odvození zůstatku a stropu.
+2. **M2 – obchod:** stránka „Obchod“ s několika položkami (zmrazení série, 3 motivy); nákup a ověření zůstatku.
+3. **M3 – avatar:** SVG vrstvy, 15–20 položek, správa vybavení, zobrazení na Domů.
+4. **M4 – rozšíření:** sbírka, bonusové kapitoly, nápovědy v testech podle zkušeností.
+
+Odhad: M1 S, M2 M, M3 L, M4 podle výběru. Navrhuji začít M1 a M2, pak se rozhodnout o avataru podle toho, jak mince fungují.
+
+### 6.6 Otázky na tebe
+
+1. Má být avatar **hlavní** cíl mincí, nebo jen jedna z možností (doporučuji jednu z několika)?
+2. Jaký styl postavičky: realistický, kreslený, nebo jednoduchý (emoji/ikony)? Ovlivňuje to pracnost víc než kód.
+3. Mají být některé věci jen **k získání** (ne ke koupi), např. za dokončení A1/A2?
+4. Chceš v budoucnu srovnání s ostatními (žebříček, výzvy)? To by vyžadovalo server.
