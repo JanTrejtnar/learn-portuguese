@@ -81,12 +81,17 @@ export const schedule = (prev: CardState | undefined, id: string, rating: Rating
   return s;
 };
 
+/** Lidský popis „kdy uvidíš kartu znovu“ (kalendářní dny, žádné minuty do půlnoci). */
 export const formatInterval = (from: number, to: number): string => {
-  const ms = to - from;
-  if (ms < DAY) return `${Math.max(1, Math.round(ms / MINUTE))} min`;
-  const days = Math.round(ms / DAY);
-  if (days < 30) return `${days} d`;
-  return `${Math.round(days / 30)} měs.`;
+  if (to - from < 60 * MINUTE) return 'za chvíli';
+  const days = Math.round((dayStart(to) - dayStart(from)) / DAY);
+  if (days <= 0) return 'dnes';
+  if (days === 1) return 'zítra';
+  if (days < 5) return `za ${days} dny`;
+  if (days < 14) return `za ${days} dní`;
+  if (days < 60) { const wk = Math.round(days / 7); return `za ${wk} ${wk < 5 ? 'týdny' : 'týdnů'}`; }
+  if (days < 365) return `za ${Math.round(days / 30)} měs.`;
+  return 'za rok a víc';
 };
 
 /** Popisky „za jak dlouho“ pro všechna čtyři tlačítka. */

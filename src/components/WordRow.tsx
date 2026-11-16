@@ -1,5 +1,6 @@
 import type { Word } from '../types';
 import { AudioButton } from './AudioButton';
+import { hasInfo, WordInfo } from './WordInfo';
 
 const genderLabel: Record<string, string> = { m: 'm.', f: 'ž.', 'm/f': 'm./ž.' };
 
@@ -12,6 +13,7 @@ export const WordRow = ({ word }: { word: Word }) => (
       </span>
       <span class="text-ink-soft">{word.cs}</span>
     </div>
+    {hasInfo(word) && <div class="mt-2"><WordInfo word={word} /></div>}
     {word.gender && <span class="mt-1 inline-block text-xs text-muted">{genderLabel[word.gender]}</span>}
     {word.example && (
       <p class="mt-2 flex items-center gap-2 text-sm">

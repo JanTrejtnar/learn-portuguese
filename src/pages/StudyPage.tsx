@@ -17,11 +17,16 @@ import { href } from '../router';
 import type { Word } from '../types';
 import { NotFoundPage } from './NotFoundPage';
 
-const ratings: { id: Rating; label: string; key: string; tone: string }[] = [
-  { id: 'again', label: 'Znovu', key: '1', tone: 'bg-flag-600 text-white hover:bg-flag-500' },
-  { id: 'hard', label: 'Těžké', key: '2', tone: 'bg-gold-400 text-brand-950 hover:bg-gold-300' },
-  { id: 'good', label: 'Dobře', key: '3', tone: 'bg-brand-600 text-white hover:bg-brand-500' },
-  { id: 'easy', label: 'Snadno', key: '4', tone: 'bg-brand-800 text-white hover:bg-brand-700' },
+interface RatingDef { id: Rating; label: string; key: string; tone: string }
+const advancedRatings: RatingDef[] = [
+  { id: 'again', label: 'Nevěděl jsem', key: '1', tone: 'bg-flag-600 text-white hover:bg-flag-500' },
+  { id: 'hard', label: 'Těžce', key: '2', tone: 'bg-gold-400 text-brand-950 hover:bg-gold-300' },
+  { id: 'good', label: 'Věděl jsem', key: '3', tone: 'bg-brand-600 text-white hover:bg-brand-500' },
+  { id: 'easy', label: 'Hračka', key: '4', tone: 'bg-brand-800 text-white hover:bg-brand-700' },
+];
+const simpleRatings: RatingDef[] = [
+  { id: 'again', label: 'Neznal jsem', key: '1', tone: 'bg-flag-600 text-white hover:bg-flag-500' },
+  { id: 'good', label: 'Znal jsem', key: '2', tone: 'bg-brand-600 text-white hover:bg-brand-500' },
 ];
 
 const Toggle = ({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) => (
@@ -129,10 +134,16 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
       setFlipped((f) => (current ? !f : f));
-    } else if (['1', '2', '3', '4'].includes(e.key)) rate(ratings[Number(e.key) - 1]!.id);
+    } else if (['1', '2', '3', '4'].includes(e.key)) {
+      if (flipped) {
+        const r = ratings[Number(e.key) - 1];
+        if (r) rate(r.id);
+      }
+    }
     else if (e.key.toLowerCase() === 'p' && current) speak(current.pt);
   });
 
+  const ratings = settings.simpleRating ? simpleRatings : advancedRatings;
   const intervals = current && srs && flipped ? previewIntervals(cards.current.get(current.id), current.id, Date.now()) : null;
   const sessionDone = total > 0 && !current;
   const nothingToDo = total === 0;
@@ -173,22 +184,35 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
 
       {current && (
         <>
-          <Flashcard word={current} flipped={flipped} direction={settings.direction} onFlip={() => setFlipped((f) => !f)} />
+          <Flashcard key={current.id} word={current} flipped={flipped} direction={settings.direction} onFlip={() => setFlipped((f) => !f)} />
           {flipped ? (
-            <div class="mt-4 grid grid-cols-4 gap-2">
+            <div class="mt-4">
+              {srs && !settings.ratingHelpSeen && (
+                <div class="mb-3 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm">
+                  <p><b>Jak hodnotit?</b> Řekni, jak dobře jsi slovíčko znal. Čím lépe ho znáš, tím později ti ho ukážu znovu. Pod tlačítkem vidíš, kdy to bude.</p>
+                  <button type="button" onClick={() => update({ ratingHelpSeen: true })} class="mt-2 rounded-lg bg-brand-700 px-3 py-1 text-xs font-semibold text-white">Rozumím</button>
+                </div>
+              )}
+              <div class={`grid gap-2 ${settings.simpleRating ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4'}`}>
               {ratings.map((r) => (
                 <button key={r.id} type="button" onClick={() => rate(r.id)} class={`min-h-14 rounded-xl px-2 py-3 text-sm font-bold shadow-soft ${r.tone}`}>
                   {r.label}
-                  <span class="block text-[10px] font-normal opacity-80">{intervals ? intervals[r.id] : `[${r.key}]`}</span>
+                  <span class="block text-[11px] font-normal opacity-90">{intervals ? intervals[r.id] : `[${r.key}]`}</span>
                 </button>
               ))}
+              </div>
+              {srs && (
+                <button type="button" class="mt-2 text-xs text-muted underline" onClick={() => update({ simpleRating: !settings.simpleRating })}>
+                  {settings.simpleRating ? 'Chci podrobnější hodnocení (4 tlačítka)' : 'Zpět na jednoduché hodnocení'}
+                </button>
+              )}
             </div>
           ) : (
             <button type="button" onClick={() => setFlipped(true)} class="mt-4 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
               Otočit
             </button>
           )}
-          <p class="mt-3 hidden text-center text-xs text-muted md:block">Mezerník = otočit · 1–4 = hodnocení · P = přehrát</p>
+          <p class="mt-3 hidden text-center text-xs text-muted md:block">Mezerník = otočit · 1–{ratings.length} = hodnocení · P = přehrát · I = vysvětlení</p>
         </>
       )}
 

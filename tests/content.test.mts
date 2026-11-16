@@ -80,3 +80,14 @@ test('v jedné lekci se slovíčka neopakují', () => {
     assert.equal(new Set(keys).size, keys.length, `${l.id}: duplicitní slovíčko`);
   }
 });
+
+test('vysvětlení (usage) míří na existující slovíčka a nemá brazilismy', async () => {
+  const { usage } = await import('../src/content/usage.ts');
+  const { allWords } = await import('../src/content/index.ts');
+  const ids = new Set(allWords().map((x) => x.id));
+  for (const id of Object.keys(usage)) assert.ok(ids.has(id), `usage pro neexistující slovíčko ${id}`);
+  for (const [id, u] of Object.entries(usage)) {
+    assert.ok(u.usage || u.literal || u.register, `prázdné vysvětlení ${id}`);
+    assert.ok(!/\b(você|ônibus|trem|celular)\b/i.test(`${u.usage ?? ''}${u.literal ?? ''}`.replace(/„vocês?“/gi, '')), `brazilismus v ${id}`);
+  }
+});

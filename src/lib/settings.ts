@@ -13,10 +13,14 @@ export interface StudySettings {
   dailyGoal: number;
   /** Ukazovat české překlady v roleplayi. */
   showTranslations: boolean;
+  /** Jednoduché hodnocení: jen „Neznal jsem“ / „Znal jsem“. */
+  simpleRating: boolean;
+  /** Uživatel už viděl vysvětlení hodnocení. */
+  ratingHelpSeen: boolean;
 }
 
 const KEY = 'ap:study-settings';
-const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10, dailyGoal: 40, showTranslations: true };
+const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10, dailyGoal: 40, showTranslations: true, simpleRating: true, ratingHelpSeen: false };
 
 export const useStudySettings = (): [StudySettings, (patch: Partial<StudySettings>) => void] => {
   const [settings, setSettings] = useState<StudySettings>(() => loadJson(KEY, defaults));

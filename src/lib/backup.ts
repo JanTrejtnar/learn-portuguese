@@ -99,7 +99,7 @@ export const backupFilename = (now: Date): string => `aprender-portugues-zaloha-
 export const sanitizeSettings = (raw: Record<string, unknown>): Record<string, unknown> => {
   const out: Record<string, unknown> = {};
   if (raw.direction === 'pt-cs' || raw.direction === 'cs-pt') out.direction = raw.direction;
-  for (const k of ['autoplay', 'shuffle', 'showTranslations'] as const) if (typeof raw[k] === 'boolean') out[k] = raw[k];
+  for (const k of ['autoplay', 'shuffle', 'showTranslations', 'simpleRating', 'ratingHelpSeen'] as const) if (typeof raw[k] === 'boolean') out[k] = raw[k];
   for (const k of ['newPerDay', 'dailyGoal'] as const) {
     const v = raw[k];
     if (typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 500) out[k] = v;

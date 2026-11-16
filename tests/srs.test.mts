@@ -35,6 +35,8 @@ test('easy/hard na nové kartě a spodní mez ease', () => {
 
 test('náhled intervalů', () => {
   const p = previewIntervals(undefined, 'n', t0);
-  assert.equal(p.again, '10 min');
+  assert.equal(p.again, 'za chvíli');
+  assert.equal(p.good, 'zítra');
+  assert.equal(p.easy, 'za 4 dny');
   assert.equal(maturity(undefined), 'new');
 });

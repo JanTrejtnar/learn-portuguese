@@ -13,6 +13,12 @@ export interface Word {
   example?: { pt: string; cs: string };
   /** Poznámka k PT-PT (výslovnost, pravopis, použití…). */
   note?: string;
+  /** Doslovný překlad, pokud se liší od významu („Até amanhã“ = „do zítřka“). */
+  literal?: string;
+  /** Kdy a jak se to říká (situace, odstín). */
+  usage?: string;
+  /** Stylová rovina. */
+  register?: 'formal' | 'informal' | 'colloquial';
 }
 
 export interface GrammarTable {

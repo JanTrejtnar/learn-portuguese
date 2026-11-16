@@ -1,4 +1,7 @@
+import { useState } from 'preact/hooks';
 import type { Word } from '../types';
+import { useKeydown } from '../lib/useKeydown';
+import { hasInfo, WordInfo } from './WordInfo';
 import { AudioButton } from './AudioButton';
 
 interface Props {
@@ -14,6 +17,11 @@ const PtText = ({ text, big }: { text: string; big?: boolean }) => (
 
 export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
   const ptFirst = direction === 'pt-cs';
+  const [info, setInfo] = useState(false);
+  const canInfo = flipped && hasInfo(word);
+  useKeydown((e) => {
+    if (e.key.toLowerCase() === 'i' && canInfo && !e.metaKey && !e.ctrlKey && !(e.target instanceof HTMLInputElement)) setInfo((v) => !v);
+  });
 
   return (
     <div
@@ -46,6 +54,17 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
               <AudioButton text={word.pt} size="md" withSlow />
             </div>
           )}
+          {hasInfo(word) && (
+            <button
+              type="button"
+              aria-expanded={info}
+              onClick={(e) => { e.stopPropagation(); setInfo((v) => !v); }}
+              class="inline-flex items-center gap-1.5 rounded-full border border-gold-400 bg-gold-400/15 px-3 py-1 text-sm font-semibold hover:bg-gold-400/30"
+            >
+              <span aria-hidden="true">ⓘ</span> Jak se to používá?
+            </button>
+          )}
+          {info && hasInfo(word) && <div onClick={(e) => e.stopPropagation()} class="w-full"><div class="mx-auto w-full max-w-md"><WordInfo word={word} /></div></div>}
           {word.gender && <span class="text-xs text-muted">{{ m: 'mužský rod', f: 'ženský rod', 'm/f': 'mužský / ženský rod' }[word.gender]}</span>}
           {word.example && (
             <p class="flex items-center gap-2 text-sm">
