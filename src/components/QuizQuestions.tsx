@@ -37,11 +37,16 @@ export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
   return (
     <div>
       <p class="mb-1 text-sm text-stone-500">
-        {q.kind === 'pt-to-cs' ? 'Co to znamená česky?' : q.kind === 'cs-to-pt' ? 'Jak se to řekne portugalsky (PT-PT)?' : 'Co slyšíš?'}
+        {q.kind === 'pt-to-cs' ? 'Co to znamená česky?' : q.kind === 'cs-to-pt' ? 'Jak se to řekne portugalsky (PT-PT)?' : q.kind === 'cloze' ? 'Doplň správný tvar:' : 'Co slyšíš?'}
       </p>
       <div class="mb-5 flex items-center gap-3">
         {q.kind === 'listen' ? (
           <AudioButton text={q.audio!} size="md" withSlow />
+        ) : q.kind === 'cloze' ? (
+          <div>
+            <span lang="pt-PT" class="text-2xl font-bold text-brand-700 dark:text-brand-100">{q.prompt.replace('___', answer ? q.options[q.answer]! : '＿＿＿')}</span>
+            {q.hint && <span class="mt-1 block text-sm text-stone-500">{q.hint}</span>}
+          </div>
         ) : (
           <>
             <span lang={q.kind === 'pt-to-cs' ? 'pt-PT' : 'cs'} class="text-3xl font-bold text-brand-700 dark:text-brand-100">{q.prompt}</span>

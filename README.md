@@ -20,7 +20,8 @@ Vite · Preact · TypeScript · Tailwind CSS 4 · hash router (bez serveru) · o
 - `src/router.ts` – minimalistický hash router.
 
 ## Pravidla obsahu
-- Pouze PT-PT (*tu estás a fazer*, enklitika *chamo-me*, *autocarro*, *telemóvel*…).
+- Pouze PT-PT (*tu estás a fazer*, enklitika *chamo-me*, *autocarro*, *telemóvel*…). **Žádné brazilské tvary ani srovnání s brazilštinou.**
+- Doplňovací cvičení (`cloze`) patří ke gramatice lekce; `npm test` hlídá strukturu obsahu.
 - `reviewed: false` u lekce = zatím nezkontroloval rodilý mluvčí.
 
 ## Plán
@@ -28,5 +29,5 @@ Vite · Preact · TypeScript · Tailwind CSS 4 · hash router (bez serveru) · o
 2. ✅ Flashcards + audio (`pt-PT`)
 3. ✅ SRS + IndexedDB
 4. ✅ Kvízy a testy
-5. Zbytek A1 + gramatická cvičení + brazilismo alert
+5. 🔄 Zbytek A1 + gramatická cvičení (doplňování vět): hotové jednotky 1–5, zbývají 6–8
 6. Gamifikace · 7. Roleplay · 8. PWA/offline · 9. A2 · 10. AI konverzace

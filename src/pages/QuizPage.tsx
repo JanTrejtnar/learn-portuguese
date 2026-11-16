@@ -6,7 +6,7 @@ import { VoiceWarning } from '../components/VoiceWarning';
 import { allWords, getTestScope, units, unitUnlocked } from '../content';
 import { getVoiceStatus } from '../lib/audio';
 import { saveCard, saveTest, type Progress, type TestResult } from '../lib/db';
-import { PASS_RATIO, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
+import { PASS_RATIO, collectCloze, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
 import { schedule } from '../lib/srs';
 import { useKeydown } from '../lib/useKeydown';
 import { useProgress } from '../lib/useProgress';
@@ -83,7 +83,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const questions = useMemo<Question[]>(() => {
     const audio = getVoiceStatus();
     const sentences = collectSentences(scope.lessons).filter((s) => scope.id !== 'quick' || (s.wordId && scope.words.some((w) => w.id === s.wordId)));
-    return generateQuiz({ words: scope.words, pool: allWords(), sentences, count: scope.count, audio: audio !== 'unsupported' && audio !== 'no-pt-pt' });
+    return generateQuiz({ words: scope.words, pool: allWords(), sentences, cloze: scope.id === 'quick' ? [] : collectCloze(scope.lessons), count: scope.count, audio: audio !== 'unsupported' && audio !== 'no-pt-pt' });
   }, [attempt]);
 
   const [index, setIndex] = useState(0);
@@ -175,7 +175,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
           </div>
 
           <div key={q2.id}>
-            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
+            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
             {(q2.kind === 'typing' || q2.kind === 'dictation') && <TypingQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
             {q2.kind === 'match' && <MatchQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
             {q2.kind === 'build' && <BuildQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
@@ -189,7 +189,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
                 <p class="mt-1 flex items-center gap-2 text-sm">
                   Správně:
                   <b lang={q2.kind === 'pt-to-cs' ? 'cs' : 'pt-PT'}>{correctText(q2, answer.missed)}</b>
-                  {q2.kind !== 'match' && q2.kind !== 'pt-to-cs' && <AudioButton text={correctText(q2)} />}
+                  {q2.kind !== 'match' && q2.kind !== 'pt-to-cs' && q2.kind !== 'cloze' && <AudioButton text={correctText(q2)} />}
                 </p>
               )}
               <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-stone-900 py-2.5 font-semibold text-white dark:bg-white dark:text-stone-900">

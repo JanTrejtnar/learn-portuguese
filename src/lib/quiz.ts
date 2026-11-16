@@ -2,7 +2,7 @@
  * Kvízový engine – čistá logika (bez UI a bez importu obsahu), aby šla testovat v Node.
  * Typy otázek: výběr (PT→CZ, CZ→PT, poslech), psaní, diktát, přiřazování párů, skládání věty.
  */
-import type { Lesson, Word } from '../types';
+import type { ClozeItem, Lesson, Word } from '../types';
 
 export const PASS_RATIO = 0.8;
 
@@ -20,8 +20,10 @@ interface Base {
 }
 
 export interface ChoiceQ extends Base {
-  kind: 'pt-to-cs' | 'cs-to-pt' | 'listen';
+  kind: 'pt-to-cs' | 'cs-to-pt' | 'listen' | 'cloze';
   prompt: string;
+  /** Český překlad jako nápověda (cloze). */
+  hint?: string;
   /** Text k přečtení nahlas (PT). */
   audio?: string;
   options: string[];
@@ -137,6 +139,8 @@ export interface GenerateOptions {
   /** Širší zásoba na špatné odpovědi (typicky všechna slovíčka). */
   pool: Word[];
   sentences: Sentence[];
+  /** Doplňovací cvičení (volitelné). */
+  cloze?: ClozeItem[];
   count: number;
   /** false = zařízení nemá pt-PT hlas → žádné poslechové otázky. */
   audio: boolean;
@@ -172,6 +176,8 @@ const choice = (kind: ChoiceQ['kind'], word: Word, scope: Word[], pool: Word[], 
   };
 };
 
+export const collectCloze = (lessons: Lesson[]): ClozeItem[] => lessons.flatMap((l) => l.cloze ?? []);
+
 const WORD_KINDS: (ChoiceQ['kind'] | TypingQ['kind'])[] = ['pt-to-cs', 'cs-to-pt', 'listen', 'typing', 'dictation'];
 
 export const generateQuiz = (opts: GenerateOptions): Question[] => {
@@ -194,6 +200,13 @@ export const generateQuiz = (opts: GenerateOptions): Question[] => {
     const others = sentences.filter((o) => o.pt !== s.pt).flatMap((o) => o.pt.split(/\s+/));
     const extras = shuffle([...new Set(others)].filter((t) => !tokens.includes(t)), rng).slice(0, 2);
     questions.push({ id: nextId(), kind: 'build', wordIds: s.wordId ? [s.wordId] : [], prompt: s.cs, tokens, bank: shuffle([...tokens, ...extras], rng) });
+  }
+
+  // Doplňování vět (gramatika)
+  const nCloze = Math.min(opts.cloze?.length ?? 0, Math.ceil(count / 4));
+  for (const item of shuffle(opts.cloze ?? [], rng).slice(0, nCloze)) {
+    const options = shuffle([item.answer, ...item.distractors], rng);
+    questions.push({ id: nextId(), kind: 'cloze', wordIds: [], prompt: item.pt, hint: item.cs, audio: undefined, options, optionsLang: 'pt', answer: options.indexOf(item.answer) });
   }
 
   // Otázky na jednotlivá slovíčka (střídají se druhy)
@@ -230,6 +243,7 @@ export const promptText = (q: Question): string => {
     case 'pt-to-cs': return q.prompt;
     case 'cs-to-pt': return q.prompt;
     case 'listen': return `🔊 ${q.options[q.answer]}`;
+    case 'cloze': return q.prompt;
     case 'typing': return q.prompt;
     case 'dictation': return `🔊 ${q.display}`;
     case 'build': return q.prompt;
@@ -241,7 +255,8 @@ export const correctText = (q: Question, missed: string[] = []): string => {
   switch (q.kind) {
     case 'pt-to-cs':
     case 'cs-to-pt':
-    case 'listen': return q.options[q.answer]!;
+    case 'listen':
+    case 'cloze': return q.options[q.answer]!;
     case 'typing':
     case 'dictation': return q.display;
     case 'build': return q.tokens.join(' ');

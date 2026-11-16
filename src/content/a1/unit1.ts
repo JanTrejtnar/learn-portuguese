@@ -80,7 +80,7 @@ export const unit1: Unit = {
         title: 'Tu × o senhor / a senhora',
         body: [
           'Portugalci tykají (tu) kamarádům, rodině a lidem svého věku. Starším nebo neznámým lidem a v úředních situacích vykají třetí osobou: „Como está?“, „Como se chama?“ případně s „o senhor / a senhora“.',
-          'Slovo „você“ se v PT-PT pro vykání používá jen opatrně a může znít chladně nebo nezdvořile. Na začátku se ho raději vyhněte. (V brazilské portugalštině je naopak zcela běžné.)',
+          'Slovo „você“ se v PT-PT pro vykání používá jen opatrně a může znít chladně nebo nezdvořile. Na začátku se ho raději vyhněte a vykejte třetí osobou.',
         ],
         table: {
           headers: ['Situace', 'Neformálně (tu)', 'Formálně'],
@@ -118,12 +118,12 @@ export const unit1: Unit = {
         w('u1l3-11', 'onze', '11', { pos: 'num' }),
         w('u1l3-12', 'doze', '12', { pos: 'num' }),
         w('u1l3-13', 'treze', '13', { pos: 'num' }),
-        w('u1l3-14', 'catorze', '14', { pos: 'num', note: 'PT-PT „catorze“ (v Brazílii „quatorze“).' }),
+        w('u1l3-14', 'catorze', '14', { pos: 'num', note: 'Pozor na pravopis: catorze (s „c“).' }),
         w('u1l3-15', 'quinze', '15', { pos: 'num' }),
-        w('u1l3-16', 'dezasseis', '16', { pos: 'num', note: 'PT-PT „dezasseis“ (v Brazílii „dezesseis“).' }),
-        w('u1l3-17', 'dezassete', '17', { pos: 'num', note: 'PT-PT „dezassete“ (v Brazílii „dezessete“).' }),
+        w('u1l3-16', 'dezasseis', '16', { pos: 'num', note: 'Pozor na pravopis: dezasseis (dvě „s“, „-ass-“).' }),
+        w('u1l3-17', 'dezassete', '17', { pos: 'num', note: 'Pozor na pravopis: dezassete (dvě „s“, „-ass-“).' }),
         w('u1l3-18', 'dezoito', '18', { pos: 'num' }),
-        w('u1l3-19', 'dezanove', '19', { pos: 'num', note: 'PT-PT „dezanove“ (v Brazílii „dezenove“).' }),
+        w('u1l3-19', 'dezanove', '19', { pos: 'num', note: 'Pozor na pravopis: dezanove (-an-).' }),
         w('u1l3-20', 'vinte', '20', { pos: 'num' }),
       ],
       grammar: {

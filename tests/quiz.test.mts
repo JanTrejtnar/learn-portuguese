@@ -53,3 +53,19 @@ test('odemykání jednotek', () => {
   assert.equal(isUnitUnlocked(units, 'b', tests), true);
   assert.equal(isUnitUnlocked(units, 'c', tests), false);
 });
+
+test('cloze: otázky vznikají z cvičení a správná odpověď sedí', () => {
+  const cloze = [
+    { pt: 'Eu ___ cansado.', cs: 'Jsem unavený.', answer: 'estou', distractors: ['sou', 'está'] },
+    { pt: 'Ele ___ em casa.', cs: 'Je doma.', answer: 'está', distractors: ['é', 'estou'] },
+  ];
+  for (let i = 0; i < 30; i++) {
+    const qs = generateQuiz({ words, pool: words, sentences, cloze, count: 8, audio: true });
+    const c = qs.filter((q) => q.kind === 'cloze');
+    assert.ok(c.length >= 1 && c.length <= 2);
+    for (const q of c) {
+      assert.ok(q.kind === 'cloze' && q.prompt.includes('___'));
+      assert.ok(['estou', 'está'].includes(q.options[q.answer]!));
+    }
+  }
+});

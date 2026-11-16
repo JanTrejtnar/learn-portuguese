@@ -2,7 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 
 /**
  * Audio přes Web Speech API – striktně evropská portugalština.
- * Nikdy nepřepínáme na pt-BR: pokud zařízení pt-PT hlas nemá, uživatele upozorníme.
+ * Nikdy nepřepínáme na jiný hlas než pt-PT: pokud zařízení pt-PT hlas nemá, uživatele upozorníme.
  */
 export type VoiceStatus =
   | 'unsupported' // prohlížeč nemá speechSynthesis

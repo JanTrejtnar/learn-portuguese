@@ -112,8 +112,8 @@ export const unit2: Unit = {
         w('u2l3-engenheiro', 'o engenheiro / a engenheira', 'inženýr / inženýrka', { pos: 'noun', gender: 'm/f' }),
         w('u2l3-enfermeiro', 'o enfermeiro / a enfermeira', 'zdravotní bratr / sestra', { pos: 'noun', gender: 'm/f' }),
         w('u2l3-advogado', 'o advogado / a advogada', 'právník / právnička', { pos: 'noun', gender: 'm/f' }),
-        w('u2l3-empregado', 'o empregado de mesa / a empregada de mesa', 'číšník / servírka', { pos: 'noun', gender: 'm/f', note: 'PT-PT „empregado de mesa“ (v Brazílii „garçom“).' }),
-        w('u2l3-reformado', 'o reformado / a reformada', 'důchodce / důchodkyně', { pos: 'noun', gender: 'm/f', note: 'PT-PT „reformado“ (v Brazílii „aposentado“).' }),
+        w('u2l3-empregado', 'o empregado de mesa / a empregada de mesa', 'číšník / servírka', { pos: 'noun', gender: 'm/f' }),
+        w('u2l3-reformado', 'o reformado / a reformada', 'důchodce / důchodkyně', { pos: 'noun', gender: 'm/f' }),
       ],
       grammar: {
         title: 'Národnosti a povolání bez členu',

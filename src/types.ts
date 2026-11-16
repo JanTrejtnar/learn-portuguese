@@ -11,7 +11,7 @@ export interface Word {
   pos?: PartOfSpeech;
   gender?: Gender;
   example?: { pt: string; cs: string };
-  /** Poznámka k PT-PT (výslovnost, rozdíl proti brazilštině…). */
+  /** Poznámka k PT-PT (výslovnost, pravopis, použití…). */
   note?: string;
 }
 
@@ -32,6 +32,16 @@ export interface DialogueLine {
   cs: string;
 }
 
+/** Doplňovací cvičení: věta s mezerou `___`. */
+export interface ClozeItem {
+  /** Věta v PT-PT s mezerou `___`. */
+  pt: string;
+  cs: string;
+  answer: string;
+  /** Špatné možnosti (2–3). */
+  distractors: string[];
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -39,6 +49,8 @@ export interface Lesson {
   words: Word[];
   grammar?: GrammarBlock;
   dialogue?: DialogueLine[];
+  /** Gramatická cvičení (doplň správný tvar). */
+  cloze?: ClozeItem[];
   /** Obsah zkontroloval rodilý mluvčí PT-PT. */
   reviewed: boolean;
 }
