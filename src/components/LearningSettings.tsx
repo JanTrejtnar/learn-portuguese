@@ -32,6 +32,15 @@ export const LearningSettings = () => {
         </div>
       </div>
       <div>
+        <div class="mb-2 font-semibold">Psaní při opakování</div>
+        <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Psaní při opakování">
+          {([['off', 'Vypnuto', 'Jen otáčení karet'], ['sometimes', 'Někdy', 'Občas napíšeš slovo'], ['often', 'Často', 'Většinu známých slov napíšeš']] as const).map(([id, label, hint]) => (
+            <button key={id} type="button" role="radio" aria-checked={s.recall === id} onClick={() => update({ recall: id })} class={chip(s.recall === id)}><b>{label}</b><span class="block text-xs text-muted">{hint}</span></button>
+          ))}
+        </div>
+        <p class="mt-1 text-xs text-muted">Psaní a diktát se nabízí u slov, která už trochu znáš. Aktivní vybavování pomáhá víc než jen poznat slovo.</p>
+      </div>
+      <div>
         <div class="mb-2 font-semibold">Směr karet</div>
         <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Směr karet">
           <button type="button" role="radio" aria-checked={s.direction === 'pt-cs'} onClick={() => update({ direction: 'pt-cs' })} class={chip(s.direction === 'pt-cs')}>Portugalsky → česky</button>

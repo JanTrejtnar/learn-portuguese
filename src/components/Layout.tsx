@@ -14,7 +14,7 @@ interface NavItem {
 
 const nav: NavItem[] = [
   { label: 'Lekce', icon: 'book', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') || p.startsWith('/map') },
-  { label: 'Karty', icon: 'cards', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') },
+  { label: 'Karty', icon: 'cards', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') || p.startsWith('/grammar') },
   { label: 'Testy', icon: 'check', to: '/quiz', active: (p) => p.startsWith('/quiz') },
   { label: 'Praxe', icon: 'chat', to: '/practice', active: (p) => ['/practice', '/roleplay', '/pairs', '/speak'].some((x) => p.startsWith(x)) },
   { label: 'Pokrok', icon: 'chart', to: '/stats', active: (p) => p.startsWith('/stats') || p.startsWith('/shop') },

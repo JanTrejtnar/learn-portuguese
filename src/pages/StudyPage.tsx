@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
 import { Breadcrumb } from '../components/Breadcrumb';
+import { AudioButton } from '../components/AudioButton';
 import { Flashcard } from '../components/Flashcard';
+import { TypingQuestion, type Answer } from '../components/QuizQuestions';
 import { VoiceWarning } from '../components/VoiceWarning';
-import { getDeck, unlockedWords } from '../content';
+import { allWords, getDeck, unlockedWords } from '../content';
 import { speak, stopSpeaking } from '../lib/audio';
 import { saveCard, saveDay, type DayStats, type Progress } from '../lib/db';
+import { typingQuestion } from '../lib/quiz';
+import { recallVariant } from '../lib/recall';
 import { buildQueue, newIntroducedToday, shuffled } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
 import { dateKey, previewIntervals, schedule, type Rating } from '../lib/srs';
@@ -77,20 +81,25 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
   const current = queue[0];
   // Nová karta se nejdřív jen ukáže (bez hodnocení); po prohlédnutí se vrátí na konec fronty už jako zkouška.
   const learning = srs && !!current && !cards.current.has(current.id) && !introduced.current.has(current.id);
+  // Aktivní vybavování: u známých slov se místo otočení karty píše odpověď (nebo diktát).
+  const [recallAns, setRecallAns] = useState<Answer | null>(null);
+  const [noTyping, setNoTyping] = useState(false);
+  const variant = srs && !noTyping && current && !learning ? recallVariant(current, cards.current.get(current.id), settings.recall, dateKey(Date.now())) : null;
+  const recallQ = useMemo(() => (variant && current ? typingQuestion(current, allWords(), variant, `r-${current.id}`) : null), [current?.id, variant]);
   const done = useMemo(() => total - new Set(queue.map((w) => w.id)).size, [queue, total]);
   const unseenLeft = words.filter((w) => !cards.current.has(w.id)).length;
 
   useEffect(() => {
-    if (current && settings.autoplay && (settings.direction === 'pt-cs' || flipped)) speak(current.pt);
+    if (current && !variant && settings.autoplay && (settings.direction === 'pt-cs' || flipped)) speak(current.pt);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current?.id, flipped, settings.direction, settings.autoplay]);
+  }, [current?.id, flipped, settings.direction, settings.autoplay, !!variant]);
   useEffect(() => stopSpeaking, []);
 
   // Pojistka proti dvojímu hodnocení téže karty (dva rychlé stisky před překreslením).
   const locked = useRef(false);
   locked.current = false; // při každém překreslení se odemkne
-  const rate = (r: Rating) => {
-    if (!current || !flipped || locked.current) return;
+  const rate = (r: Rating, fromRecall = false) => {
+    if (!current || (!flipped && !fromRecall) || locked.current) return;
     locked.current = true;
     const now = Date.now();
     if (srs) {
@@ -115,6 +124,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     // „Znovu“ vrátí kartu na konec dnešní fronty (do SRS se zapíše i termín za 10 min).
     setQueue((q) => (r === 'again' ? [...q.slice(1), q[0]!] : q.slice(1)));
     setFlipped(false);
+    setRecallAns(null);
   };
 
   const learnNext = () => {
@@ -142,6 +152,13 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
 
   useKeydown((e) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.metaKey || e.ctrlKey) return;
+    if (variant) {
+      if (e.key === 'Enter' && !e.repeat && recallAns) {
+        e.preventDefault();
+        rate(recallAns.correct ? 'good' : 'again', true);
+      }
+      return;
+    }
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
       if (learning) { learnNext(); return; }
@@ -194,7 +211,28 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
         </div>
       )}
 
-      {current && (
+      {current && variant && recallQ && (
+        <div>
+          <div class="rounded-3xl border border-line bg-surface p-5 shadow-soft">
+            <TypingQuestion key={recallQ.id} q={recallQ} answer={recallAns} onAnswer={setRecallAns} />
+            {recallAns && (
+              <div class={`mt-4 rounded-xl p-3 text-sm ${recallAns.correct ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100' : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'}`} role="status">
+                <p class="font-semibold">{recallAns.correct ? (recallAns.note ?? 'Správně!') : 'Zatím ne.'}</p>
+                <p class="mt-1 flex items-center gap-2">Správně: <b lang="pt-PT">{current.pt}</b> <AudioButton text={current.pt} /></p>
+              </div>
+            )}
+          </div>
+          {recallAns ? (
+            <button type="button" onClick={() => rate(recallAns.correct ? 'good' : 'again', true)} class="mt-4 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
+              Další <span class="text-xs opacity-60">(Enter)</span>
+            </button>
+          ) : (
+            <button type="button" onClick={() => setNoTyping(true)} class="mt-3 text-xs text-muted underline">Dnes bez psaní (jen otáčet karty)</button>
+          )}
+        </div>
+      )}
+
+      {current && !variant && (
         <>
           <Flashcard key={current.id + (learning ? '-new' : '')} word={current} flipped={flipped || learning} direction={settings.direction} onFlip={() => setFlipped((f) => !f)} />
           {learning ? (

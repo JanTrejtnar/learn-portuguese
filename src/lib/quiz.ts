@@ -180,6 +180,16 @@ const choice = (kind: ChoiceQ['kind'], word: Word, scope: Word[], pool: Word[], 
   };
 };
 
+/** Otázka na psaní nebo diktát jednoho slovíčka. */
+export const typingQuestion = (word: Word, pool: Word[], kind: TypingQ['kind'], id: string): TypingQ => ({
+  id, kind, wordIds: [word.id],
+  prompt: kind === 'typing' ? word.cs : '',
+  audio: kind === 'dictation' ? word.pt : undefined,
+  // Uznej i jiná slovíčka se stejným překladem (např. dvě různé správné fráze pro „Kolik to stojí?“).
+  accepted: [...new Set([word.pt, ...pool.filter((x) => key(x.cs) === key(word.cs)).map((x) => x.pt)].flatMap(answerVariants))],
+  display: word.pt,
+});
+
 export const collectCloze = (lessons: Lesson[]): ClozeItem[] => lessons.flatMap((l) => l.cloze ?? []);
 
 const WORD_KINDS: (ChoiceQ['kind'] | TypingQ['kind'])[] = ['pt-to-cs', 'cs-to-pt', 'listen', 'typing', 'dictation'];
@@ -238,13 +248,7 @@ export const generateQuiz = (opts: GenerateOptions): Question[] => {
     if (!typeable) kind = kind === 'typing' ? 'cs-to-pt' : kind === 'dictation' ? 'listen' : kind;
     if (!audio && kind === 'listen') kind = 'cs-to-pt';
     if (kind === 'typing' || kind === 'dictation') {
-      questions.push({
-        id: nextId(), kind, wordIds: [word.id],
-        prompt: kind === 'typing' ? word.cs : '',
-        audio: kind === 'dictation' ? word.pt : undefined,
-        // Uznej i jiná slovíčka se stejným překladem (např. dvě různé správné fráze pro „Kolik to stojí?“).
-        accepted: [...new Set([word.pt, ...pool.filter((x) => key(x.cs) === key(word.cs)).map((x) => x.pt)].flatMap(answerVariants))], display: word.pt,
-      });
+      questions.push(typingQuestion(word, pool, kind, nextId()));
     } else {
       questions.push(choice(kind, word, words, pool, rng, nextId()));
     }

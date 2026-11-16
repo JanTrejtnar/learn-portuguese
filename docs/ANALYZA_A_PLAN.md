@@ -16,6 +16,12 @@ Stav k 16. 11. 2026. Doplňuje `docs/IMPROVEMENTS.md` (ten je široký katalog n
 
 **Také hotovo:** T1 (po třech neúspěšných pokusech o test jednotky nabídka odemknout další jednotku, test zůstává k opakování), P1 dokončeno (Pokrok už jen odkazuje na Nastavení; na stránce Karty zůstala zkratka „nových karet denně“). K2 (lazy-load obsahu) jsem neřešil: celá aplikace má po sestavení asi 480 KB, takže přínos by byl malý.
 
+**Také hotovo (L5, L6 – aktivní vybavování):**
+- *Analýza:* pasivní otáčení karet nestačí; nejlépe pomáhá vybavit si slovo z hlavy. Řešení nesmí přidat další úložiště ani rozbít SRS, proto se používá stejný stav karty a stejné hodnocení.
+- *L6 Psaní a diktát při opakování:* u slovíček, která už mají ≥ 2 opakování a jsou krátká, se místo otočení karty někdy zobrazí „napiš portugalsky“ nebo „napiš, co slyšíš“ (`src/lib/recall.ts`, `StudyPage.tsx`). Výběr je stabilní v rámci dne, podíl řídí nastavení „Psaní při opakování“ (vypnuto / někdy ≈ 1/3 / často ≈ 70 %, výchozí „někdy“). Správně nebo jen s chybou v diakritice = „Znal jsem“, jinak „Neznal jsem“. Tlačítko „Dnes bez psaní“ vypne psaní pro aktuální sezení.
+- *L5 Gramatika:* 268 vět s mezerou z 51 lekcí se opakuje plánem SRS na stránce `/grammar` (Karty → Gramatika: doplňování vět). Id karet má předponu `cl:`, takže se nepočítají mezi slovíčka v odznacích; každé sezení přidá až 6 nových vět.
+- Testy: 51 jednotkových, 11 E2E.
+
 **Zbývá:** M4 (sbírka, bonusové kapitoly, nápovědy v testech – podle zkušeností s mincemi) (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
 
 ## 0. Shrnutí v jedné stránce

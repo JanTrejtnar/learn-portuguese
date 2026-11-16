@@ -127,9 +127,59 @@ await test('obchod: zůstatek 0, nákup zamčený, nasazení motivu přes ulože
   await ctx.close();
 });
 
+await test('gramatika: věta s mezerou se opakuje a ukládá', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/grammar');
+  await page.getByRole('heading', { name: 'Gramatika: doplňování vět' }).waitFor();
+  await page.getByText('Doplň správný tvar:').waitFor();
+  await page.keyboard.press('1');
+  await page.getByRole('status').waitFor();
+  await page.getByRole('button', { name: /^Další/ }).click();
+  // uložená karta má předponu cl: a nezapočítá se mezi slovíčka
+  const saved = await page.evaluate(() => new Promise((resolve) => {
+    const req = indexedDB.open('ap-progress');
+    req.onsuccess = () => {
+      const all = req.result.transaction('cards').objectStore('cards').getAll();
+      all.onsuccess = () => resolve(all.result.map((c) => c.id));
+    };
+  }));
+  assert.ok(saved.length === 1 && saved[0].startsWith('cl:'), JSON.stringify(saved));
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test('opakování: známé slovo se píše, špatná odpověď se vrátí', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/stats');
+  await page.getByText('Můj pokrok').first().waitFor();
+  const ids = ['ola', 'bom-dia', 'boa-tarde', 'boa-noite', 'adeus', 'ate-logo', 'ate-amanha', 'tchau', 'tudo-bem', 'como-estas', 'como-esta', 'estou-bem', 'obrigado', 'de-nada', 'por-favor', 'desculpe', 'com-licenca', 'sim', 'nao'];
+  await page.evaluate((ids) => new Promise((resolve) => {
+    localStorage.setItem('ap:study-settings', JSON.stringify({ recall: 'often', autoplay: false }));
+    const req = indexedDB.open('ap-progress');
+    req.onsuccess = () => {
+      const tx = req.result.transaction('cards', 'readwrite');
+      for (const id of ids) tx.objectStore('cards').put({ id: 'u1l1-' + id, ease: 2.5, interval: 5, reps: 5, lapses: 0, due: 1, last: 1, introduced: 1 });
+      tx.oncomplete = () => resolve(true);
+    };
+  }), ids);
+  await page.goto(base + '#/cards/a1-u1-l1');
+  const input = page.locator('input[lang="pt-PT"]');
+  for (let i = 0; i < 19 && !(await input.isVisible().catch(() => false)); i++) {
+    await page.getByRole('button', { name: 'Otočit', exact: true }).click();
+    await page.getByRole('button', { name: /^Znal jsem/ }).click();
+  }
+  await input.waitFor({ timeout: 3000 });
+  await input.fill('xyz');
+  await input.press('Enter');
+  await page.getByText('Zatím ne.').waitFor();
+  await page.getByRole('button', { name: /^Další/ }).click();
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test('všechny hlavní stránky se načtou bez chyby', async () => {
   const { page, errors, ctx } = await newPage();
-  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/shop', '/settings', '/roleplay', '/pairs', '/speak']) {
+  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/shop', '/grammar', '/settings', '/roleplay', '/pairs', '/speak']) {
     await page.goto(base + '#' + r);
     await page.waitForTimeout(150);
     assert.ok(await page.locator('main, #obsah, h1').first().isVisible(), r);

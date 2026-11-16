@@ -60,7 +60,8 @@ export const CardsPage = () => {
       </select>
     </label>
 
-    <div class="mt-6">
+    <div class="mt-6 space-y-2">
+      <Row to="/grammar" emoji="🧩" title="Gramatika: doplňování vět" meta="Věty s mezerou z lekcí, opakují se chytrým plánem" />
       <Row to="/cards/all" emoji="🌍" title="Všechna odemčená slovíčka" meta={`${progress ? unlockedWords(progress.tests).length : '…'} karet · denní plán`} />
     </div>
 

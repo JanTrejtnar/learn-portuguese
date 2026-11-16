@@ -15,12 +15,14 @@ export interface StudySettings {
   showTranslations: boolean;
   /** Jednoduché hodnocení: jen „Neznal jsem“ / „Znal jsem“. */
   simpleRating: boolean;
+  /** Aktivní vybavování: jak často se při opakování místo otočení karty píše odpověď. */
+  recall: 'off' | 'sometimes' | 'often';
   /** Uživatel už viděl vysvětlení hodnocení. */
   ratingHelpSeen: boolean;
 }
 
 const KEY = 'ap:study-settings';
-const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10, dailyGoal: 40, showTranslations: true, simpleRating: true, ratingHelpSeen: false };
+const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10, dailyGoal: 40, showTranslations: true, simpleRating: true, recall: 'sometimes', ratingHelpSeen: false };
 
 export const useStudySettings = (): [StudySettings, (patch: Partial<StudySettings>) => void] => {
   const [settings, setSettings] = useState<StudySettings>(() => loadJson(KEY, defaults));

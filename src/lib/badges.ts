@@ -63,9 +63,11 @@ export const badgeContext = (p: Progress, unitList: UnitRef[]): BadgeContext => 
   const a1 = new Set(unitList.filter((u) => u.level === 'A1').map((u) => u.id));
   const a2 = new Set(unitList.filter((u) => u.level === 'A2').map((u) => u.id));
   const unitSet = new Set(unitList.map((u) => u.id));
+  // gramatické karty (předpona „cl:“) se do počtu slovíček nepočítají
+  const wordCards = [...p.cards.values()].filter((c) => !c.id.startsWith('cl:'));
   return {
-    seen: p.cards.size,
-    mature: [...p.cards.values()].filter((s) => maturity(s) === 'mature').length,
+    seen: wordCards.length,
+    mature: wordCards.filter((s) => maturity(s) === 'mature').length,
     bestStreak: bestStreak(p.days),
     testsPassed: tests.length,
     perfectTests: tests.filter((t) => t.best >= 1).length,
