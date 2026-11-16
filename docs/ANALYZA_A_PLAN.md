@@ -8,7 +8,9 @@ Stav k 16. 11. 2026. Doplňuje `docs/IMPROVEMENTS.md` (ten je široký katalog n
 
 **Hotovo (fáze 1 a část fáze 2):** U1 onboarding (`/welcome`), U3 „Otevřít lekci“ pro nového uživatele, U4 smazaný banner, U5 offline toast jen jednou, G1 sbalitelné vysvětlení (ⓘ) v seznamech, G2 „Co dál?“ na konci lekce, C2 štítek „neověřeno“, L1 krok „Nové slovíčko“ před zkouškou, L4 čistý souhrn, P1 nastavení učení na jednom místě (Nastavení → Učení).
 
-**Zbývá:** N1/N2 sloučení navigace, T1/T2 výsledek testu, P2 zmrazení série, K1 E2E testy v CI, K2 lazy-load, K6 prompt na aktualizaci, L5/L6 gramatické a psací karty, C1/C3/A1 (obsah a audio).
+**Také hotovo:** K1 E2E testy (`npm run test:e2e`, 7 scénářů, spouští se v CI po buildu).
+
+**Zbývá:** N1/N2 sloučení navigace, T1/T2 výsledek testu, P2 zmrazení série, K2 lazy-load, K6 prompt na aktualizaci, L5/L6 gramatické a psací karty, C1/C3/A1 (obsah a audio).
 
 ## 0. Shrnutí v jedné stránce
 
