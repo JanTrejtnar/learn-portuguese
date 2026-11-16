@@ -2,7 +2,7 @@ name: CI a nasazení
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'claude/**']
   pull_request:
   workflow_dispatch:
 
@@ -26,14 +26,15 @@ jobs:
       - run: npm test
       - run: npm run build
       - uses: actions/configure-pages@v5
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
       - uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
         with:
           path: dist
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    # Prostředí „github-pages“ povoluje nasazení jen z výchozí větve repozitáře.
+    if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
     needs: build
     runs-on: ubuntu-latest
     permissions:
