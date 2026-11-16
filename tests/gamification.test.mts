@@ -56,7 +56,7 @@ test('odznaky se odvozují z pokroku', () => {
     days: new Map<string, any>([day(0, { goalReached: true, xp: 50 })]),
     tests: new Map([['u1', { id: 'u1', passed: true, best: 1 }], ['u2', { id: 'u2', passed: true, best: 0.9, skipped: true }]]),
   };
-  const ctx = badgeContext(p, ['u1', 'u2']);
+  const ctx = badgeContext(p, [{ id: 'u1', level: 'A1' }, { id: 'u2', level: 'A1' }]);
   assert.equal(ctx.seen, 2);
   assert.equal(ctx.mature, 1);
   assert.equal(ctx.unitTestsPassed, 1, 'ručně odemčená jednotka se nepočítá');

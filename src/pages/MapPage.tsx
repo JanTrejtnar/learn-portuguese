@@ -1,4 +1,5 @@
-import { units, unitUnlocked } from '../content';
+import { useState } from 'preact/hooks';
+import { unitCode, units, unitUnlocked } from '../content';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
 
@@ -18,11 +19,17 @@ const outlinePath = OUTLINE.map(([lon, lat], i) => `${i === 0 ? 'M' : 'L'}${proj
 
 type State = 'done' | 'current' | 'open' | 'locked';
 
+const LEVEL_TABS = ['A1', 'A2'] as const;
+
 export const MapPage = () => {
   const progress = useProgress();
+  const [chosen, setChosen] = useState<(typeof LEVEL_TABS)[number] | null>(null);
   if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
 
-  const mapped = units.filter((u) => u.city);
+  // Výchozí záložka = úroveň, ve které právě jsi (první nesplněná odemčená jednotka).
+  const current = units.find((u) => u.city && !progress.tests.get(u.id)?.passed && unitUnlocked(u.id, progress.tests));
+  const level = chosen ?? (current?.level as (typeof LEVEL_TABS)[number] | undefined) ?? 'A1';
+  const mapped = units.filter((u) => u.city && u.level === level);
   const stateOf = (id: string): State => {
     if (progress.tests.get(id)?.passed) return 'done';
     return unitUnlocked(id, progress.tests) ? 'open' : 'locked';
@@ -45,8 +52,17 @@ export const MapPage = () => {
     <div>
       <h1 class="text-2xl font-bold">Cesta Portugalskem 🇵🇹</h1>
       <p class="mt-1 text-stone-600 dark:text-stone-400">
-        Každá jednotka je jedno město. Splň test jednotky a cesta pokračuje dál. Hotovo: <b>{doneCount} / {mapped.length}</b>.
+        Každá jednotka je jedno město. Splň test jednotky a cesta pokračuje dál. Hotovo ({level}): <b>{doneCount} / {mapped.length}</b>.
       </p>
+
+      <div class="mt-4 flex gap-2" role="tablist" aria-label="Úroveň">
+        {LEVEL_TABS.map((l) => (
+          <button key={l} type="button" role="tab" aria-selected={level === l} onClick={() => setChosen(l)}
+            class={`rounded-xl px-4 py-2 font-semibold ${level === l ? 'bg-brand-700 text-white' : 'border border-stone-300 dark:border-stone-700'}`}>
+            {l}
+          </button>
+        ))}
+      </div>
 
       {firstOpen && (
         <a href={href(`/unit/${firstOpen.id}`)} class="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-brand-700 p-4 text-white hover:bg-brand-600">
@@ -97,7 +113,7 @@ export const MapPage = () => {
                 <span class="text-2xl" aria-hidden="true">{st === 'done' ? '✅' : st === 'locked' ? '🔒' : '📍'}</span>
                 <span class="min-w-0">
                   <span class="block font-semibold">{u.city!.name}</span>
-                  <span class="block text-sm text-stone-600 dark:text-stone-400">Jednotka {u.order}: {u.title}</span>
+                  <span class="block text-sm text-stone-600 dark:text-stone-400">Jednotka {unitCode(u)}: {u.title}</span>
                 </span>
               </a>
             </li>

@@ -1,4 +1,4 @@
-import { units, unitUnlocked } from '../content';
+import { unitCode, units, unitUnlocked } from '../content';
 import { PASS_RATIO } from '../lib/quiz';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
@@ -35,7 +35,7 @@ export const QuizHubPage = () => {
         return (
           <section key={u.id} class="mt-8">
             <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-stone-500">
-              {!unlocked && <span aria-hidden="true">🔒</span>} {u.level} · Jednotka {u.order}: {u.title}
+              {!unlocked && <span aria-hidden="true">🔒</span>} Jednotka {unitCode(u)}: {u.title}
             </h2>
             {unlocked ? (
               <div class="space-y-2">

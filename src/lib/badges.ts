@@ -10,7 +10,9 @@ export interface BadgeContext {
   testsPassed: number;
   perfectTests: number;
   unitTestsPassed: number;
-  totalUnits: number;
+  a1Total: number;
+  a1Passed: number;
+  a2Passed: number;
   goalDays: number;
   level: number;
   scenariosDone: number;
@@ -39,17 +41,28 @@ export const BADGES: BadgeDef[] = [
   { id: 'first-test', emoji: '🏆', title: 'Primeiro Teste', desc: 'Splnil jsi první test (≥ 80 %).', earned: (c) => c.testsPassed >= 1 },
   { id: 'perfect', emoji: '💯', title: 'Perfeito!', desc: 'Test na 100 %.', earned: (c) => c.perfectTests >= 1 },
   { id: 'units-4', emoji: '🚋', title: 'A Meio Caminho', desc: 'Splněné testy 4 jednotek.', earned: (c) => c.unitTestsPassed >= 4 },
-  { id: 'a1-done', emoji: '🎓', title: 'A1 Completo', desc: 'Splněné testy všech jednotek A1.', earned: (c) => c.totalUnits > 0 && c.unitTestsPassed >= c.totalUnits },
+  { id: 'a1-done', emoji: '🎓', title: 'A1 Completo', desc: 'Splněné testy všech jednotek A1.', earned: (c) => c.a1Total > 0 && c.a1Passed >= c.a1Total },
+  { id: 'a2-done', emoji: '🏰', title: 'A2 Completo', desc: 'Splněné testy všech 8 jednotek A2.', earned: (c) => c.a2Passed >= A2_PLANNED_UNITS },
   { id: 'actor', emoji: '🎭', title: 'Ator', desc: 'Dokončil jsi první roleplay scénář.', earned: (c) => c.scenariosDone >= 1 },
   { id: 'actor-5', emoji: '🎬', title: 'Elenco Completo', desc: 'Dokončil jsi všech 5 roleplay scénářů.', earned: (c) => c.scenariosDone >= 5 },
   { id: 'level-5', emoji: '⭐', title: 'Conversador', desc: 'Dosáhl jsi 5. úrovně.', earned: (c) => c.level >= 5 },
 ];
 
-export const badgeContext = (p: Progress, unitIds: string[]): BadgeContext => {
+/** Plánovaný počet jednotek A2 (odznak A2 Completo vyžaduje všechny). */
+export const A2_PLANNED_UNITS = 8;
+
+export interface UnitRef {
+  id: string;
+  level: string;
+}
+
+export const badgeContext = (p: Progress, unitList: UnitRef[]): BadgeContext => {
   const passedAll = [...p.tests.values()].filter((t) => t.passed && !t.skipped);
   // Výsledky scénářů se ukládají s předponou „rp:“ a nepočítají se jako testy lekcí.
   const tests = passedAll.filter((t) => !t.id.startsWith('rp:'));
-  const unitSet = new Set(unitIds);
+  const a1 = new Set(unitList.filter((u) => u.level === 'A1').map((u) => u.id));
+  const a2 = new Set(unitList.filter((u) => u.level === 'A2').map((u) => u.id));
+  const unitSet = new Set(unitList.map((u) => u.id));
   return {
     seen: p.cards.size,
     mature: [...p.cards.values()].filter((s) => maturity(s) === 'mature').length,
@@ -57,14 +70,16 @@ export const badgeContext = (p: Progress, unitIds: string[]): BadgeContext => {
     testsPassed: tests.length,
     perfectTests: tests.filter((t) => t.best >= 1).length,
     unitTestsPassed: tests.filter((t) => unitSet.has(t.id)).length,
-    totalUnits: unitIds.length,
+    a1Total: a1.size,
+    a1Passed: tests.filter((t) => a1.has(t.id)).length,
+    a2Passed: tests.filter((t) => a2.has(t.id)).length,
     goalDays: [...p.days.values()].filter((d) => d.goalReached).length,
     level: levelInfo(totalXp(p.days)).level,
     scenariosDone: passedAll.filter((t) => t.id.startsWith('rp:')).length,
   };
 };
 
-export const earnedBadges = (p: Progress, unitIds: string[]): BadgeDef[] => {
-  const ctx = badgeContext(p, unitIds);
+export const earnedBadges = (p: Progress, unitList: UnitRef[]): BadgeDef[] => {
+  const ctx = badgeContext(p, unitList);
   return BADGES.filter((b) => b.earned(ctx));
 };

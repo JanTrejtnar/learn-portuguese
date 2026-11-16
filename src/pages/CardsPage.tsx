@@ -1,4 +1,4 @@
-import { units, unitUnlocked, unlockedWords } from '../content';
+import { unitCode, units, unitUnlocked, unlockedWords } from '../content';
 import { useProgress } from '../lib/useProgress';
 import { useStudySettings } from '../lib/settings';
 import { href } from '../router';
@@ -44,7 +44,7 @@ export const CardsPage = () => {
     {units.filter((u) => open(u.id)).map((u) => (
       <section key={u.id} class="mt-8">
         <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-stone-500">
-          {u.level} · Jednotka {u.order}: {u.title}
+          Jednotka {unitCode(u)}: {u.title}
         </h2>
         <div class="space-y-2">
           <Row to={`/cards/${u.id}`} emoji={u.emoji} title="Celá jednotka" meta={`${u.lessons.flatMap((l) => l.words).length} karet`} />

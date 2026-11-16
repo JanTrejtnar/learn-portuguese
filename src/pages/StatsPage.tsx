@@ -28,7 +28,7 @@ export const StatsPage = () => {
   const words = allWords();
   const xp = totalXp(progress.days);
   const lvl = levelInfo(xp);
-  const ctx = badgeContext(progress, units.map((u) => u.id));
+  const ctx = badgeContext(progress, units);
   const earned = new Set(BADGES.filter((b) => b.earned(ctx)).map((b) => b.id));
   const counts: Record<Maturity, number> = { new: 0, learning: 0, young: 0, mature: 0 };
   for (const w of words) counts[maturity(progress.cards.get(w.id))] += 1;
