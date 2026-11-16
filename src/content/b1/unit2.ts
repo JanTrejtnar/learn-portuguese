@@ -63,7 +63,7 @@ export const unit2: Unit = {
       subtitle: 'Počasí, krajina a příroda',
       reviewed: false,
       words: [
-        wx('b1u2l2-chuva', 'a chuva', 'déšť', 'noun', 'A chuva não pára desde ontem.', 'Déšť neustává od včerejška.', { gender: 'f' }),
+        wx('b1u2l2-chuva', 'a chuva', 'déšť', 'noun', 'A chuva não para desde ontem.', 'Déšť neustává od včerejška.', { gender: 'f' }),
         wx('b1u2l2-nevoeiro', 'o nevoeiro', 'mlha', 'noun', 'Há muito nevoeiro de manhã.', 'Ráno je velká mlha.', { gender: 'm' }),
         wx('b1u2l2-geada', 'a geada', 'mráz, jinovatka', 'noun', 'Esta noite vai haver geada.', 'V noci bude mrznout.', { gender: 'f' }),
         wx('b1u2l2-neve', 'a neve', 'sníh', 'noun', 'Em Bragança cai neve no inverno.', 'V Bragança v zimě sněží.', { gender: 'f' }),
@@ -100,7 +100,7 @@ export const unit2: Unit = {
         c('É possível que ___ neve na serra.', 'Je možné, že na horách bude sníh.', 'haja', ['há', 'houve']),
         c('Tomara que o tempo ___ bom.', 'Kéž by bylo hezky.', 'esteja', ['está', 'estar']),
         c('Agora ___ a chover.', 'Teď prší.', 'está', ['esteja', 'estar']),
-        c('Hoje ___ muito vento.', 'Dnes hodně fouká.', 'faz', ['faça', 'há']),
+        c('Hoje ___ muito vento.', 'Dnes hodně fouká.', 'faz', ['faça', 'fazem']),
       ],
     },
     {
@@ -127,7 +127,7 @@ export const unit2: Unit = {
       grammar: {
         title: 'Conjuntivo presente: nepravidelná slovesa',
         body: [
-          'Některá slovesa mají nepravidelný kmen. Nejdůležitější jsou ser, estar, ter, ir, fazer, ver, dar, saber, querer, poder, dizer a vir. U nepravidelných sloves se tvar nedá odvodit z „eu“, je třeba se je naučit.',
+          'Některá slovesa mají nepravidelný kmen. Nejdůležitější jsou ser, estar, ter, ir, fazer, ver, dar, saber, querer, poder, dizer a vir. U fazer, ver, dizer, vir, poder a ter conjuntivo vychází z 1. osoby (faço → faça, digo → diga, tenho → tenha). Opravdu nepravidelné jsou ser, estar, ir, dar, saber, querer a haver, ty je třeba se naučit.',
           'Po „talvez“ a „oxalá“ se v PT-PT používá conjuntivo: „Talvez ele venha.“ Po „acho que“ se naopak používá indikativ: „Acho que ele vem.“',
         ],
         table: {

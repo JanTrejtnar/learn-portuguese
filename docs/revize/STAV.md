@@ -12,4 +12,4 @@ Nálezy se stylem a s nízkou jistotou, např. oslovení „minha senhora“, �
 Nálezy „chyba“ s vysokou jistotou, zejména: překlady (daruji, souhlasím, 3+1), „stříška“ místo „čárka“ u porquê, nepravidelná slovesa v imperfeitu (pôr místo ir), „mais pequeno“, „à penicilina“, „se estiver sol“, tvary v tabulce zájmen a doplňování, kde „špatná“ možnost byla také správná (přidán časový údaj nebo vyměněn distraktor).
 
 ## A2 a B1: ponecháno
-Pochybné a stylové nálezy, nízká jistota a zbylá doplňování s více správnými odpověďmi mimo „chyby“. Zůstávají v souborech `A2-*.md` a `B1-*.md` pro rodilého mluvčího. B1.1–2 se zpracovává, jakmile je zpráva hotová.
+Pochybné a stylové nálezy, nízká jistota a zbylá doplňování s více správnými odpověďmi mimo „chyby“. Zůstávají v souborech `A2-*.md` a `B1-*.md` pro rodilého mluvčího. Z B1.1–2 jsou opraveny tři „chyby“ (vítr, conjuntivo, pravopis „para“).

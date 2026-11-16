@@ -51,7 +51,7 @@ export const unit1: Unit = {
       cloze: [
         c('Quando eu era criança, ___ na aldeia dos meus avós.', 'Když jsem byl(a) dítě, bydlel(a) jsem ve vesnici svých prarodičů.', 'vivia', ['vivi', 'vivo']),
         c('Antigamente, nós ___ sempre ao mercado ao sábado.', 'Dříve jsme v sobotu vždycky chodili na trh.', 'íamos', ['fomos', 'vamos']),
-        c('Eu ___ muito tímido na escola.', 'Ve škole jsem byl velmi stydlivý.', 'era', ['fui', 'sou']),
+        c('Naquele tempo, eu ___ muito tímido na escola.', 'Tehdy jsem byl ve škole velmi stydlivý.', 'era', ['fui', 'sou']),
         c('Os meus avós ___ uma quinta no Minho.', 'Moji prarodiče měli statek v Minhu.', 'tinham', ['têm', 'tiveram']),
         c('Tu ___ todos os dias com os primos?', 'Hrával(a) sis každý den s bratranci?', 'brincavas', ['brincaste', 'brincas']),
         c('Nessa época, nós ___ muito cedo.', 'V té době jsme vstávali velmi brzy.', 'acordávamos', ['acordamos', 'acordaram']),
