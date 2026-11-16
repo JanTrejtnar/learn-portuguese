@@ -51,7 +51,7 @@
 | Nápad | Dopad | Pracnost | Poznámka |
 |---|---|---|---|
 | **Onboarding**: cíl, úroveň, denní cíl, čas připomenutí, krátká prohlídka | 🔴 | M | Dnes uživatel vidí rovnou úvodní stránku. |
-| **Hledání** ve slovíčkách a lekcích (slovník) | 🟡 | S | Data jsou v paměti, stačí index. |
+| **Hledání** ve slovíčkách (hotovo na stránce Karty; zbývá hledání v lekcích a gramatice) | 🟡 | S | |
 | **Oblíbené / „těžká slova“** a poznámky ke slovíčku | 🟡 | S | |
 | **Swipe gesta** u karet (doprava = dobře, doleva = znovu), přehled klávesových zkratek | 🟡 | S | |
 | **Zvukové efekty, haptika, konfety** při splnění testu / série (s přepínačem) | 🟢 | S | Respektovat „omezit pohyb“ (už respektováno u animací). |

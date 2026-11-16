@@ -1,4 +1,6 @@
+import { useState } from 'preact/hooks';
 import { unitCode, units, unitUnlocked, unlockedWords } from '../content';
+import { WordRow } from '../components/WordRow';
 import { useProgress } from '../lib/useProgress';
 import { useStudySettings } from '../lib/settings';
 import { href } from '../router';
@@ -16,16 +18,37 @@ const Row = ({ to, title, meta, emoji }: { to: string; title: string; meta: stri
   </a>
 );
 
+const norm = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 export const CardsPage = () => {
+  const [q, setQ] = useState('');
   const [settings, update] = useStudySettings();
   const progress = useProgress();
   const open = (id: string) => !progress || unitUnlocked(id, progress.tests);
+  const needle = norm(q.trim());
+  const hits = needle.length < 2 ? [] : (progress ? unlockedWords(progress.tests) : []).filter(
+    (w) => norm(w.pt).includes(needle) || norm(w.cs).includes(needle),
+  );
   return (
   <div>
     <h1 class="text-2xl font-bold">Kartičky</h1>
     <p class="mt-1 text-ink-soft">
       Opakování řídí chytrý plán (SRS): karty se vrací v rostoucích odstupech. Vyber balíček.
     </p>
+    <input
+      type="search"
+      value={q}
+      onInput={(e) => setQ(e.currentTarget.value)}
+      placeholder="🔍 Hledat slovíčko (česky i portugalsky)…"
+      aria-label="Hledat slovíčko"
+      class="mt-4 w-full rounded-xl border border-line-strong bg-surface px-4 py-3"
+    />
+    {needle.length >= 2 && (
+      <div class="mt-3" aria-live="polite">
+        <p class="text-sm text-muted">{hits.length ? `Nalezeno: ${hits.length}` : 'Nic nenalezeno (hledá se v odemčených slovíčkách).'}</p>
+        <ul class="mt-2 space-y-2">{hits.slice(0, 30).map((w) => <WordRow key={w.pt + w.cs} word={w} />)}</ul>
+      </div>
+    )}
     <label class="mt-4 flex items-center gap-2 text-sm">
       Nových karet denně:
       <select
