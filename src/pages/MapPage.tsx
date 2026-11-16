@@ -6,6 +6,7 @@ import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
 import { ViewSwitch } from '../components/ViewSwitch';
 import type { Unit } from '../types';
+import { TRAVEL_KEY } from '../components/PostcardScreen';
 
 /* ───────── Zeměpis (lon/lat → SVG) ───────── */
 const SX = 85;
@@ -80,11 +81,42 @@ const Stars = ({ n, size = 1 }: { n: number; size?: number }) => (
   </g>
 );
 
+const FlagMarker = () => (
+  <g class="map-bounce">
+    <path d="M-5 9 L0 17 L5 9 Z" fill="#fff" stroke="#ffe900" stroke-width="2" stroke-linejoin="round" />
+    <circle r="11" fill="#fff" stroke="#ffe900" stroke-width="2.5" />
+    <svg x="-8" y="-8" width="16" height="16" viewBox="0 0 32 32">
+      <g clip-path="url(#flagclip)"><rect width="32" height="32" fill="#da291c" /><rect width="12.8" height="32" fill="#046a38" /><circle cx="12.8" cy="16" r="6" fill="none" stroke="#ffe900" stroke-width="2.4" /></g>
+    </svg>
+  </g>
+);
+
+/** Po dokončení jednotky se mapa otevře s animací přesunu praporku do dalšího města (jednorázově). */
+const readTravel = (): { from: string; to: string } | null => {
+  try {
+    const raw = sessionStorage.getItem(TRAVEL_KEY);
+    if (!raw) return null;
+    sessionStorage.removeItem(TRAVEL_KEY);
+    const t = JSON.parse(raw) as { from?: string; to?: string };
+    return t.from && t.to ? { from: t.from, to: t.to } : null;
+  } catch {
+    return null;
+  }
+};
+
 export const MapPage = () => {
   const progress = useProgress();
   const [chosen, setChosen] = useState<Level | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const travelRef = useRef<{ from: string; to: string } | null | undefined>(undefined);
+  if (travelRef.current === undefined) travelRef.current = readTravel();
+  const [travelOver, setTravelOver] = useState(false);
+  useEffect(() => {
+    if (!travelRef.current) return;
+    const t = window.setTimeout(() => setTravelOver(true), 2400);
+    return () => clearTimeout(t);
+  }, []);
   useEffect(() => {
     if (!selected) return;
     closeRef.current?.focus();
@@ -96,7 +128,8 @@ export const MapPage = () => {
 
   const withCity = units.filter((u) => u.city);
   const currentUnit = withCity.find((u) => !progress.tests.get(u.id)?.passed && unitUnlocked(u.id, progress.tests));
-  const level: Level = chosen ?? ((currentUnit?.level as Level | undefined) ?? 'A1');
+  const travelTo = travelRef.current ? withCity.find((u) => u.id === travelRef.current!.to) : undefined;
+  const level: Level = chosen ?? ((travelTo?.level as Level | undefined) ?? (currentUnit?.level as Level | undefined) ?? 'A1');
   const mapped = withCity.filter((u) => u.level === level);
 
   const stateOf = (u: Unit): State => {
@@ -126,6 +159,9 @@ export const MapPage = () => {
       : [(a.p[0] + b.p[0]) / 2 + (-dy / len) * len * 0.2 * (i % 2 ? 1 : -1), (a.p[1] + b.p[1]) / 2 + (dx / len) * len * 0.2 * (i % 2 ? 1 : -1)];
     return { d: `M${fmt(a.p)} Q${fmt(ctrl)} ${fmt(b.p)}`, len: Math.round(len * 1.25), done: a.st === 'done', next: a.st === 'current' };
   });
+
+  const travelIdx = travelRef.current ? positioned.findIndex((x, i) => x.u.id === travelRef.current!.from && positioned[i + 1]?.u.id === travelRef.current!.to) : -1;
+  const traveling = travelIdx >= 0 && !travelOver;
 
   const fills: Record<State, { fill: string; ring: string }> = {
     done: { fill: '#ffe900', ring: '#046a38' },
@@ -201,10 +237,18 @@ export const MapPage = () => {
           {segments.map((s, i) => <path key={`b${i}`} d={s.d} fill="none" stroke="var(--road)" stroke-width="10" stroke-linecap="round" opacity=".55" />)}
           {segments.map((s, i) =>
             s.done ? (
-              <path key={`g${i}`} d={s.d} fill="none" stroke="#ffe900" stroke-width="4.5" stroke-linecap="round" class="map-draw" style={{ '--len': s.len }} />
+              <path key={`g${i}`} d={s.d} fill="none" stroke="#ffe900" stroke-width="4.5" stroke-linecap="round" class="map-draw" style={i === travelIdx ? { '--len': s.len, animationDelay: '.5s', animationDuration: '1.6s', animationTimingFunction: 'linear' } : { '--len': s.len }} />
             ) : (
               <path key={`d${i}`} d={s.d} fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="0.1 8" class={s.next ? 'map-flow' : ''} opacity={s.next ? 1 : 0.8} />
             ),
+          )}
+
+          {traveling && (
+            <g visibility="hidden" aria-hidden="true">
+              <set attributeName="visibility" to="visible" begin=".5s" fill="freeze" />
+              <animateMotion dur="1.6s" begin=".5s" fill="freeze" {...({ path: segments[travelIdx]!.d } as object)} calcMode="linear" />
+              <g transform="translate(0 -42)"><FlagMarker /></g>
+            </g>
           )}
 
           {/* města */}
@@ -246,16 +290,8 @@ export const MapPage = () => {
                   <rect width={w} height="18" rx="9" fill={st === 'done' ? '#ffe900' : st === 'current' ? 'var(--color-flag-600)' : 'var(--surface)'} stroke={st === 'done' ? '#046a38' : st === 'current' ? '#fff' : 'var(--line)'} stroke-width={st === 'locked' ? 1 : 1.6} opacity={st === 'locked' ? 0.75 : 1} />
                   <text x={w / 2} y="12.5" font-size="10" font-weight="800" text-anchor="middle" fill={st === 'done' ? '#14221a' : st === 'current' ? '#fff' : st === 'locked' ? 'var(--muted)' : 'var(--map-ink)'}>{name}</text>
                 </g>
-                {st === 'current' && (
-                  <g transform="translate(0 -42)" aria-hidden="true">
-                    <g class="map-bounce">
-                      <path d="M-5 9 L0 17 L5 9 Z" fill="#fff" stroke="#ffe900" stroke-width="2" stroke-linejoin="round" />
-                      <circle r="11" fill="#fff" stroke="#ffe900" stroke-width="2.5" />
-                      <svg x="-8" y="-8" width="16" height="16" viewBox="0 0 32 32">
-                        <g clip-path="url(#flagclip)"><rect width="32" height="32" fill="#da291c" /><rect width="12.8" height="32" fill="#046a38" /><circle cx="12.8" cy="16" r="6" fill="none" stroke="#ffe900" stroke-width="2.4" /></g>
-                      </svg>
-                    </g>
-                  </g>
+                {st === 'current' && !traveling && (
+                  <g transform="translate(0 -42)" aria-hidden="true"><FlagMarker /></g>
                 )}
               </g>
             );

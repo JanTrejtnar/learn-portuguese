@@ -11,7 +11,9 @@ import { getVoiceStatus } from '../lib/audio';
 import { saveCard, saveDay, saveTest, type Progress, type TestResult } from '../lib/db';
 import { PASS_RATIO, collectCloze, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
 import { schedule } from '../lib/srs';
-import { playCorrect, playWrong } from '../lib/sound';
+import { playChime, playCorrect, playWrong } from '../lib/sound';
+import { PostcardScreen } from '../components/PostcardScreen';
+import { postcards } from '../content/postcards';
 import { useKeydown } from '../lib/useKeydown';
 import { useStudySettings } from '../lib/settings';
 import { notifyProgress, toast } from '../lib/toast';
@@ -104,8 +106,9 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const [results, setResults] = useState<QuestionResult[]>([]);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const saved = useRef(false);
-  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: { id: string; title: string } | null; xp: number; attempts: number } | null>(null);
+  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: { id: string; title: string } | null; xp: number; attempts: number; postcard: boolean } | null>(null);
   const [skippedNow, setSkippedNow] = useState(false);
+  const [showPostcard, setShowPostcard] = useState(false);
 
   const q = questions[index];
   const finished = index >= questions.length;
@@ -117,6 +120,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const next = () => {
     if (!answer || !q || closed.current === q.id) return;
     closed.current = q.id;
+    if (index + 1 === questions.length && (results.filter((r) => r.correct).length + (answer.correct ? 1 : 0)) / questions.length >= PASS_RATIO) playChime(); // z klepnutí (iOS)
     setResults((r) => [...r, { question: q, ...answer }]);
     setAnswer(null);
     setIndex((i) => i + 1);
@@ -148,6 +152,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     let passed = ratio >= PASS_RATIO;
     let newlyUnlocked: { id: string; title: string } | null = null;
     let attempts = 0;
+    let postcard = false;
     let xp = correctCount * XP_PER_CORRECT_ANSWER;
     if (scope.graded) {
       const old = progress.tests.get(scope.id);
@@ -165,6 +170,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       const idx = units.findIndex((u) => u.id === scope.id);
       const before = scope.unlocks && wasUnlocked(idx + 1);
       attempts = result.attempts;
+      postcard = scope.unlocks && passed && (!old?.passed || !!old.skipped) && !!postcards[scope.id];
       progress.tests.set(scope.id, result);
       void saveTest(result);
       if (scope.unlocks && !before && wasUnlocked(idx + 1)) newlyUnlocked = { id: units[idx + 1]!.id, title: units[idx + 1]!.title };
@@ -175,7 +181,8 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     void saveDay(award.day);
     if (award.goalJustReached) toast({ emoji: '🎯', title: `Denní cíl splněn! +${XP_GOAL_BONUS} XP` });
     notifyProgress();
-    setOutcome({ passed, newlyUnlocked, xp: award.gained, attempts });
+    setOutcome({ passed, newlyUnlocked, xp: award.gained, attempts, postcard });
+    if (postcard) setShowPostcard(true);
   }, [finished]);
 
   const nextUnit = scope.unlocks ? units[units.findIndex((u) => u.id === scope.id) + 1] : undefined;
@@ -256,10 +263,18 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
         </>
       )}
 
+      {finished && showPostcard && outcome?.postcard && (
+        <PostcardScreen
+          unitId={scope.id}
+          next={unlockedNext}
+          onClose={() => setShowPostcard(false)}
+        />
+      )}
+
       {finished && (
         <div>
           <div class="relative rounded-3xl border border-line bg-surface p-6 text-center">
-            {ratio >= PASS_RATIO && <Celebrate />}
+            {ratio >= PASS_RATIO && !outcome?.postcard && <Celebrate full />}
             <div class="text-5xl" aria-hidden="true">{ratio >= PASS_RATIO ? '🎉' : '💪'}</div>
             <h1 class="mt-2 text-3xl font-bold">{Math.round(ratio * 100)} %</h1>
             <p class="text-ink-soft">{correctCount} z {questions.length} správně</p>

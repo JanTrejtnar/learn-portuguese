@@ -93,10 +93,14 @@ export const HomePage = () => {
               force((n) => n + 1);
             };
             return (
-              <li key={u.id}>
+              <li key={u.id} class="flex flex-col">
                 <a
                   href={href(`/unit/${u.id}`)}
-                  class={`flex h-full items-center gap-4 rounded-2xl border bg-surface p-4 shadow-soft hover:shadow-lift ${current?.id === u.id ? 'border-brand-600 ring-2 ring-brand-600/30' : 'border-line hover:border-brand-500'} ${locked ? 'border-dashed' : ''}`}
+                  class={`flex flex-1 items-center gap-4 rounded-2xl border p-4 hover:shadow-lift ${
+                    current?.id === u.id ? 'unit-current border-2 border-flag-600 bg-flag-50 shadow-lift dark:bg-flag-900/30'
+                    : t?.passed ? 'border-2 border-brand-600 bg-brand-50 shadow-soft dark:bg-brand-950'
+                    : locked ? 'border-dashed border-line-strong bg-surface-2'
+                    : 'border-line bg-surface shadow-soft hover:border-brand-500'}`}
                 >
                   <span class={`text-3xl ${locked ? 'opacity-40 grayscale' : ''}`} aria-hidden="true">{u.emoji}</span>
                   <span class="min-w-0">
@@ -104,8 +108,8 @@ export const HomePage = () => {
                     <span class="block font-semibold">{u.title}</span>
                     <span class="block text-sm text-ink-soft">{u.subtitle}</span>
                   </span>
-                  {t?.passed && <span class="ml-auto shrink-0 rounded-full bg-brand-100 px-2.5 py-1 text-xs font-bold text-brand-800 dark:bg-brand-900 dark:text-brand-100">✓ splněno</span>}
-                  {current?.id === u.id && <span class="ml-auto shrink-0 rounded-full bg-flag-600 px-2.5 py-1 text-xs font-bold text-white">další krok</span>}
+                  {t?.passed && <span class="ml-auto shrink-0 rounded-full bg-brand-700 px-2.5 py-1 text-xs font-bold text-white">✓ splněno</span>}
+                  {current?.id === u.id && <span class="ml-auto shrink-0 rounded-full bg-flag-600 px-3 py-1.5 text-sm font-extrabold text-white shadow-soft">▶ další krok</span>}
                   {locked && <span class="ml-auto shrink-0 text-muted"><Icon name="lock" class="h-5 w-5" /></span>}
                 </a>
                 {canSkipTo && prevUnit && (

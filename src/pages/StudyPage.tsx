@@ -8,14 +8,14 @@ import { TypingQuestion, type Answer } from '../components/QuizQuestions';
 import { hasInfo, WordInfo } from '../components/WordInfo';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { allWords, getDeck, unlockedWords } from '../content';
-import { speak, stopSpeaking } from '../lib/audio';
+import { speak, stopSpeaking, useVoicesReady } from '../lib/audio';
 import { saveCard, saveDay, type DayStats, type Progress } from '../lib/db';
 import { typingQuestion } from '../lib/quiz';
 import { recallVariant } from '../lib/recall';
 import { buildQueue, shuffled } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
 import { dateKey, schedule, type Rating } from '../lib/srs';
-import { playCorrect, playWrong } from '../lib/sound';
+import { playChime, playCorrect, playWrong } from '../lib/sound';
 import { useKeydown } from '../lib/useKeydown';
 import { notifyProgress, toast } from '../lib/toast';
 import { XP_GOAL_BONUS, awardXp, xpForRating } from '../lib/xp';
@@ -36,8 +36,10 @@ const ratings: RatingDef[] = [
 export const StudyPage = ({ deckId, mode }: { deckId: string; mode: 'srs' | 'free' }) => {
   const deck = getDeck(deckId);
   const progress = useProgress();
+  const voicesReady = useVoicesReady();
   if (!deck) return <NotFoundPage />;
-  if (!progress) return <Loading />;
+  // Počkáme na načtení hlasů, aby se hned první karta přečetla.
+  if (!progress || !voicesReady) return <Loading />;
   return <Session key={`${mode}-${deckId}`} title={deck.title} deckId={deckId} words={deckId === 'all' ? unlockedWords(progress.tests) : deck.words} mode={mode} progress={progress} />;
 };
 
@@ -122,6 +124,7 @@ const Session = ({ deckId, words, mode, progress }: SessionProps) => {
     setCounts((c) => ({ ...c, [r]: c[r] + 1 }));
     // „Znovu“ vrátí kartu na konec dnešní fronty (do SRS se zapíše i termín za 10 min).
     setQueue((q) => (r === 'again' ? [...q.slice(1), q[0]!] : q.slice(1)));
+    if (queue.length === 1 && r !== 'again') playChime(); // poslední karta: fanfára přímo z klepnutí (iOS)
     setFlipped(false);
     setRecallAns(null);
   };
@@ -236,7 +239,7 @@ const Session = ({ deckId, words, mode, progress }: SessionProps) => {
 
       {(sessionDone || nothingToDo) && (
         <div class="relative rounded-3xl border border-line bg-surface p-8 text-center">
-          {sessionDone && <Celebrate />}
+          {sessionDone && <Celebrate full />}
           <div class="text-5xl" aria-hidden="true">{sessionDone ? '🎉' : '✅'}</div>
           <h2 class="mt-3 text-xl font-bold">{sessionDone ? 'Hotovo! Muito bem!' : 'Tady už máš všechno zopakované'}</h2>
           {sessionDone ? (

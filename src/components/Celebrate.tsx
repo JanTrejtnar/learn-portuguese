@@ -2,7 +2,7 @@ import { useEffect } from 'preact/hooks';
 import { playChime } from '../lib/sound';
 
 const COLORS = ['var(--color-gold-400)', 'var(--color-flag-600)', 'var(--color-brand-500)', 'var(--color-brand-700)'];
-const PIECES = Array.from({ length: 22 }, (_, i) => ({
+const PIECES = Array.from({ length: 44 }, (_, i) => ({
   left: (i * 37) % 100,
   delay: (i % 7) * 0.08,
   dur: 1.4 + (i % 5) * 0.25,
@@ -11,12 +11,12 @@ const PIECES = Array.from({ length: 22 }, (_, i) => ({
 }));
 
 /** Konfety a krátký zvuk při dokončení (respektuje „omezit pohyb“ i vypnutý zvuk). */
-export const Celebrate = () => {
+export const Celebrate = ({ full = false }: { full?: boolean }) => {
   useEffect(() => {
     playChime();
   }, []);
   return (
-    <div class="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl" aria-hidden="true">
+    <div class={full ? 'pointer-events-none fixed inset-0 z-[70] overflow-hidden' : 'pointer-events-none absolute inset-0 overflow-hidden rounded-3xl'} style={full ? { '--fall': '105vh' } as Record<string, string> : undefined} aria-hidden="true">
       {PIECES.map((p, i) => (
         <span
           key={i}

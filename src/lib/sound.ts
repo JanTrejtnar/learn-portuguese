@@ -72,6 +72,7 @@ const element = (name: string): HTMLAudioElement | undefined => {
  *  (ztlumené přehrání nestačí) a potom do elementu vrátíme skutečný zvuk. */
 export const unlockAudio = (): void => {
   const go = () => {
+    webAudio();
     window.removeEventListener('pointerdown', go);
     window.removeEventListener('keydown', go);
     for (const name of Object.keys(SOUNDS)) {
@@ -89,22 +90,60 @@ export const unlockAudio = (): void => {
   window.addEventListener('keydown', go);
 };
 
-const play = (name: string): void => {
+let actx: AudioContext | undefined;
+const webAudio = (): AudioContext | undefined => {
+  try {
+    const C = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!C) return undefined;
+    actx ??= new C();
+    if (actx.state === 'suspended') void actx.resume();
+    return actx;
+  } catch {
+    return undefined;
+  }
+};
+
+/** Záloha, když <audio> přehrání odmítne: stejné tóny přes WebAudio. */
+const playWebAudio = (name: string): void => {
+  const ctx = webAudio();
+  if (!ctx) return;
+  const t0 = ctx.currentTime;
+  for (const n of SOUNDS[name] ?? []) {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = n.type ?? 'triangle';
+    o.frequency.value = n.f;
+    g.gain.setValueAtTime(0.0001, t0 + n.at);
+    g.gain.linearRampToValueAtTime(n.vol ?? 0.5, t0 + n.at + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.at + n.len);
+    o.connect(g).connect(ctx.destination);
+    o.start(t0 + n.at);
+    o.stop(t0 + n.at + n.len + 0.05);
+  }
+};
+
+const lastPlayed = new Map<string, number>();
+
+const play = (name: string, dedupeMs = 0): void => {
   if (!soundsOn()) return;
+  const now = Date.now();
+  if (dedupeMs && now - (lastPlayed.get(name) ?? 0) < dedupeMs) return;
+  lastPlayed.set(name, now);
   const a = element(name);
-  if (!a) return;
+  if (!a) { playWebAudio(name); return; }
   try {
     a.muted = false;
     a.volume = 1;
     a.currentTime = 0;
-    void a.play().catch(() => undefined);
+    void a.play().catch(() => playWebAudio(name));
   } catch {
-    /* zvuk je bonus */
+    playWebAudio(name);
   }
 };
 
-/** Dokončení lekce / testu: stoupající fanfára. */
-export const playChime = (): void => play('chime');
+/** Dokončení lekce / testu: stoupající fanfára. Víc volání těsně po sobě se sloučí (jedno ze dvou může být
+ *  navázané přímo na klepnutí, které iOS vždy pustí). */
+export const playChime = (): void => play('chime', 3000);
 
 /** Správná odpověď: veselé „ding“. */
 export const playCorrect = (): void => play('correct');

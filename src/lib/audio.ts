@@ -109,3 +109,33 @@ export const speak = (text: string, opts: { slow?: boolean } = {}): boolean => {
   }
   return true;
 };
+
+/** iOS pustí syntézu řeči až poté, co ji stránka jednou „odemkne“ při dotyku: tichá prázdná věta při prvním klepnutí. */
+export const unlockSpeech = (): void => {
+  if (!supported()) return;
+  const go = () => {
+    window.removeEventListener('pointerdown', go);
+    try {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      u.lang = 'pt-PT';
+      window.speechSynthesis.speak(u);
+    } catch { /* bonus */ }
+  };
+  window.addEventListener('pointerdown', go);
+};
+
+/** Hlasy se načítají asynchronně: true, jakmile jsou k dispozici (nejvýš po 1,5 s, pak se jede bez čekání). */
+export const useVoicesReady = (): boolean => {
+  const [ready, setReady] = useState(() => !supported() || window.speechSynthesis.getVoices().length > 0);
+  useEffect(() => {
+    if (ready) return;
+    const synth = window.speechSynthesis;
+    const done = () => setReady(true);
+    if (synth.getVoices().length > 0) { done(); return; }
+    synth.addEventListener('voiceschanged', done);
+    const t = window.setTimeout(done, 1500);
+    return () => { synth.removeEventListener('voiceschanged', done); clearTimeout(t); };
+  }, [ready]);
+  return ready;
+};
