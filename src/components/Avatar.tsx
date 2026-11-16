@@ -145,6 +145,18 @@ const Top = ({ id }: { id?: string }): { base: ComponentChildren; over: Componen
         ),
         over: <path d="M82 148L100 172L118 148L126 152L100 184L74 152Z" fill={GREEN} />,
       };
+    case 'top-b1':
+      return {
+        base: (
+          <g>
+            <path d={TORSO} fill="#f4f1e8" />
+            <path d="M12 200C18 164 52 146 84 148L92 200Z" fill="#6b4a2f" />
+            <path d="M188 200C182 164 148 146 116 148L108 200Z" fill="#6b4a2f" />
+            <circle cx="84" cy="176" r="3" fill={GOLD} /><circle cx="84" cy="190" r="3" fill={GOLD} />
+          </g>
+        ),
+        over: <path d="M84 148Q100 166 116 148" stroke="#c9b99a" stroke-width="3" fill="none" />,
+      };
     case 'top-marinheiro':
       return {
         base: (

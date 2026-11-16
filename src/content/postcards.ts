@@ -26,5 +26,13 @@ export const postcards: Record<string, Postcard> = {
   'a2-u5': { fact: 'Guimarães se označuje za kolébku Portugalska. Nad městem stojí středověký hrad.', pt: 'Visitamos o castelo.', cs: 'Navštívíme hrad.' },
   'a2-u6': { fact: 'Viseu leží v oblasti, kde se pěstuje víno Dão. Je to klidné město s krásným historickým centrem.', pt: 'Um copo de vinho do Dão, por favor.', cs: 'Sklenku vína Dão, prosím.' },
   'a2-u7': { fact: 'V Tomaru stojí klášter Convento de Cristo, původně sídlo templářů. Je na seznamu UNESCO.', pt: 'O convento é enorme.', cs: 'Klášter je obrovský.' },
+  'b1-u1': { fact: 'Viana do Castelo leží u ústí řeky Lima. Nad městem stojí bazilika Santa Luzia s výhledem na oceán a v srpnu se tu konají slavnosti Nossa Senhora da Agonia.', pt: 'A vista da basílica é lindíssima.', cs: 'Výhled od baziliky je nádherný.' },
+  'b1-u2': { fact: 'Bragança má dobře zachovanou středověkou citadelu. Nedaleko leží přírodní park Montesinho, kde ještě žijí vlci.', pt: 'Espero que faça sol no sábado.', cs: 'Doufám, že v sobotu bude svítit slunce.' },
+  'b1-u3': { fact: 'U Nazaré vznikají na pláži Praia do Norte obří vlny, na kterých se surfuje. Z vyhlídky Sítio je nad nimi vidět celé městečko.', pt: 'Se pudesse, aprendia a surfar.', cs: 'Kdybych mohl(a), naučil(a) bych se surfovat.' },
+  'b1-u4': { fact: 'V Castelo Branco je barokní zahrada bývalého biskupského paláce se žulovými sochami. Město je známé ručně vyšívanými přehozy.', pt: 'Estudo para eles poderem trabalhar.', cs: 'Studuji, aby mohli pracovat.' },
+  'b1-u5': { fact: 'V pevnosti v Peniche bylo za diktatury vězení, dnes tam sídlí Národní muzeum odboje a svobody. Odtud se jezdí lodí na ostrovy Berlengas.', pt: 'Quero fazer uma reclamação.', cs: 'Chci podat stížnost.' },
+  'b1-u6': { fact: 'Funchal je hlavní město Madeiry. K čtvrti Monte se jezdí lanovkou a zpátky se dá sjet v proutěné koloběžce, která se jmenuje carro de cesto.', pt: 'Não deixe de provar o bolo do caco.', cs: 'Určitě ochutnejte bolo do caco.' },
+  'b1-u7': { fact: 'Ponta Delgada je největší město Azor na ostrově São Miguel. Nedaleko jsou dvě kráterová jezera Sete Cidades, jedno modré a druhé zelené.', pt: 'Na minha opinião, o lago é lindo.', cs: 'Podle mého názoru je jezero krásné.' },
+  'b1-u8': { fact: 'Beja leží v Alentejské rovině. Je známá vysokou věží hradu a tradičním zpěvem cante alentejano, který je zapsán na seznamu UNESCO.', pt: 'Quando puder, vou a Beja.', cs: 'Až budu moct, pojedu do Beje.' },
   'a2-u8': { fact: 'Guarda patří k nejvýše položeným městům Portugalska. Nedaleko je pohoří Serra da Estrela.', pt: 'Aqui faz muito frio.', cs: 'Tady je velká zima.' },
 };

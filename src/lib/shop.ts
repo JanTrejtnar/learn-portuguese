@@ -45,6 +45,7 @@ export const ITEMS: ShopItem[] = [
   { id: 'hat-barrete', kind: 'avatar', slot: 'hat', name: 'Barrete', desc: 'Tradiční čepice z Minha.', price: 50 },
   { id: 'hat-alentejano', kind: 'avatar', slot: 'hat', name: 'Alentejský klobouk', desc: 'Široká krempa proti slunci.', price: 70 },
   { id: 'hat-coroa', kind: 'avatar', slot: 'hat', name: 'Koruna', desc: 'Za odznak A2 Completo.', price: 0, badge: 'a2-done' },
+  { id: 'top-b1', kind: 'avatar', slot: 'top', name: 'Pastýřská vesta', desc: 'Za odznak B1 Completo.', price: 0, badge: 'b1-done' },
   // doplňky
   { id: 'acc-bryle', kind: 'avatar', slot: 'acc', name: 'Sluneční brýle', desc: 'Algarve volá.', price: 30 },
   { id: 'acc-bica', kind: 'avatar', slot: 'acc', name: 'Bica', desc: 'Espresso po lisabonsku.', price: 30 },

@@ -1,6 +1,6 @@
-export type Level = 'A1' | 'A2';
+export type Level = 'A1' | 'A2' | 'B1';
 export type Gender = 'm' | 'f' | 'm/f';
-export type PartOfSpeech = 'noun' | 'verb' | 'adj' | 'adv' | 'prep' | 'pron' | 'phrase' | 'num' | 'interj';
+export type PartOfSpeech = 'noun' | 'verb' | 'adj' | 'adv' | 'conj' | 'prep' | 'pron' | 'phrase' | 'num' | 'interj';
 
 /** Jedna slovíčko-kartička. `pt` je vždy evropská portugalština (PT-PT). */
 export interface Word {
@@ -68,6 +68,8 @@ export interface City {
   icon?: string;
   lon: number;
   lat: number;
+  /** Ostrov mimo pevninu: na mapě se kreslí jako vložený ostrůvek v oceánu na těchto souřadnicích (mimo měřítko). */
+  inset?: { lon: number; lat: number; label: string };
 }
 
 export interface Unit {

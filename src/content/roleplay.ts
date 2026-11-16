@@ -413,6 +413,70 @@ export const scenarios: Scenario[] = [
       ]),
     },
   },
+  {
+    id: 'reclamacao',
+    title: 'Reklamace v obchodě',
+    emoji: '🛍️',
+    unitId: 'b1-u5',
+    npcName: 'Empregada',
+    setting: 'Koupil(a) jsi fén, který nefunguje. Jsi v obchodě v Peniche.',
+    goal: 'Vysvětli problém, ukaž doklad a požádej o vrácení peněz.',
+    start: 'n0',
+    nodes: {
+      n0: node('Boa tarde. Em que posso ajudá-lo?', 'Dobrý den. Čím vám mohu pomoci?', [
+        ch('good', 'Boa tarde. Comprei este secador ontem e está avariado.', 'Dobrý den. Koupil(a) jsem včera tento fén a je porouchaný.', 'Jasně popsaný problém v minulém čase.', 'n1'),
+        ch('ok', 'Secador avariado.', 'Fén porouchaný.', 'Stačí k pochopení, ale lépe celou větou.', 'n1'),
+        ch('bad', 'Quero um café.', 'Chci kávu.', 'Tady řešíš reklamaci, ne objednávku.', 'n1'),
+      ]),
+      n1: node('Peço desculpa. Tem o talão?', 'Omlouvám se. Máte pokladní lístek?', [
+        ch('good', 'Tenho, aqui está.', 'Mám, tady je.', 'Krátká a správná odpověď.', 'n2'),
+        ch('ok', 'Sim.', 'Ano.', 'Doplň, že ho podáváš: „Aqui está.“', 'n2'),
+        ch('bad', 'Não sei.', 'Nevím.', 'Doklad je potřeba k reklamaci.', 'n2'),
+      ]),
+      n2: node('Posso trocá-lo por outro ou devolver o dinheiro. O que prefere?', 'Mohu vám ho vyměnit, nebo vrátit peníze. Co dáváte přednost?', [
+        ch('good', 'Preferia o reembolso, por favor.', 'Raději bych vrácení peněz, prosím.', 'Zdvořilé přání v imperfeitu.', 'n3'),
+        ch('ok', 'Dinheiro.', 'Peníze.', 'Zdvořileji: „Preferia o reembolso.“', 'n3'),
+        ch('bad', 'Quero fazer queixa à polícia!', 'Chci to oznámit policii!', 'To je přehnané. Řeš to s obchodem.', 'n3'),
+      ]),
+      n3: node('Com certeza. Aqui tem o recibo. Boa tarde!', 'Jistě. Tady je potvrzení. Hezký den!', [
+        ch('good', 'Muito obrigado pela ajuda. Boa tarde!', 'Moc děkuji za pomoc. Hezký den!', 'Zdvořilé rozloučení.', null),
+        ch('ok', 'Obrigado.', 'Děkuji.', 'Správně, můžeš dodat i pozdrav.', null),
+        ch('bad', 'Adeus.', 'Nashledanou.', 'Poděkuj za pomoc.', null),
+      ]),
+    },
+  },
+  {
+    id: 'hotel-funchal',
+    title: 'Rezervace pokoje',
+    emoji: '🏨',
+    unitId: 'b1-u6',
+    npcName: 'Rececionista',
+    setting: 'Jsi v hotelu ve Funchalu a chceš si zarezervovat pokoj.',
+    goal: 'Požádej o pokoj, zeptej se na cenu a snídani a poděkuj.',
+    start: 'n0',
+    nodes: {
+      n0: node('Boa tarde! Em que posso ajudá-lo?', 'Dobrý den! Čím vám mohu pomoci?', [
+        ch('good', 'Boa tarde. Gostaria de reservar um quarto duplo para duas noites.', 'Dobrý den. Rád(a) bych rezervoval(a) dvoulůžkový pokoj na dvě noci.', 'Zdvořilá žádost s condicionálem.', 'n1'),
+        ch('ok', 'Quero um quarto.', 'Chci pokoj.', 'Správně, ale zdvořileji: „Gostaria de…“', 'n1'),
+        ch('bad', 'Onde fica o aeroporto?', 'Kde je letiště?', 'Na recepci chceš pokoj, ne letiště.', 'n1'),
+      ]),
+      n1: node('Temos um quarto com vista para o mar. Serve?', 'Máme pokoj s výhledem na moře. Hodí se?', [
+        ch('good', 'Sim, perfeito. Qual é o preço por noite?', 'Ano, perfektní. Jaká je cena za noc?', 'Přirozená otázka na cenu.', 'n2'),
+        ch('ok', 'Sim.', 'Ano.', 'Zeptej se ještě na cenu.', 'n2'),
+        ch('bad', 'Não gosto de mar.', 'Nemám rád moře.', 'To by byl divný hotel pro Madeiru. Zkus se zeptat na cenu.', 'n2'),
+      ]),
+      n2: node('São oitenta euros por noite, com pequeno-almoço incluído.', 'Je to osmdesát eur za noc se snídaní v ceně.', [
+        ch('good', 'Ótimo. A que horas é o pequeno-almoço?', 'Skvělé. V kolik je snídaně?', 'Užitečná doplňující otázka.', 'n3'),
+        ch('ok', 'Está bem.', 'Dobře.', 'Můžeš se zeptat na čas snídaně.', 'n3'),
+        ch('bad', 'É muito caro. Adeus!', 'To je moc drahé. Nashledanou!', 'Zbytečně strohé. Zeptej se spíš na detaily.', 'n3'),
+      ]),
+      n3: node('Das sete às dez. Aqui tem a chave. Boa estadia!', 'Od sedmi do deseti. Tady je klíč. Příjemný pobyt!', [
+        ch('good', 'Muito obrigado. Pode recomendar-me um restaurante?', 'Moc děkuji. Můžete mi doporučit restauraci?', 'Výborné: poděkování a otázka na doporučení.', null),
+        ch('ok', 'Obrigado.', 'Děkuji.', 'Správně, ale můžeš využít šanci zeptat se na tip.', null),
+        ch('bad', 'Adeus.', 'Nashledanou.', 'Poděkuj za klíč a pomoc.', null),
+      ]),
+    },
+  },
 ];
 
 export const getScenario = (id: string): Scenario | undefined => scenarios.find((s) => s.id === id);

@@ -15,7 +15,7 @@ export default defineConfig({
       manifest: {
         name: 'Portuglove — evropská portugalština',
         short_name: 'Portuglove',
-        description: 'Učení evropské portugalštiny (PT-PT) pro úrovně A1 a A2.',
+        description: 'Učení evropské portugalštiny (PT-PT) pro úrovně A1 až B1.',
         lang: 'cs',
         theme_color: '#046a38',
         background_color: '#f6f4ec',

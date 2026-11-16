@@ -15,11 +15,19 @@ import { unit5 as a2unit5 } from './a2/unit5';
 import { unit6 as a2unit6 } from './a2/unit6';
 import { unit7 as a2unit7 } from './a2/unit7';
 import { unit8 as a2unit8 } from './a2/unit8';
+import { unit1 as b1unit1 } from './b1/unit1';
+import { unit2 as b1unit2 } from './b1/unit2';
+import { unit3 as b1unit3 } from './b1/unit3';
+import { unit4 as b1unit4 } from './b1/unit4';
+import { unit5 as b1unit5 } from './b1/unit5';
+import { unit6 as b1unit6 } from './b1/unit6';
+import { unit7 as b1unit7 } from './b1/unit7';
+import { unit8 as b1unit8 } from './b1/unit8';
 import { isUnitUnlocked } from '../lib/unlock';
 import type { TestResult } from '../lib/db';
 
 /** Všechny jednotky seřazené podle úrovně a pořadí. Další jednotky se přidávají sem. */
-export const units: Unit[] = [unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, a2unit1, a2unit2, a2unit3, a2unit4, a2unit5, a2unit6, a2unit7, a2unit8].sort((a, b) => a.level.localeCompare(b.level) || a.order - b.order);
+export const units: Unit[] = [unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, a2unit1, a2unit2, a2unit3, a2unit4, a2unit5, a2unit6, a2unit7, a2unit8, b1unit1, b1unit2, b1unit3, b1unit4, b1unit5, b1unit6, b1unit7, b1unit8].sort((a, b) => a.level.localeCompare(b.level) || a.order - b.order);
 
 /** Zkrácené označení jednotky, např. „A1.3“. */
 export const unitCode = (u: Unit): string => `${u.level}.${u.order}`;

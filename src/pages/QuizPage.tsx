@@ -303,7 +303,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             <p class="text-ink-soft">{correctCount} z {questions.length} správně</p>
             {scope.placement ? (
               ratio >= PASS_RATIO ? (
-                <p class="mt-3 font-semibold text-green-700 dark:text-green-400">Skvělé! {scope.placement === 'A1' ? 'Jednotky A1 jsou přeskočené, začínáš na A2.' : 'Jednotky A1 i A2 jsou přeskočené.'}</p>
+                <p class="mt-3 font-semibold text-green-700 dark:text-green-400">Skvělé! {scope.placement === 'A1' ? 'Jednotky A1 jsou přeskočené, začínáš na A2.' : 'Jednotky A1 i A2 jsou přeskočené, začínáš na B1.'}</p>
               ) : (
                 <p class="mt-3 font-semibold text-amber-700 dark:text-amber-400">Na přeskočení je potřeba aspoň {Math.round(PASS_RATIO * 100)} %. Doporučujeme začít od začátku, půjde to rychle.</p>
               )

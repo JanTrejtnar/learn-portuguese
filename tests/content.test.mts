@@ -135,3 +135,16 @@ test('sbírka: každá jednotka s městem má pohlednici a naopak', async () => 
   }
   for (const id of Object.keys(postcards)) assert.ok(units.some((u) => u.id === id), `pohlednice pro neexistující jednotku ${id}`);
 });
+
+test('B1: 8 jednotek po 3 lekcích, každé s městem; ostrovy mají vložený ostrůvek', () => {
+  const b1 = units.filter((u) => u.level === 'B1');
+  assert.equal(b1.length, 8);
+  assert.deepEqual(b1.map((u) => u.order), [1, 2, 3, 4, 5, 6, 7, 8]);
+  for (const u of b1) {
+    assert.equal(u.lessons.length, 3, `${u.id}: má mít 3 lekce`);
+    assert.ok(u.lessons.every((l) => l.words.length >= 12 && l.words.every((w) => w.example)), `${u.id}: slovíčko bez příkladu`);
+    assert.ok(u.lessons.every((l) => l.reviewed === false), `${u.id}: neověřený obsah musí být označen`);
+  }
+  assert.equal(new Set(b1.map((u) => u.city!.name)).size, 8);
+  assert.deepEqual(b1.filter((u) => u.city!.inset).map((u) => u.city!.name), ['Funchal', 'Ponta Delgada']);
+});

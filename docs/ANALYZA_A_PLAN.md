@@ -301,7 +301,7 @@ Odhad: M1 S, M2 M, M3 L, M4 podle výběru. Navrhuji začít M1 a M2, pak se roz
 - Zvuky se renderují do WAV a hrají přes `<audio>` (funguje i na iPhonu s vypnutým zvonkem).
 - Mapa na jednu obrazovku s přesnějším obrysem; ikona ozubeného kola pro Nastavení.
 
-## Plán: úroveň B1 (zatím jen návrh, nic není implementováno)
+## Hotovo: úroveň B1 (první verze, obsah čeká na revizi)
 
 **Rozhodnutí o pořadí:** B1 se připravuje jako návrh a **nevydává se, dokud uživatel neprojde obsah A1+A2** (viz „Rizika“). Důvod: veškerý text je zatím psaný AI a čeká na revizi rodilým mluvčím. Další úroveň by nasypala další neověřený obsah. Technicky ale jde B1 připravit tak, aby po schválení stačilo přepnout příznak.
 
@@ -382,3 +382,11 @@ Dnes existuje 3krokový úvod (`/welcome`: jak se učíme, denní cíl, kde zač
 - **Tutoriál implementován:** `/welcome` je 5krokový průvodce (lekce, procvičování, odměny, denní cíl, výběr úrovně). Texty a čísla jsou v `src/content/tutorial.ts` (hodnoty z konstant `PASS_RATIO`, `COINS_PER_*`, `HINT_PRICE`, `FREEZE_PRICE`, `MAX_FREEZES`), hlídá je `tests/tutorial.test.mts`. Odkaz „Zobrazit úvodního průvodce“ je v Nastavení.
 - **Zařazovací test:** trasa `/quiz/placement-a1` a `/quiz/placement-a2` (12 otázek, bez nápověd). Při splnění `PASS_RATIO` se jednotky A1 (u A2 i A2) uloží jako `skipped`. Žádné XP, mince, hvězdy ani pohlednice. Pohlednice ve sbírce se počítají jen za skutečně splněný test.
 - Nápovědy v testech jsou v tutoriálu zmíněny (kapitola Procvičování).
+
+## Hotovo: úroveň B1
+
+- **Obsah:** 8 jednotek B1.1–B1.8 (Viana do Castelo, Bragança, Nazaré, Castelo Branco, Peniche, Funchal, Ponta Delgada, Beja), každá 3 lekce se slovíčky a příklady, gramatikou, cvičeními a dialogem. Celkem ≈ 330 položek (stejná hustota jako A2; původní odhad 950 byl příliš vysoký). Gramatika: imperfeito/perfeito/mais-que-perfeito, conjuntivo presente, futuro a condicional, infinitivo pessoal a vztažné věty, zájmena (clitics), imperativ, trpný rod a nepřímá řeč, conjuntivo imperfeito a budoucí. Soubory `src/content/b1/`.
+- **Mapa:** třetí záložka B1. Madeira a Azory jsou vložené ostrůvky v oceánu vlevo od pevniny (`City.inset`), cesta mezi nimi vede po moři.
+- **Pohlednice:** 8 nových. **Odznak** „B1 Completo“ (50 mincí) a odměna v obchodě (Pastýřská vesta). **Scénáře:** Reklamace v obchodě (B1.5) a Rezervace pokoje (B1.6).
+- **Odemykání:** B1.1 se odemkne dokončením A2.8. Volba „Umím docela dost (A2)“ v průvodci přeskočí A1 i A2 a začíná na B1.
+- **Neověřeno:** veškerý obsah B1 je `reviewed: false` a čeká na rodilého mluvčího, zvlášť gramatika (conjuntivo, infinitivo pessoal, zájmena).

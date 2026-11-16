@@ -13,6 +13,7 @@ import { isOnboarded } from './WelcomePage';
 const LEVELS = [
   { level: 'A1', title: 'A1 — Začátečník' },
   { level: 'A2', title: 'A2 — Základní' },
+  { level: 'B1', title: 'B1 — Samostatný' },
 ] as const;
 
 const PlayerStripWithSettings = ({ progress }: { progress: Progress }) => {

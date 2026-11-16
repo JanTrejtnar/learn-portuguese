@@ -13,6 +13,7 @@ export interface BadgeContext {
   a1Total: number;
   a1Passed: number;
   a2Passed: number;
+  b1Passed: number;
   goalDays: number;
   level: number;
   scenariosDone: number;
@@ -43,6 +44,7 @@ export const BADGES: BadgeDef[] = [
   { id: 'units-4', emoji: '🚋', title: 'A Meio Caminho', desc: 'Splněné testy 4 jednotek.', earned: (c) => c.unitTestsPassed >= 4 },
   { id: 'a1-done', emoji: '🎓', title: 'A1 Completo', desc: 'Splněné testy všech jednotek A1.', earned: (c) => c.a1Total > 0 && c.a1Passed >= c.a1Total },
   { id: 'a2-done', emoji: '🏰', title: 'A2 Completo', desc: 'Splněné testy všech 8 jednotek A2.', earned: (c) => c.a2Passed >= A2_PLANNED_UNITS },
+  { id: 'b1-done', emoji: '🏔️', title: 'B1 Completo', desc: 'Splněné testy všech 8 jednotek B1.', earned: (c) => c.b1Passed >= B1_PLANNED_UNITS },
   { id: 'actor', emoji: '🎭', title: 'Ator', desc: 'Dokončil jsi první roleplay scénář.', earned: (c) => c.scenariosDone >= 1 },
   { id: 'actor-5', emoji: '🎬', title: 'Elenco Completo', desc: 'Dokončil jsi všech 5 roleplay scénářů.', earned: (c) => c.scenariosDone >= 5 },
   { id: 'level-5', emoji: '⭐', title: 'Conversador', desc: 'Dosáhl jsi 5. úrovně.', earned: (c) => c.level >= 5 },
@@ -50,6 +52,8 @@ export const BADGES: BadgeDef[] = [
 
 /** Plánovaný počet jednotek A2 (odznak A2 Completo vyžaduje všechny). */
 export const A2_PLANNED_UNITS = 8;
+/** Plánovaný počet jednotek B1 (odznak B1 Completo vyžaduje všechny). */
+export const B1_PLANNED_UNITS = 8;
 
 export interface UnitRef {
   id: string;
@@ -62,6 +66,7 @@ export const badgeContext = (p: Progress, unitList: UnitRef[]): BadgeContext => 
   const tests = passedAll.filter((t) => !t.id.startsWith('rp:'));
   const a1 = new Set(unitList.filter((u) => u.level === 'A1').map((u) => u.id));
   const a2 = new Set(unitList.filter((u) => u.level === 'A2').map((u) => u.id));
+  const b1 = new Set(unitList.filter((u) => u.level === 'B1').map((u) => u.id));
   const unitSet = new Set(unitList.map((u) => u.id));
   // gramatické karty (předpona „cl:“) se do počtu slovíček nepočítají
   const wordCards = [...p.cards.values()].filter((c) => !c.id.startsWith('cl:'));
@@ -75,6 +80,7 @@ export const badgeContext = (p: Progress, unitList: UnitRef[]): BadgeContext => 
     a1Total: a1.size,
     a1Passed: tests.filter((t) => a1.has(t.id)).length,
     a2Passed: tests.filter((t) => a2.has(t.id)).length,
+    b1Passed: tests.filter((t) => b1.has(t.id)).length,
     goalDays: [...p.days.values()].filter((d) => d.goalReached).length,
     level: levelInfo(totalXp(p.days)).level,
     scenariosDone: passedAll.filter((t) => t.id.startsWith('rp:')).length,

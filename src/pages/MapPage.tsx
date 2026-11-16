@@ -59,10 +59,10 @@ const WAVES: [number, number][] = [[-10.1, 38.9], [-10.05, 40.8], [-9.95, 42.0],
 
 // Drobné posuny kvůli čitelnosti u měst, která leží blízko sebe.
 const NUDGE: Record<string, [number, number]> = { Sintra: [-14, -22], Lisboa: [8, 12], Porto: [-4, 6], Braga: [6, -8], 'Setúbal': [-8, 6], Viseu: [-8, -8], Guarda: [16, 16] };
-const LABEL_LEFT = new Set(['Porto', 'Óbidos', 'Lagos', 'Setúbal', 'Aveiro']);
+const LABEL_LEFT = new Set(['Bragança', 'Porto', 'Óbidos', 'Lagos', 'Setúbal', 'Aveiro']);
 
 type State = 'done' | 'current' | 'open' | 'locked';
-const LEVEL_TABS = ['A1', 'A2'] as const;
+const LEVEL_TABS = ['A1', 'A2', 'B1'] as const;
 type Level = (typeof LEVEL_TABS)[number];
 
 /** Hvězdy za nejlepší výsledek v testu jednotky. */
@@ -139,7 +139,7 @@ export const MapPage = () => {
   };
 
   const positioned = mapped.map((u) => {
-    const base = proj(u.city!.lon, u.city!.lat);
+    const base = u.city!.inset ? proj(u.city!.inset.lon, u.city!.inset.lat) : proj(u.city!.lon, u.city!.lat);
     const [dx, dy] = NUDGE[u.city!.name] ?? [0, 0];
     return { u, p: [base[0] + dx, base[1] + dy] as [number, number], st: stateOf(u) };
   });
@@ -154,8 +154,9 @@ export const MapPage = () => {
     const dy = b.p[1] - a.p[1];
     const len = Math.hypot(dx, dy);
     const long = len > 230;
+    const atSea = a.p[0] < 0 && b.p[0] < 0; // dvě „ostrovní“ města: trasa vede po moři vlevo od pevniny
     const ctrl: [number, number] = long
-      ? [Math.max(a.p[0], b.p[0]) + 120, (a.p[1] + b.p[1]) / 2]
+      ? [atSea ? Math.min(a.p[0], b.p[0]) - 60 : Math.max(a.p[0], b.p[0]) + 120, (a.p[1] + b.p[1]) / 2]
       : [(a.p[0] + b.p[0]) / 2 + (-dy / len) * len * 0.2 * (i % 2 ? 1 : -1), (a.p[1] + b.p[1]) / 2 + (dx / len) * len * 0.2 * (i % 2 ? 1 : -1)];
     return { d: `M${fmt(a.p)} Q${fmt(ctrl)} ${fmt(b.p)}`, len: Math.round(len * 1.25), done: a.st === 'done', next: a.st === 'current' };
   });
@@ -241,7 +242,7 @@ export const MapPage = () => {
           {RIVERS.map((d, i) => <path key={i} d={d} fill="none" stroke="var(--river)" stroke-width="2.6" stroke-linecap="round" opacity=".9" />)}
 
           {LAND_DECOR.map(([lon, lat, e, s], i) => { const [x, y] = proj(lon, lat); return <text key={i} x={x} y={y} font-size={s} text-anchor="middle" opacity=".85" aria-hidden="true">{e}</text>; })}
-          {SEA_DECOR.map(([lon, lat, e, s, cls], i) => { const [x, y] = proj(lon, lat); return <g key={i} class={cls} aria-hidden="true"><text x={x} y={y} font-size={s} text-anchor="middle">{e}</text></g>; })}
+          {level !== 'B1' && SEA_DECOR.map(([lon, lat, e, s, cls], i) => { const [x, y] = proj(lon, lat); return <g key={i} class={cls} aria-hidden="true"><text x={x} y={y} font-size={s} text-anchor="middle">{e}</text></g>; })}
 
           {/* cesta */}
           {segments.map((s, i) => <path key={`b${i}`} d={s.d} fill="none" stroke="var(--road)" stroke-width="10" stroke-linecap="round" opacity=".55" />)}
@@ -275,6 +276,12 @@ export const MapPage = () => {
                 aria-label={`${name}: ${u.title}, ${st === 'done' ? 'splněno' : st === 'locked' ? 'zamčeno' : 'k dispozici'}`}
                 onClick={() => setSelected(u.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(u.id); } }}>
                 <circle r="28" fill="transparent" />
+                {u.city!.inset && (
+                  <g aria-hidden="true">
+                    <ellipse cy="6" rx="26" ry="14" fill="url(#land)" stroke="var(--sand)" stroke-width="2.5" />
+                    <text y="34" font-size="8" font-weight="700" fill="var(--sea-line)" text-anchor="middle" opacity=".95">{u.city!.inset.label}</text>
+                  </g>
+                )}
                 {isSel && <circle r="25" fill="none" stroke="#ffe900" stroke-width="3" stroke-dasharray="6 4" class="map-flow" />}
                 {st === 'current' && (
                   <>

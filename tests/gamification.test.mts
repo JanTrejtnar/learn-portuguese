@@ -99,3 +99,11 @@ test('týdenní souhrn počítá jen posledních 7 dní', () => {
   assert.deepEqual(w, { activeDays: 2, reviews: 20, newCards: 5, xp: 50, retention: 75 });
   assert.equal(weekSummary(new Map(), now).retention, null);
 });
+
+test('B1 Completo vyžaduje všech 8 jednotek B1', () => {
+  const b1 = Array.from({ length: 8 }, (_, i) => ({ id: `b1-u${i + 1}`, level: 'B1' }));
+  const passed = (ids: string[]) => new Map(ids.map((id) => [id, { id, passed: true, best: 0.9, attempts: 1, last: 1 }]));
+  const earned = (ids: string[]) => BADGES.filter((b) => b.earned(badgeContext({ cards: new Map(), days: new Map(), tests: passed(ids) } as any, b1))).map((b) => b.id);
+  assert.ok(!earned(b1.slice(0, 7).map((u) => u.id)).includes('b1-done'));
+  assert.ok(earned(b1.map((u) => u.id)).includes('b1-done'));
+});

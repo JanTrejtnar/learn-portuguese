@@ -65,6 +65,17 @@ await test('průvodce: „Už něco umím“ vede na zařazovací test', async (
   await ctx.close();
 });
 
+await test('mapa B1: osm měst včetně ostrovů, nová jednotka je zamčená', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/map');
+  await page.getByRole('tab', { name: 'B1' }).click();
+  await page.getByRole('button', { name: /^Viana do Castelo/ }).waitFor();
+  for (const city of ['Bragança', 'Nazaré', 'Castelo Branco', 'Peniche', 'Funchal', 'Ponta Delgada', 'Beja']) await page.getByRole('button', { name: new RegExp(`^${city}`) }).waitFor();
+  assert.match(await page.getByRole('button', { name: /^Viana do Castelo/ }).getAttribute('aria-label'), /zamčeno/);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test('karty: nové slovíčko → zkouška → hodnocení', async () => {
   const { page, errors, ctx } = await newPage();
   await page.goto(base + '#/cards/a1-u1-l1');

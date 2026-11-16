@@ -34,7 +34,7 @@ export const CollectionPage = () => {
   if (!progress) return <Loading />;
   const rows = units.filter((u) => u.city && postcards[u.id]);
   const got = owned.length;
-  const levels = ['A1', 'A2'] as const;
+  const levels = ['A1', 'A2', 'B1'] as const;
   const cur = idx >= 0 ? owned[idx] : undefined;
   const tone = (id: string) => TONES[units.findIndex((u) => u.id === id) % TONES.length]!;
 
@@ -52,7 +52,7 @@ export const CollectionPage = () => {
 
       {levels.map((level) => (
         <section key={level}>
-          <h2 class="mt-7 mb-3 text-sm font-bold uppercase tracking-wider text-muted">{level === 'A1' ? 'A1 — Začátečník' : 'A2 — Základní'}</h2>
+          <h2 class="mt-7 mb-3 text-sm font-bold uppercase tracking-wider text-muted">{level === 'A1' ? 'A1 — Začátečník' : level === 'A2' ? 'A2 — Základní' : 'B1 — Samostatný'}</h2>
           <ul class="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3">
             {rows.filter((u) => u.level === level).map((u) => {
               const has = progress.tests.get(u.id)?.passed === true && !progress.tests.get(u.id)?.skipped;

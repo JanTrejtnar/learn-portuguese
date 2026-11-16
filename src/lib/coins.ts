@@ -10,7 +10,7 @@ export type CoinTier = 10 | 25 | 50;
 /** Odměna za odznak (výchozí 10). */
 export const BADGE_COINS: Record<string, CoinTier> = {
   'words-50': 25, 'words-100': 25, 'mature-25': 25, 'streak-7': 25, 'goal-7': 25, perfect: 25, 'units-4': 25, 'actor-5': 25, 'level-5': 25,
-  'words-250': 50, 'streak-30': 50, 'a1-done': 50, 'a2-done': 50,
+  'words-250': 50, 'streak-30': 50, 'a1-done': 50, 'a2-done': 50, 'b1-done': 50,
 };
 export const COINS_PER_GOAL_DAY = 5;
 export const COINS_PER_LEVEL = 20;

@@ -32,7 +32,7 @@ export const tutorialSteps = (): TutorialStep[] => [
     id: 'lessons',
     emoji: '🗺️',
     title: 'Bem-vindo! Jak fungují lekce',
-    intro: 'Naučíš se evropskou portugalštinu (A1–A2) v češtině, stačí pár minut denně.',
+    intro: 'Naučíš se evropskou portugalštinu (A1–B1) v češtině, stačí pár minut denně.',
     items: [
       { emoji: '📚', title: 'Jednotky a lekce', text: 'Cesta vede po městech Portugalska. Každá jednotka má několik lekcí: slovíčka s výslovností, gramatiku a dialog.' },
       { emoji: '🗺️', title: 'Mapa i seznam', text: 'Na úvodní stránce můžeš přepínat mezi mapou a seznamem lekcí.' },
@@ -75,6 +75,6 @@ export interface LevelOption {
 export const LEVEL_OPTIONS: LevelOption[] = [
   { id: 'zero', title: 'Začínám od nuly', hint: 'Začneme první lekcí: pozdravy' },
   { id: 'a1', title: 'Už něco umím (A1)', hint: `Krátký test (${PLACEMENT_COUNT} otázek). Při ${passPercent()} % a více přeskočíš A1 a začneš na A2.` },
-  { id: 'a2', title: 'Umím docela dost (A2)', hint: `Krátký test (${PLACEMENT_COUNT} otázek). Při ${passPercent()} % a více přeskočíš A1 i A2.` },
+  { id: 'a2', title: 'Umím docela dost (A2)', hint: `Krátký test (${PLACEMENT_COUNT} otázek). Při ${passPercent()} % a více přeskočíš A1 i A2 a začneš na B1.` },
   { id: 'look', title: 'Jen se porozhlédnout', hint: 'Přejít na hlavní stránku' },
 ];
