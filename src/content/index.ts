@@ -4,11 +4,14 @@ import { unit2 } from './a1/unit2';
 import { unit3 } from './a1/unit3';
 import { unit4 } from './a1/unit4';
 import { unit5 } from './a1/unit5';
+import { unit6 } from './a1/unit6';
+import { unit7 } from './a1/unit7';
+import { unit8 } from './a1/unit8';
 import { isUnitUnlocked } from '../lib/unlock';
 import type { TestResult } from '../lib/db';
 
 /** Všechny jednotky seřazené podle úrovně a pořadí. Další jednotky se přidávají sem. */
-export const units: Unit[] = [unit1, unit2, unit3, unit4, unit5].sort((a, b) => a.level.localeCompare(b.level) || a.order - b.order);
+export const units: Unit[] = [unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8].sort((a, b) => a.level.localeCompare(b.level) || a.order - b.order);
 
 export const getUnit = (id: string): Unit | undefined => units.find((u) => u.id === id);
 

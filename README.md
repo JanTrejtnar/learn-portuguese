@@ -25,9 +25,9 @@ Vite · Preact · TypeScript · Tailwind CSS 4 · hash router (bez serveru) · o
 - `reviewed: false` u lekce = zatím nezkontroloval rodilý mluvčí.
 
 ## Plán
-1. ✅ Skeleton + data A1 (jednotky 1–2)
+1. ✅ Skeleton + data A1 (jednotky 1–2, později rozšířeno)
 2. ✅ Flashcards + audio (`pt-PT`)
 3. ✅ SRS + IndexedDB
 4. ✅ Kvízy a testy
-5. 🔄 Zbytek A1 + gramatická cvičení (doplňování vět): hotové jednotky 1–5, zbývají 6–8
+5. ✅ Kompletní A1 (jednotky 1–8) + gramatická cvičení (doplňování vět)
 6. Gamifikace · 7. Roleplay · 8. PWA/offline · 9. A2 · 10. AI konverzace

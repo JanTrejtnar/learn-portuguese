@@ -1,5 +1,5 @@
 import type { Unit } from '../../types';
-import { w } from '../helpers';
+import { c, w } from '../helpers';
 
 export const unit1: Unit = {
   id: 'a1-u1',
@@ -14,6 +14,12 @@ export const unit1: Unit = {
       title: 'Cumprimentos',
       subtitle: 'Pozdravy a zdvořilostní fráze',
       reviewed: false,
+      cloze: [
+        c('Ana (žena) říká: Muito ___!', 'Ana děkuje.', 'obrigada', ['obrigado', 'obrigados']),
+        c('Tomáš (muž) říká: ___.', 'Tomáš děkuje.', 'Obrigado', ['Obrigada', 'De nada']),
+        c('Bom ___!', 'Dobré ráno!', 'dia', ['noite', 'tarde']),
+        c('Boa ___!', 'Dobré odpoledne!', 'tarde', ['dia', 'nada']),
+      ],
       words: [
         w('u1l1-ola', 'Olá', 'Ahoj', { pos: 'interj', example: { pt: 'Olá! Tudo bem?', cs: 'Ahoj! Všechno v pořádku?' } }),
         w('u1l1-bom-dia', 'Bom dia', 'Dobré ráno / dobrý den (dopoledne)', { pos: 'phrase', note: 'Používá se až do oběda.' }),
@@ -55,6 +61,12 @@ export const unit1: Unit = {
       title: 'Apresentações',
       subtitle: 'Jak se představit a zeptat se na jméno',
       reviewed: false,
+      cloze: [
+        c('Como ___ chamas?', 'Jak se jmenuješ?', 'te', ['se', 'me']),
+        c('Como ___ chama, senhora?', 'Jak se jmenujete, paní?', 'se', ['te', 'me']),
+        c('Chamo-___ Tomáš.', 'Jmenuji se Tomáš.', 'me', ['te', 'se']),
+        c('De onde ___?', 'Odkud jsi?', 'és', ['é', 'sou']),
+      ],
       words: [
         w('u1l2-eu', 'eu', 'já', { pos: 'pron' }),
         w('u1l2-tu', 'tu', 'ty', { pos: 'pron', note: 'V Portugalsku se tyká mezi přáteli, rodinou, vrstevníky a dětmi.' }),
@@ -103,6 +115,11 @@ export const unit1: Unit = {
       title: 'Números 0–20',
       subtitle: 'Čísla od nuly do dvaceti',
       reviewed: false,
+      cloze: [
+        c('Um café e ___ bica.', 'Jedno espresso a jedna bica.', 'uma', ['um', 'dois']),
+        c('___ cafés, por favor.', 'Dvě kávy, prosím.', 'Dois', ['Duas', 'Um']),
+        c('___ bicas, por favor.', 'Dvě bicas, prosím.', 'Duas', ['Dois', 'Uma']),
+      ],
       words: [
         w('u1l3-0', 'zero', '0', { pos: 'num' }),
         w('u1l3-1', 'um / uma', '1', { pos: 'num', note: 'Rod: um (m), uma (ž).' }),

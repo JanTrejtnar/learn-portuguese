@@ -44,3 +44,22 @@ test('žádné zmínky o brazilské variantě v obsahu (jen PT-PT)', () => {
   const text = JSON.stringify(units).toLowerCase();
   assert.ok(!/brazíli|brazilsk|pt-br|garçom/.test(text.replace(/brasileiro \/ brasileira|brazilský \/ brazilská/g, '')), 'obsah obsahuje zmínku o brazilské variantě');
 });
+
+test('stejná věta v cvičení má vždy stejnou odpověď', () => {
+  const seen = new Map<string, string>();
+  for (const l of units.flatMap((u) => u.lessons)) {
+    for (const item of l.cloze ?? []) {
+      const prev = seen.get(item.pt);
+      if (prev !== undefined) assert.equal(prev, item.answer, `„${item.pt}“ má různé odpovědi`);
+      seen.set(item.pt, item.answer);
+    }
+  }
+});
+
+test('každá jednotka má 3–4 lekce a aspoň 12 cvičení', () => {
+  for (const u of units) {
+    assert.ok(u.lessons.length >= 2, `${u.id}: málo lekcí`);
+    const n = u.lessons.reduce((a, l) => a + (l.cloze?.length ?? 0), 0);
+    assert.ok(n >= 6, `${u.id}: málo doplňovacích cvičení (${n})`);
+  }
+});

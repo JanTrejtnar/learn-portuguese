@@ -1,5 +1,5 @@
 import type { Unit } from '../../types';
-import { w } from '../helpers';
+import { c, w } from '../helpers';
 
 export const unit2: Unit = {
   id: 'a1-u2',
@@ -14,6 +14,14 @@ export const unit2: Unit = {
       title: 'O verbo «ser»',
       subtitle: 'Být: identita a vlastnosti',
       reviewed: false,
+      cloze: [
+        c('Eu ___ estudante.', 'Jsem student.', 'sou', ['és', 'é']),
+        c('Tu ___ checo?', 'Ty jsi Čech?', 'és', ['é', 'sou']),
+        c('Ela ___ simpática.', 'Ona je sympatická.', 'é', ['são', 'sou']),
+        c('Nós ___ amigos.', 'Jsme přátelé.', 'somos', ['são', 'sou']),
+        c('Eles ___ portugueses.', 'Jsou Portugalci.', 'são', ['somos', 'é']),
+        c('Eu ___ sou português.', 'Nejsem Portugalec.', 'não', ['nem', 'nunca']),
+      ],
       words: [
         w('u2l1-ser', 'ser', 'být (trvale, identita)', { pos: 'verb', example: { pt: 'Eu sou estudante.', cs: 'Jsem student.' } }),
         w('u2l1-simpatico', 'simpático / simpática', 'sympatický / sympatická', { pos: 'adj', example: { pt: 'Ela é muito simpática.', cs: 'Je velmi sympatická.' } }),
@@ -51,6 +59,12 @@ export const unit2: Unit = {
       title: 'A família',
       subtitle: 'Rodina a členy',
       reviewed: false,
+      cloze: [
+        c('___ pai é simpático.', 'Otec je sympatický.', 'O', ['A', 'Os']),
+        c('___ mãe é médica.', 'Matka je lékařka.', 'A', ['O', 'As']),
+        c('Esta é a minha ___.', 'Tohle je moje sestra.', 'irmã', ['irmão', 'irmãs']),
+        c('Este é o meu ___.', 'Tohle je můj otec.', 'pai', ['mãe', 'irmã']),
+      ],
       words: [
         w('u2l2-familia', 'a família', 'rodina', { pos: 'noun', gender: 'f' }),
         w('u2l2-pai', 'o pai', 'otec', { pos: 'noun', gender: 'm', example: { pt: 'Este é o meu pai.', cs: 'Tohle je můj otec.' } }),
@@ -96,6 +110,13 @@ export const unit2: Unit = {
       title: 'Nacionalidades e profissões',
       subtitle: 'Odkud jsem a co dělám',
       reviewed: false,
+      cloze: [
+        c('O Tomáš é ___.', 'Tomáš je Čech.', 'checo', ['checa', 'checos']),
+        c('A Marie é ___.', 'Marie je Češka.', 'checa', ['checo', 'checas']),
+        c('A Inês é ___.', 'Inês je Portugalka.', 'portuguesa', ['português', 'portugueses']),
+        c('O Hans é ___.', 'Hans je Němec.', 'alemão', ['alemã', 'alemães']),
+        c('A Greta é ___.', 'Greta je Němka.', 'alemã', ['alemão', 'alemãs']),
+      ],
       words: [
         w('u2l3-checo', 'checo / checa', 'český / česká (Čech / Češka)', { pos: 'adj', example: { pt: 'Sou checo. / Sou checa.', cs: 'Jsem Čech. / Jsem Češka.' } }),
         w('u2l3-chequia', 'a Chéquia / a República Checa', 'Česko / Česká republika', { pos: 'noun', gender: 'f' }),
