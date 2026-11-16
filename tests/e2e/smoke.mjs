@@ -24,7 +24,7 @@ const waitForServer = async () => {
 const results = [];
 const test = async (name, fn) => {
   try { await fn(); results.push([name, true]); console.log('ok  ', name); }
-  catch (e) { results.push([name, false]); console.log('FAIL', name, '\n    ', e.message.split('\n')[0]); }
+  catch (e) { results.push([name, false]); console.log('FAIL', name, '\n    ', e.message.split('\n')[0], process.env.E2E_STACK ? e.stack : ''); }
 };
 
 await waitForServer();
@@ -108,6 +108,23 @@ await test('přepínač Seznam / Mapa a záložky', async () => {
   await page.waitForURL(/#\/$/);
   await page.getByRole('link', { name: /Mapa/ }).click();
   await page.waitForURL(/#\/map/);
+  await ctx.close();
+});
+
+await test('mapa: detail města je dialog přes mapu, zavře se křížkem i Esc', async () => {
+  const { page, ctx } = await newPage(true);
+  await page.goto(base + '#/map');
+  await page.getByRole('button', { name: /^Lisboa:/ }).waitFor({ state: 'attached' });
+  assert.equal(await page.getByRole('dialog').count(), 0);
+  await page.getByRole('button', { name: /^Lisboa:/ }).dispatchEvent('click');
+  await page.getByRole('dialog').waitFor();
+  await page.getByRole('button', { name: 'Zavřít' }).click();
+  await page.getByRole('dialog').waitFor({ state: 'detached' });
+  await page.getByRole('button', { name: /^Lisboa:/ }).dispatchEvent('click');
+  await page.getByRole('dialog').waitFor();
+  await page.waitForTimeout(300); // posluchač Esc se registruje v efektu po vykreslení
+  await page.keyboard.press('Escape');
+  await page.getByRole('dialog').waitFor({ state: 'detached' });
   await ctx.close();
 });
 

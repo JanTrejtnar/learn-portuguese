@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
 import { unitCode, units, unitUnlocked } from '../content';
 import type { TestResult } from '../lib/db';
@@ -77,6 +77,14 @@ export const MapPage = () => {
   const progress = useProgress();
   const [chosen, setChosen] = useState<Level | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!selected) return;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selected]);
   if (!progress) return <Loading />;
 
   const withCity = units.filter((u) => u.city);
@@ -95,8 +103,7 @@ export const MapPage = () => {
     const [dx, dy] = NUDGE[u.city!.name] ?? [0, 0];
     return { u, p: [base[0] + dx, base[1] + dy] as [number, number], st: stateOf(u) };
   });
-  const current = positioned.find((x) => x.st === 'current');
-  const sel = positioned.find((x) => x.u.id === selected) ?? current ?? positioned[0];
+  const sel = positioned.find((x) => x.u.id === selected);
   const done = positioned.filter((x) => x.st === 'done').length;
   const stars = positioned.reduce((a, x) => a + starsForResult(progress.tests.get(x.u.id)), 0);
   const allDone = positioned.length > 0 && done === positioned.length;
@@ -132,7 +139,7 @@ export const MapPage = () => {
   return (
     <div class="mx-auto max-w-md">
       <h1 class="text-3xl font-extrabold">Cesta Portugalskem</h1>
-      <p class="mt-1 text-ink-soft">Každá jednotka je jedno město. Splň její test a cesta se otevře dál.</p>
+      <p class="mt-1 text-ink-soft">Každá jednotka je jedno město. Klepni na město a splň test, cesta se otevře dál.</p>
       <ViewSwitch current="map" />
 
       <div class="mt-4 flex items-center gap-3">
@@ -240,8 +247,11 @@ export const MapPage = () => {
       </div>
 
       {sel && (
-        <section class="pop mt-5 rounded-3xl border border-line bg-surface p-5 shadow-soft" aria-live="polite" key={sel.u.id}>
-          <div class="flex items-center gap-4">
+        <div class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 pb-20 md:items-center md:pb-3" onClick={(e) => { if (e.target === e.currentTarget) setSelected(null); }}>
+        <section role="dialog" aria-modal="true" aria-label={`${sel.u.city!.name}: ${sel.u.title}`} class="pop relative max-h-full w-full max-w-md overflow-y-auto rounded-3xl border border-line bg-surface p-5 shadow-lift" key={sel.u.id}>
+          <button ref={closeRef} type="button" aria-label="Zavřít" onClick={() => setSelected(null)}
+            class="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full border border-line-strong bg-surface-2 text-xl font-bold">×</button>
+          <div class="flex items-center gap-4 pr-10">
             <div class={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 text-3xl ${selState === 'done' ? 'border-gold-400 bg-brand-600' : selState === 'locked' ? 'border-line-strong bg-surface-2 opacity-70' : 'border-brand-600 bg-surface'}`} aria-hidden="true">
               {sel.u.city!.icon ?? sel.u.emoji}
             </div>
@@ -279,6 +289,7 @@ export const MapPage = () => {
             )}
           </div>
         </section>
+        </div>
       )}
     </div>
   );
