@@ -1,6 +1,8 @@
 import { href } from '../router';
 
 const items = [
+  { to: '/gramatika', emoji: '📘', title: 'Přehled gramatiky', text: 'Všechna gramatika z odemčených lekcí na jednom místě, s hledáním.' },
+  { to: '/grammar', emoji: '🧩', title: 'Doplňování vět', text: 'Opakování gramatiky: věty s mezerou z lekcí, chytrý plán jako u slovíček.' },
   { to: '/roleplay', emoji: '🎭', title: 'Scénáře', text: 'Větvené rozhovory z reálných situací: pastelaria, nádraží, obchod, cesta.' },
   { to: '/pairs', emoji: '👂', title: 'Minimální páry', text: 'Rozlišuj podobně znějící slova: avó × avô, caro × carro, mês × mas…' },
   { to: '/speak', emoji: '🎤', title: 'Mluvení', text: 'Poslechni si větu, zopakuj ji nahlas a dostaneš zpětnou vazbu.' },

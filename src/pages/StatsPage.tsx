@@ -9,7 +9,7 @@ import { useStudySettings } from '../lib/settings';
 import { Coin } from '../components/Coin';
 import { coinsEarned } from '../lib/coins';
 import { balance, loadShop } from '../lib/shop';
-import { streakOf } from '../lib/stats';
+import { streakOf, weekSummary } from '../lib/stats';
 import { levelInfo, totalXp, xpToday } from '../lib/xp';
 
 const Tile = ({ label, value, hint }: { label: string; value: string | number; hint?: string }) => (
@@ -93,6 +93,27 @@ export const StatsPage = () => {
         <Tile label="K opakování teď" value={dueNow} />
         <Tile label="Úspěšnost (30 d)" value={retention === null ? '–' : `${retention} %`} hint={`${rev30} hodnocení`} />
       </div>
+
+      {(() => {
+        const w = weekSummary(progress.days, now);
+        return (
+          <section class="mt-5 rounded-2xl border border-line bg-surface p-4" aria-label="Tento týden">
+            <h2 class="font-semibold">Posledních 7 dní</h2>
+            <p class="mt-1 text-sm text-ink-soft">
+              {w.activeDays === 0 ? 'Zatím žádná aktivita. Stačí pár minut denně.' : (
+                <>Učil(a) ses <b>{w.activeDays} z 7 dní</b>, opakoval(a) <b>{w.reviews}</b> karet, přidal(a) <b>{w.newCards}</b> nových slovíček a získal(a) <b>{w.xp} XP</b>{w.retention !== null && <>; úspěšnost <b>{w.retention} %</b></>}.</>
+              )}
+            </p>
+            <div class="mt-3 flex gap-1" aria-hidden="true">
+              {Array.from({ length: 7 }, (_, i) => {
+                const k = dateKey(dayStart(now) - (6 - i) * DAY);
+                const on = (progress.days.get(k)?.reviews ?? 0) > 0 || (progress.days.get(k)?.xp ?? 0) > 0;
+                return <span key={k} class={`h-2 flex-1 rounded-full ${on ? 'bg-brand-500' : 'bg-track'}`} />;
+              })}
+            </div>
+          </section>
+        );
+      })()}
 
       <h2 class="mt-8 mb-3 text-lg font-semibold">Slovní zásoba ({words.length} karet)</h2>
       <div class="flex h-4 overflow-hidden rounded-full bg-track" role="img" aria-label="Rozložení karet podle zralosti">

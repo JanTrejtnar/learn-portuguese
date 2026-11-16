@@ -4,6 +4,7 @@ import { Breadcrumb } from '../components/Breadcrumb';
 import { AudioButton } from '../components/AudioButton';
 import { Flashcard } from '../components/Flashcard';
 import { TypingQuestion, type Answer } from '../components/QuizQuestions';
+import { hasInfo, WordInfo } from '../components/WordInfo';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { allWords, getDeck, unlockedWords } from '../content';
 import { speak, stopSpeaking } from '../lib/audio';
@@ -20,6 +21,9 @@ import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
 import type { Word } from '../types';
 import { NotFoundPage } from './NotFoundPage';
+
+/** Po kolika zapomenutích se karta považuje za „pijavici“ a ukáže se jí vysvětlení. */
+const LEECH_LAPSES = 4;
 
 interface RatingDef { id: Rating; label: string; key: string; tone: string }
 const advancedRatings: RatingDef[] = [
@@ -235,6 +239,12 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
       {current && !variant && (
         <>
           <Flashcard key={current.id + (learning ? '-new' : '')} word={current} flipped={flipped || learning} direction={settings.direction} onFlip={() => setFlipped((f) => !f)} />
+          {srs && flipped && (cards.current.get(current.id)?.lapses ?? 0) >= LEECH_LAPSES && (
+            <div class="mt-3 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm">
+              <p><b>Tvrdé slovíčko.</b> Zapomněl(a) ses ho už {cards.current.get(current.id)!.lapses}×. Zkus si ho spojit s obrázkem, vlastní větou nebo podobným českým slovem.</p>
+              {hasInfo(current) && <div class="mt-2"><WordInfo word={current} /></div>}
+            </div>
+          )}
           {learning ? (
             <div class="mt-4">
               <p class="mb-2 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm"><b>Nové slovíčko.</b> Prohlédni si ho a poslechni výslovnost. Za chvíli se tě na něj zeptám.</p>

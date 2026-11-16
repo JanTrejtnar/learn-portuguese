@@ -70,3 +70,27 @@ export const dayToFreeze = (days: Days, now: number, frozen: ReadonlySet<string>
   const after = streakOf(days, now, new Set([...frozen, yesterday]));
   return after > before ? yesterday : null;
 };
+
+export interface WeekSummary {
+  activeDays: number;
+  reviews: number;
+  newCards: number;
+  xp: number;
+  /** Úspěšnost v % (null, když nebylo žádné hodnocení). */
+  retention: number | null;
+}
+
+/** Souhrn posledních 7 dní včetně dneška. */
+export const weekSummary = (days: Days, now: number): WeekSummary => {
+  const out = { activeDays: 0, reviews: 0, newCards: 0, xp: 0, again: 0 };
+  for (let i = 0; i < 7; i++) {
+    const d = days.get(dateKey(dayStart(now) - i * DAY));
+    if (!d) continue;
+    if (isActive(d)) out.activeDays += 1;
+    out.reviews += d.reviews;
+    out.newCards += d.newCards;
+    out.xp += d.xp ?? 0;
+    out.again += d.again;
+  }
+  return { activeDays: out.activeDays, reviews: out.reviews, newCards: out.newCards, xp: out.xp, retention: out.reviews > 0 ? Math.round(((out.reviews - out.again) / out.reviews) * 100) : null };
+};

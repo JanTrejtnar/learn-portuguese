@@ -8,7 +8,8 @@ import { Icon } from '../components/Icon';
 import { ViewSwitch } from '../components/ViewSwitch';
 import { PlayerStrip } from '../components/PlayerStrip';
 import { href } from '../router';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
+import { saveTest } from '../lib/db';
 import { isOnboarded } from './WelcomePage';
 
 const LEVELS = [
@@ -64,10 +65,12 @@ const quick = [
 export const HomePage = () => {
   const progress = useProgress();
   const g = greeting();
+  const [, force] = useState(0);
   useEffect(() => {
     if (progress && progress.cards.size === 0 && progress.days.size === 0 && !isOnboarded()) window.location.hash = '#/welcome';
   }, [progress]);
   // První odemčená a nesplněná jednotka = „další krok“
+  const firstLocked = progress ? units.find((u) => !unitUnlocked(u.id, progress.tests)) : undefined;
   const current = progress ? units.find((u) => unitUnlocked(u.id, progress.tests) && !progress.tests.get(u.id)?.passed) : undefined;
   return (
   <div>
@@ -97,6 +100,17 @@ export const HomePage = () => {
           {units.filter((u) => u.level === level).map((u) => {
             const locked = progress ? !unitUnlocked(u.id, progress.tests) : false;
             const t = progress?.tests.get(u.id);
+            const idx = units.findIndex((x) => x.id === u.id);
+            const prevUnit = idx > 0 ? units[idx - 1] : undefined;
+            const canSkipTo = locked && !!prevUnit && !!progress && u.id === firstLocked?.id;
+            const unlock = () => {
+              if (!prevUnit || !progress) return;
+              const old = progress.tests.get(prevUnit.id);
+              const result = { id: prevUnit.id, best: old?.best ?? 0, passed: true, attempts: old?.attempts ?? 0, last: Date.now(), skipped: true };
+              progress.tests.set(prevUnit.id, result);
+              void saveTest(result);
+              force((n) => n + 1);
+            };
             return (
               <li key={u.id}>
                 <a
@@ -113,6 +127,10 @@ export const HomePage = () => {
                   {current?.id === u.id && <span class="ml-auto shrink-0 rounded-full bg-flag-600 px-2.5 py-1 text-xs font-bold text-white">další krok</span>}
                   {locked && <span class="ml-auto shrink-0 text-muted"><Icon name="lock" class="h-5 w-5" /></span>}
                 </a>
+                {canSkipTo && prevUnit && (
+                  <button type="button" onClick={() => { if (window.confirm(`Odemknout jednotku „${u.title}“ bez testu jednotky „${prevUnit.title}“? Test můžeš kdykoli splnit později.`)) unlock(); }}
+                    class="mt-1 ml-2 text-xs font-semibold text-muted underline hover:text-brand-700">Už to umím, odemknout</button>
+                )}
               </li>
             );
           })}

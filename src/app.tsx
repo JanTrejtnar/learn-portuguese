@@ -1,6 +1,7 @@
 import { Layout } from './components/Layout';
 import { CardsPage } from './pages/CardsPage';
 import { GrammarPage } from './pages/GrammarPage';
+import { GrammarRefPage } from './pages/GrammarRefPage';
 import { HomePage } from './pages/HomePage';
 import { LessonPage } from './pages/LessonPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -39,6 +40,7 @@ export const App = () => {
       {route.name === 'roleplay' && <RoleplayPage id={route.params.id!} />}
       {route.name === 'pairs' && <PairsPage />}
       {route.name === 'settings' && <SettingsPage />}
+      {route.name === 'grammarRef' && <GrammarRefPage />}
       {route.name === 'grammar' && <GrammarPage />}
       {route.name === 'shop' && <ShopPage />}
       {route.name === 'speak' && <SpeakPage />}

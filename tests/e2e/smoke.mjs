@@ -164,7 +164,10 @@ await test('opakování: známé slovo se píše, špatná odpověď se vrátí'
   }), ids);
   await page.goto(base + '#/cards/a1-u1-l1');
   const input = page.locator('input[lang="pt-PT"]');
-  for (let i = 0; i < 19 && !(await input.isVisible().catch(() => false)); i++) {
+  const ready = page.locator('input[lang="pt-PT"], button:text-is("Otočit")').first();
+  for (let i = 0; i < 19; i++) {
+    await ready.waitFor();
+    if (await input.isVisible()) break;
     await page.getByRole('button', { name: 'Otočit', exact: true }).click();
     await page.getByRole('button', { name: /^Znal jsem/ }).click();
   }
@@ -177,9 +180,23 @@ await test('opakování: známé slovo se píše, špatná odpověď se vrátí'
   await ctx.close();
 });
 
+await test('přehled gramatiky: hledání najde lekci a týdenní souhrn je vidět', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/gramatika');
+  await page.getByRole('heading', { name: 'Přehled gramatiky' }).waitFor();
+  const before = await page.locator('details').count();
+  assert.ok(before >= 1);
+  await page.getByLabel('Hledat v gramatice').fill('zzzneexistuje');
+  await page.getByText('Nic nenalezeno.').waitFor();
+  await page.goto(base + '#/stats');
+  await page.getByText('Posledních 7 dní').waitFor();
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test('všechny hlavní stránky se načtou bez chyby', async () => {
   const { page, errors, ctx } = await newPage();
-  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/shop', '/grammar', '/settings', '/roleplay', '/pairs', '/speak']) {
+  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/shop', '/grammar', '/gramatika', '/settings', '/roleplay', '/pairs', '/speak']) {
     await page.goto(base + '#' + r);
     await page.waitForTimeout(150);
     assert.ok(await page.locator('main, #obsah, h1').first().isVisible(), r);

@@ -1,6 +1,7 @@
 import { AudioButton } from '../components/AudioButton';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { VoiceWarning } from '../components/VoiceWarning';
+import { GrammarBlockView } from '../components/GrammarBlockView';
 import { WordRow } from '../components/WordRow';
 import { getLesson } from '../content';
 import { href } from '../router';
@@ -35,27 +36,7 @@ export const LessonPage = ({ id }: { id: string }) => {
       {lesson.grammar && (
         <section class="mt-10">
           <h2 class="mb-3 text-lg font-semibold">Gramatika: {lesson.grammar.title}</h2>
-          <div class="space-y-3 rounded-2xl border border-line bg-surface p-4">
-            {lesson.grammar.body.map((p, i) => <p key={i}>{p}</p>)}
-            {lesson.grammar.table && (
-              <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                  <thead>
-                    <tr class="border-b border-line">
-                      {lesson.grammar.table.headers.map((h) => <th key={h} class="py-2 pr-4 font-semibold">{h}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lesson.grammar.table.rows.map((row, i) => (
-                      <tr key={i} class="border-b border-line last:border-0">
-                        {row.map((cell, j) => <td key={j} class="py-2 pr-4" lang={j > 0 ? 'pt-PT' : undefined}>{cell}</td>)}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <GrammarBlockView block={lesson.grammar} />
         </section>
       )}
 
