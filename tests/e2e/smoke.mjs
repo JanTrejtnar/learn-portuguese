@@ -167,6 +167,42 @@ await test('obchod: zůstatek 0, nákup zamčený, nasazení motivu přes ulože
   await ctx.close();
 });
 
+await test('test: nápověda stojí mince a slovíčko se vrátí do opakování', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/stats');
+  await page.getByText('Můj pokrok').first().waitFor();
+  // splněný test jednotky dá mince, za které se dá koupit nápověda
+  await page.evaluate(() => new Promise((resolve) => {
+    const req = indexedDB.open('ap-progress');
+    req.onsuccess = () => {
+      const tx = req.result.transaction('tests', 'readwrite');
+      tx.objectStore('tests').put({ id: 'a1-u1', best: 1, passed: true, attempts: 1, last: Date.now() });
+      tx.oncomplete = () => resolve(true);
+    };
+  }));
+  await page.goto(base + '#/quiz/a1-u1-l1');
+  const hint = page.getByRole('button', { name: /Vyřadit 2 možnosti|Odkrýt první písmeno|Prozradit první slovo/ });
+  let used = false;
+  for (let i = 0; i < 20 && !used; i++) {
+    await page.waitForTimeout(400);
+    if (await hint.count()) {
+      await hint.first().click();
+      used = true;
+      break;
+    }
+    const input = page.locator('input[lang="pt-PT"]');
+    if (await input.count()) { await input.fill('x'); await page.getByRole('button', { name: 'Zkontrolovat' }).click(); }
+    else if (await page.getByRole('button', { name: 'Zkontrolovat' }).count()) { await page.locator('button:not([disabled])', { hasText: /^[^\d]/ }).first().click().catch(() => undefined); await page.getByRole('button', { name: 'Zkontrolovat' }).click().catch(() => undefined); }
+    else await page.keyboard.press('1');
+    await page.getByRole('button', { name: /^(Další|Zobrazit výsledek)/ }).click().catch(() => undefined);
+  }
+  assert.ok(used, 'v prvních otázkách se nabídla nápověda: ' + (await page.locator('main').innerText()).replace(/\n+/g, ' | '));
+  const shop = await page.evaluate(() => JSON.parse(localStorage.getItem('ap:shop') ?? '{}'));
+  assert.equal(shop.hintsBought, 1);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test('gramatika: věta s mezerou se opakuje a ukládá', async () => {
   const { page, errors, ctx } = await newPage(true);
   await page.goto(base + '#/grammar');

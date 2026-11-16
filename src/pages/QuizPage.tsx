@@ -223,10 +223,10 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
         <>
 
           <div key={q2.id}>
-            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
-            {(q2.kind === 'typing' || q2.kind === 'dictation') && <TypingQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
+            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} hints />}
+            {(q2.kind === 'typing' || q2.kind === 'dictation') && <TypingQuestion q={q2} answer={answer} onAnswer={setAnswer} hints />}
             {q2.kind === 'match' && <MatchQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
-            {q2.kind === 'build' && <BuildQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
+            {q2.kind === 'build' && <BuildQuestion q={q2} answer={answer} onAnswer={setAnswer} hints />}
           </div>
 
           {!answer && (q2.kind === 'listen' || q2.kind === 'dictation') && (

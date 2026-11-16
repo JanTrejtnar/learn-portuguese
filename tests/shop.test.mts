@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { COINS_PER_GOAL_DAY, COINS_PER_LEVEL, coinsEarned } from '../src/lib/coins.ts';
-import { DEFAULT_SHOP, FREEZE_PRICE, ITEMS, MAX_FREEZES, balance, buyFreeze, buyItem, coinsSpent, consumeFreeze, equipItem, freezesLeft, isOwned, itemById, sanitizeShop, validEquipped } from '../src/lib/shop.ts';
+import { DEFAULT_SHOP, FREEZE_PRICE, HINT_PRICE, buyHint, ITEMS, MAX_FREEZES, balance, buyFreeze, buyItem, coinsSpent, consumeFreeze, equipItem, freezesLeft, isOwned, itemById, sanitizeShop, validEquipped } from '../src/lib/shop.ts';
 import { accentVars, ACCENTS } from '../src/lib/accent.ts';
 import { buildBackup, parseBackup } from '../src/lib/backup.ts';
 import { dayToFreeze, streakOf } from '../src/lib/stats.ts';
@@ -124,4 +124,17 @@ test('záloha obsahuje obchod a ošetří ho při načtení', () => {
   const old = parseBackup(JSON.stringify(buildBackup(src, { settings: {}, badgesSeen: [] }, new Date())));
   assert.ok(old.ok);
   if (old.ok) assert.equal(old.backup.shop, undefined);
+});
+
+test('nápověda v testu: stojí mince, nejde do záporu a počítá se do utraceného', () => {
+  assert.equal(buyHint(DEFAULT_SHOP, HINT_PRICE - 1).ok, false);
+  const ok = buyHint(DEFAULT_SHOP, HINT_PRICE);
+  assert.ok(ok.ok);
+  if (ok.ok) {
+    assert.equal(ok.state.hintsBought, 1);
+    assert.equal(coinsSpent(ok.state), HINT_PRICE);
+    assert.equal(balance(HINT_PRICE, ok.state), 0);
+  }
+  assert.equal(sanitizeShop({ hintsBought: -2 }).hintsBought, 0);
+  assert.equal(sanitizeShop({ hintsBought: 4 }).hintsBought, 4);
 });

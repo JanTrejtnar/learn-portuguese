@@ -4,6 +4,11 @@ import { useKeydown } from '../lib/useKeydown';
 import { checkTyped, tokenKey, type BuildQ, type ChoiceQ, type MatchQ, type QuestionResult, type TypingQ } from '../lib/quiz';
 import { AudioButton } from './AudioButton';
 import { BottomBar, bigBtn } from './BottomBar';
+import { Coin } from './Coin';
+import { units } from '../content';
+import { coinsEarned } from '../lib/coins';
+import { HINT_PRICE, balance, buyHint, loadShop, saveShop, useShop } from '../lib/shop';
+import { useProgress } from '../lib/useProgress';
 
 export type Answer = Pick<QuestionResult, 'correct' | 'given' | 'missed' | 'note'>;
 
@@ -12,9 +17,37 @@ interface Props<Q> {
   /** Už odpovězeno (zamyká vstup a ukazuje správnou odpověď). */
   answer: Answer | null;
   onAnswer: (a: Answer) => void;
+  /** Nabídnout nápovědu za mince (jen v kvízech a testech). */
+  hints?: boolean;
 }
 
 const shuffleOnce = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5);
+
+/** „kniha“ → „k _ _ _ _“ (první písmeno každého slova a počet ostatních). */
+const hintPattern = (text: string): string =>
+  text.split(' ').map((w) => [...w].map((ch, i) => (i === 0 || !/\p{L}/u.test(ch) ? ch : '_')).join(' ')).join('   ');
+
+/** Tlačítko nápovědy za mince. Použitá nápověda znamená, že se slovíčko ještě vrátí do opakování. */
+const HintButton = ({ label, onUse }: { label: string; onUse: () => void }) => {
+  const progress = useProgress();
+  const [shop] = useShop();
+  if (!progress) return null;
+  const bal = balance(coinsEarned(progress, units).total, shop);
+  const can = bal >= HINT_PRICE;
+  const use = () => {
+    const r = buyHint(loadShop(), bal);
+    if (!r.ok) return;
+    saveShop(r.state);
+    onUse();
+  };
+  return (
+    <button type="button" onClick={use} disabled={!can} class="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong px-4 py-2 text-sm font-semibold hover:border-brand-500 disabled:opacity-50">
+      <span aria-hidden="true">💡</span> {label} <span class="inline-flex items-center gap-1 text-muted"><Coin class="h-4 w-4" />{HINT_PRICE}</span>{!can && <span class="text-muted">· málo mincí</span>}
+    </button>
+  );
+};
+
+const HINT_NOTE = 'S nápovědou: slovíčko se ještě vrátí do opakování.';
 
 /** Poslechové otázky se po zobrazení rovnou přehrají. */
 const useAutoplay = (text: string | undefined, enabled: boolean) => {
@@ -25,15 +58,23 @@ const useAutoplay = (text: string | undefined, enabled: boolean) => {
 
 /* ───────── výběr z možností (PT→CZ, CZ→PT, poslech) ───────── */
 
-export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
+export const ChoiceQuestion = ({ q, answer, onAnswer, hints }: Props<ChoiceQ>) => {
   useAutoplay(q.kind === 'listen' ? q.audio : undefined, true);
+
+  // Nápověda 50:50: vyřadí dvě špatné možnosti.
+  const [hidden, setHidden] = useState<number[]>([]);
+  const hinted = hidden.length > 0;
+  const hide = () => {
+    const wrong = q.options.map((_, i) => i).filter((i) => i !== q.answer);
+    setHidden(shuffleOnce(wrong).slice(0, 2));
+  };
 
   useKeydown((e) => {
     const i = Number(e.key) - 1;
-    if (!answer && i >= 0 && i < q.options.length) pick(i);
+    if (!answer && i >= 0 && i < q.options.length && !hidden.includes(i)) pick(i);
   });
 
-  const pick = (i: number) => onAnswer({ correct: i === q.answer, given: q.options[i]!, missed: i === q.answer ? [] : q.wordIds });
+  const pick = (i: number) => onAnswer({ correct: i === q.answer, given: q.options[i]!, missed: i === q.answer && !hinted ? [] : q.wordIds, note: i === q.answer && hinted ? HINT_NOTE : undefined });
 
   return (
     <div>
@@ -70,10 +111,10 @@ export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
             right: 'border-green-600 bg-green-50 dark:bg-green-950',
             wrong: 'border-red-600 bg-red-50 dark:bg-red-950',
             dim: 'border-line bg-surface opacity-50',
-          }[state];
+          }[hidden.includes(i) && state === 'idle' ? 'dim' : state];
           return (
             <li key={opt}>
-              <button type="button" disabled={!!answer} onClick={() => pick(i)} lang={q.optionsLang === 'pt' ? 'pt-PT' : 'cs'} class={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left font-medium ${tone}`}>
+              <button type="button" disabled={!!answer || hidden.includes(i)} onClick={() => pick(i)} lang={q.optionsLang === 'pt' ? 'pt-PT' : 'cs'} class={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left font-medium ${tone}`}>
                 <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs text-ink-soft">{i + 1}</span>
                 {opt}
               </button>
@@ -81,15 +122,17 @@ export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
           );
         })}
       </ul>
+      {hints && !answer && q.options.length > 3 && !hinted && <HintButton label="Vyřadit 2 možnosti" onUse={hide} />}
     </div>
   );
 };
 
 /* ───────── psaní a diktát ───────── */
 
-export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
+export const TypingQuestion = ({ q, answer, onAnswer, hints }: Props<TypingQ>) => {
   const [value, setValue] = useState('');
   const ref = useRef<HTMLInputElement>(null);
+  const [hinted, setHinted] = useState(false);
   useAutoplay(q.kind === 'dictation' ? q.audio : undefined, true);
   // Pole se hned zaktivní (i po překreslení a na mobilech, kde focus někdy zabere až o chvíli později).
   useEffect(() => {
@@ -106,8 +149,8 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
     onAnswer({
       correct: verdict !== 'wrong',
       given: typed,
-      missed: verdict === 'wrong' ? q.wordIds : [],
-      note: verdict === 'diacritics' ? `Pozor na diakritiku: správně je „${q.display}“.` : undefined,
+      missed: verdict === 'wrong' || hinted ? q.wordIds : [],
+      note: verdict === 'diacritics' ? `Pozor na diakritiku: správně je „${q.display}“.` : verdict !== 'wrong' && hinted ? HINT_NOTE : undefined,
     });
   };
 
@@ -132,6 +175,10 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
           class="min-w-0 flex-1 rounded-xl border-2 border-line bg-surface px-4 py-3 text-lg disabled:opacity-60"
         />
       </form>
+      {!answer && hinted && (
+        <p class="mt-3 font-mono text-xl tracking-widest" lang="pt-PT" aria-label="Nápověda: začátek a délka slova">{hintPattern(q.display)}</p>
+      )}
+      {hints && !answer && !hinted && <HintButton label="Odkrýt první písmeno" onUse={() => setHinted(true)} />}
       {!answer && (
         <BottomBar><button type="submit" form="typing-form" class={bigBtn}>Zkontrolovat</button></BottomBar>
       )}
@@ -209,8 +256,9 @@ export const MatchQuestion = ({ q, answer, onAnswer }: Props<MatchQ>) => {
 
 /* ───────── skládání věty ───────── */
 
-export const BuildQuestion = ({ q, answer, onAnswer }: Props<BuildQ>) => {
+export const BuildQuestion = ({ q, answer, onAnswer, hints }: Props<BuildQ>) => {
   const [picked, setPicked] = useState<number[]>([]);
+  const [hinted, setHinted] = useState(false);
   const toggle = (i: number) => {
     if (answer) return;
     setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
@@ -219,7 +267,7 @@ export const BuildQuestion = ({ q, answer, onAnswer }: Props<BuildQ>) => {
   const check = () => {
     if (answer || picked.length === 0) return;
     const correct = built.map(tokenKey).join(' ') === q.tokens.map(tokenKey).join(' ');
-    onAnswer({ correct, given: built.join(' '), missed: correct ? [] : q.wordIds });
+    onAnswer({ correct, given: built.join(' '), missed: correct && !hinted ? [] : q.wordIds, note: correct && hinted ? HINT_NOTE : undefined });
   };
 
   return (
@@ -237,6 +285,8 @@ export const BuildQuestion = ({ q, answer, onAnswer }: Props<BuildQ>) => {
           <button key={i} type="button" disabled={!!answer || picked.includes(i)} onClick={() => toggle(i)} class="rounded-lg border border-line-strong bg-surface px-3 py-1.5 font-medium disabled:opacity-30">{t}</button>
         ))}
       </div>
+      {!answer && hinted && <p class="mt-3 text-sm">Věta začíná slovem: <b lang="pt-PT">{q.tokens[0]}</b></p>}
+      {hints && !answer && !hinted && <HintButton label="Prozradit první slovo" onUse={() => setHinted(true)} />}
       {!answer && (
         <BottomBar><button type="button" onClick={check} disabled={picked.length === 0} class={bigBtn}>Zkontrolovat</button></BottomBar>
       )}

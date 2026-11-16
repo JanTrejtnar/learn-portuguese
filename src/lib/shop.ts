@@ -22,6 +22,8 @@ export interface ShopItem {
 
 export const FREEZE_PRICE = 30;
 export const MAX_FREEZES = 2;
+/** Cena jedné nápovědy v testu. */
+export const HINT_PRICE = 3;
 
 export const ITEMS: ShopItem[] = [
   // pozadí
@@ -85,11 +87,13 @@ export interface ShopState {
   /** Aktivní motiv (id položky), nebo prázdné = výchozí. */
   theme: string;
   freezesBought: number;
+  /** Počet použitých nápověd v testech (každá stojí HINT_PRICE). */
+  hintsBought: number;
   /** Data zmrazených dnů (RRRR-MM-DD). */
   frozen: string[];
 }
 
-export const DEFAULT_SHOP: ShopState = { owned: [], equipped: {}, look: { skin: 1, hairColor: 1, hair: 'short' }, theme: '', freezesBought: 0, frozen: [] };
+export const DEFAULT_SHOP: ShopState = { owned: [], equipped: {}, look: { skin: 1, hairColor: 1, hair: 'short' }, theme: '', freezesBought: 0, hintsBought: 0, frozen: [] };
 
 const KEY = 'ap:shop';
 const EVENT = 'ap:shop-changed';
@@ -107,6 +111,7 @@ const sanitize = (raw: Partial<ShopState>): ShopState => {
     },
     theme: typeof raw.theme === 'string' && ids.has(raw.theme) ? raw.theme : '',
     freezesBought: Number.isInteger(raw.freezesBought) && raw.freezesBought! >= 0 && raw.freezesBought! < 1000 ? raw.freezesBought! : 0,
+    hintsBought: Number.isInteger(raw.hintsBought) && raw.hintsBought! >= 0 && raw.hintsBought! < 100000 ? raw.hintsBought! : 0,
     frozen: Array.isArray(raw.frozen) ? raw.frozen.filter((d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) : [],
   };
 };
@@ -149,7 +154,7 @@ export const isOwned = (item: ShopItem, shop: ShopState, st: Standing): boolean 
 
 /** Kolik mincí už je utraceno. */
 export const coinsSpent = (s: ShopState): number =>
-  s.owned.reduce((a, id) => a + (itemById(id)?.price ?? 0), 0) + s.freezesBought * FREEZE_PRICE;
+  s.owned.reduce((a, id) => a + (itemById(id)?.price ?? 0), 0) + s.freezesBought * FREEZE_PRICE + s.hintsBought * HINT_PRICE;
 
 export const balance = (earned: number, s: ShopState): number => Math.max(0, earned - coinsSpent(s));
 
@@ -170,6 +175,10 @@ export const buyFreeze = (s: ShopState, bal: number): BuyResult => {
   if (bal < FREEZE_PRICE) return { ok: false, reason: 'Nemáš dost mincí.' };
   return { ok: true, state: { ...s, freezesBought: s.freezesBought + 1 } };
 };
+
+/** Koupí jednu nápovědu v testu (stojí mince; zůstatek nikdy nejde do záporu). */
+export const buyHint = (s: ShopState, bal: number): BuyResult =>
+  bal < HINT_PRICE ? { ok: false, reason: 'Nemáš dost mincí.' } : { ok: true, state: { ...s, hintsBought: s.hintsBought + 1 } };
 
 /** Nasadí věc (musí být vlastněná); `null` = sundat. */
 export const equipItem = (s: ShopState, item: ShopItem, on: boolean): ShopState => {

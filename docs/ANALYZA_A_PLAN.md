@@ -24,7 +24,7 @@ Stav k 16. 11. 2026. Doplňuje `docs/IMPROVEMENTS.md` (ten je široký katalog n
 
 **Také hotovo (drobnosti):** L7 (u slovíčka zapomenutého ≥ 4× se po otočení ukáže „Těžké slovíčko“ s tipem a vysvětlením; vlastní poznámky jsem neřešil, potřebovaly by nové úložiště), G3 (stránka Praxe → Přehled gramatiky s hledáním, `/gramatika`), N3 („Už to umím, odemknout“ přímo u první zamčené jednotky na úvodní stránce), P3 (karta „Posledních 7 dní“ na stránce Pokrok).
 
-**Zbývá:** M4 (sbírka, bonusové kapitoly, nápovědy v testech – podle zkušeností s mincemi) (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
+**Zbývá:** K2 lazy-load, C1 (revize rodilým mluvčím), A1 (vlastní audio, odloženo), úroveň B1 a vstupní tutoriál (viz plány níže). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
 
 ## 0. Shrnutí v jedné stránce
 
@@ -372,3 +372,9 @@ Dnes existuje 3krokový úvod (`/welcome`: jak se učíme, denní cíl, kde zač
 2. Zařazovací test (využije generátor kvízů z `lib/quiz.ts`).
 3. Uložení volby úrovně a přeskočených jednotek; testy.
 4. Odkaz v Nastavení; E2E; aktualizace tohoto plánu.
+
+## Hotovo: příkladové věty a nápovědy v testech
+
+- **Příkladové věty:** všech 227 frází, číslovek a citoslovců, které je dosud neměly, dostalo příklad (`src/content/examples.ts`). Dnes má příklad každé z 754 slovíček. Věty jsou krátké, v PT-PT a čekají na revizi rodilým mluvčím.
+- **Nápovědy v testech (M4):** v kvízech a testech jednotek stojí nápověda `HINT_PRICE` (3) mince; v kartičkách a gramatice nejsou. Podle typu otázky: *výběr* vyřadí dvě špatné možnosti, *psaní* odkryje první písmeno a délku slov, *skládání věty* prozradí první slovo. Odpověď s nápovědou se počítá správně, ale slovíčko se ještě vrátí do opakování (stejně jako při chybě), aby nápověda neobešla učení. Cena se zapisuje do stavu obchodu (`hintsBought`), takže zůstatek zůstává odvozený a nikdy záporný. Pokud je zůstatek menší než cena, tlačítko je vypnuté.
+- Mapa a tutoriál musí zmínit nápovědy, až bude tutoriál implementován (kapitola o odměnách).
