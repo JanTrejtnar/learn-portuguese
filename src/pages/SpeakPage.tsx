@@ -25,6 +25,7 @@ export const SpeakPage = () => {
       <h1 class="text-2xl font-bold">Mluvení 🎤</h1>
       <p class="mt-1 text-ink-soft">Poslechni si větu, zopakuj ji nahlas a uvidíš, která slova zazněla.</p>
       <VoiceWarning />
+      <p class="mt-2 text-xs text-muted">Rozpoznávání řeči zajišťuje tvůj prohlížeč. V Chrome a Edge se zvuk posílá na servery výrobce prohlížeče; aplikace ho neukládá. <a href={href('/about')} class="underline">Soukromí</a></p>
       {progress ? <Session progress={progress} /> : <Loading />}
     </div>
   );

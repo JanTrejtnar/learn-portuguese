@@ -3,6 +3,8 @@
  * (hlídá to tests/tutorial.test.mts). Při změně chování aplikace tento soubor zkontroluj a uprav.
  */
 import { COINS_PER_GOAL_DAY, COINS_PER_LEVEL, COINS_PER_SCENARIO, COINS_PER_TEST, COINS_PER_WEEK_STREAK } from '../lib/coins';
+import { BACKUP_EVERY_DAYS } from '../lib/backupReminder';
+import { LEARN_BATCH } from '../lib/learn';
 import { PASS_RATIO } from '../lib/quiz';
 import { FREEZE_PRICE, HINT_PRICE, MAX_FREEZES } from '../lib/shop';
 
@@ -35,6 +37,7 @@ export const tutorialSteps = (): TutorialStep[] => [
     intro: 'Naučíš se evropskou portugalštinu (A1–B1) v češtině, stačí pár minut denně.',
     items: [
       { emoji: '📚', title: 'Jednotky a lekce', text: 'Cesta vede po městech Portugalska. Každá jednotka má několik lekcí: slovíčka s výslovností, gramatiku a dialog.' },
+      { emoji: '▶', title: 'Projít lekci', text: `Tlačítko „Projít lekci“ tě provede po ${LEARN_BATCH} nových slovech: nejdřív je uvidíš a uslyšíš, pak je hned procvičíš. Hotová slova se objeví v kartičkách k opakování.` },
       { emoji: '🗺️', title: 'Mapa i seznam', text: 'Na úvodní stránce můžeš přepínat mezi mapou a seznamem lekcí.' },
       { emoji: '✅', title: 'Dokončení jednotky', text: `Na konci jednotky je test. Při ${passPercent()} % a více odemkneš další jednotku a získáš pohlednici z daného města.` },
     ],
@@ -59,6 +62,7 @@ export const tutorialSteps = (): TutorialStep[] => [
       { emoji: '⭐', title: 'XP a denní cíl', text: 'Za správné odpovědi a hotové lekce dostaneš XP. Splněný denní cíl je základ série dnů v kuse.' },
       { emoji: '🪙', title: 'Mince', text: `Za splněný denní cíl ${COINS_PER_GOAL_DAY}, za nový level ${COINS_PER_LEVEL}, za splněný test ${COINS_PER_TEST}, za scénář ${COINS_PER_SCENARIO} a za každý týden série ${COINS_PER_WEEK_STREAK}. Mince nelze získat klikáním naprázdno.` },
       { emoji: '🛍️', title: 'Obchod', text: `Za mince koupíš věci pro avatara a motivy. Zmrazení série (${FREEZE_PRICE} mincí, nejvýš ${MAX_FREEZES}) zachrání sérii, když jeden den vynecháš.` },
+      { emoji: '💾', title: 'Záloha pokroku', text: `Pokrok je uložený jen v tomto prohlížeči. V Nastavení si ho stáhneš jako soubor a po ${BACKUP_EVERY_DAYS} dnech ti to aplikace připomene. Tamtéž si stáhneš i denní připomínku do kalendáře.` },
       { emoji: '💌', title: 'Pohlednice', text: 'Každá dokončená jednotka odemkne pohlednici. Najdeš je ve sbírce na záložce Pokrok.' },
     ],
   },

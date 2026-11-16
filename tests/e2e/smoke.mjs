@@ -305,6 +305,56 @@ await test('všechny hlavní stránky se načtou bez chyby', async () => {
   await ctx.close();
 });
 
+await test('Projít lekci: představení slov → cvičení → slova v kartičkách', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/lesson/a1-u1-l1');
+  await page.getByRole('link', { name: /Projít lekci/ }).click();
+  await page.waitForURL(/#\/learn\/a1-u1-l1/);
+  await page.getByText('Nová slova 1 / 6').waitFor();
+  for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Rozumím, dál' }).click();
+  await page.getByRole('button', { name: 'Začít cvičení' }).click();
+  await page.getByText(/^1 \/ \d+$/).waitFor();
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test('O aplikaci: upozornění na neověřený obsah a soukromí; záloha ukáže datum', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/about');
+  await page.getByRole('heading', { name: /Obsah zatím nezkontroloval/ }).waitFor();
+  await page.getByText('Žádné účty, žádné sledování.').waitFor();
+  await page.goto(base + '#/settings');
+  await page.getByTestId('last-backup').getByText('Zálohu jsi zatím nestáhl').waitFor();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Stáhnout zálohu/ }).click()]);
+  assert.match(download.suggestedFilename(), /zaloha/);
+  await page.getByTestId('last-backup').getByText(/Poslední záloha:/).waitFor();
+  const [ics] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Stáhnout připomínku/ }).click()]);
+  assert.match(ics.suggestedFilename(), /\.ics$/);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test('připomenutí zálohy se ukáže po 3 dnech aktivity a jde odložit', async () => {
+  const { page, ctx } = await newPage(true);
+  await page.addInitScript(() => {});
+  await page.goto(base);
+  await page.evaluate(async () => {
+    const req = indexedDB.open('ap-progress');
+    await new Promise((r) => { req.onsuccess = r; });
+    const db = req.result;
+    const tx = db.transaction('days', 'readwrite');
+    for (const d of ['2026-01-01', '2026-01-02', '2026-01-03']) tx.objectStore('days').put({ date: d, reviews: 1, again: 0, newCards: 0, xp: 3 });
+    await new Promise((r) => { tx.oncomplete = r; });
+  });
+  await page.reload();
+  await page.getByRole('region', { name: 'Připomenutí zálohy' }).waitFor();
+  await page.getByRole('button', { name: 'Později' }).click();
+  await page.reload();
+  await page.getByText('Dnešní plán').waitFor();
+  assert.equal(await page.getByRole('region', { name: 'Připomenutí zálohy' }).count(), 0);
+  await ctx.close();
+});
+
 const axeViolations = async (page) => {
   await page.addScriptTag({ path: axePath });
   const res = await page.evaluate(() => window.axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa'] }));
@@ -312,7 +362,7 @@ const axeViolations = async (page) => {
 };
 
 await test('přístupnost (axe, WCAG AA): hlavní stránky ve světlém i tmavém režimu', async () => {
-  const routes = ['/', '/practice', '/stats', '/settings', '/shop', '/collection', '/gramatika', '/cards', '/quiz', '/roleplay', '/pairs', '/map', '/unit/a1-u1', '/lesson/a1-u1-l1', '/cards/a1-u1-l1', '/quiz/a1-u1-l1', '/roleplay/hotel'];
+  const routes = ['/', '/practice', '/stats', '/settings', '/shop', '/collection', '/gramatika', '/cards', '/quiz', '/roleplay', '/pairs', '/map', '/unit/a1-u1', '/lesson/a1-u1-l1', '/cards/a1-u1-l1', '/quiz/a1-u1-l1', '/roleplay/hotel', '/about', '/learn/a1-u1-l1'];
   const bad = [];
   for (const dark of [false, true]) {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });

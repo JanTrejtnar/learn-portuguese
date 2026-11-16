@@ -9,6 +9,8 @@ import { PlayerStrip } from '../components/PlayerStrip';
 import { href } from '../router';
 import { useEffect } from 'preact/hooks';
 import { isOnboarded } from './WelcomePage';
+import { backupReminderDue, getBackupSnooze, getLastBackup, snoozeBackupReminder } from '../lib/backupReminder';
+import { useState } from 'preact/hooks';
 
 const LEVELS = [
   { level: 'A1', title: 'A1 — Začátečník' },
@@ -49,6 +51,22 @@ const TodayCard = ({ progress }: { progress: Progress }) => {
   );
 };
 
+const BackupReminder = ({ progress }: { progress: Progress }) => {
+  const [hidden, setHidden] = useState(false);
+  const due = !hidden && backupReminderDue({ activeDays: progress.days.size, lastBackup: getLastBackup(), snoozedUntil: getBackupSnooze(), now: Date.now() });
+  if (!due) return null;
+  return (
+    <div role="region" aria-label="Připomenutí zálohy" class="mt-4 rounded-2xl border border-gold-400 bg-surface p-4 text-sm">
+      <p class="font-semibold">💾 Zálohuj si pokrok</p>
+      <p class="mt-1 text-ink-soft">Pokrok je uložený jen v tomto prohlížeči a může zmizet, třeba po vymazání dat. Záloha je jeden soubor.</p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <a href={href('/settings')} class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 py-2 font-semibold text-white">Stáhnout zálohu</a>
+        <button type="button" class="min-h-11 rounded-xl border border-line-strong px-4 py-2 font-semibold" onClick={() => { snoozeBackupReminder(Date.now()); setHidden(true); }}>Později</button>
+      </div>
+    </div>
+  );
+};
+
 const greeting = (): { pt: string; cs: string } => {
   const h = new Date().getHours();
   return h < 12 ? { pt: 'Bom dia!', cs: 'Dobré ráno' } : h < 19 ? { pt: 'Boa tarde!', cs: 'Dobré odpoledne' } : { pt: 'Boa noite!', cs: 'Dobrý večer' };
@@ -69,6 +87,7 @@ export const HomePage = () => {
 
     <div class="mt-5">{progress ? <PlayerStripWithSettings progress={progress} /> : <div class="skeleton h-24" />}</div>
     {progress && <TodayCard progress={progress} />}
+    {progress && <BackupReminder progress={progress} />}
 
     <ViewSwitch current="list" />
 
@@ -106,6 +125,7 @@ export const HomePage = () => {
       </section>
     ))}
 
+    <p class="mt-10 text-center text-xs text-muted">Obsah vznikl s pomocí AI a zatím ho nezkontroloval rodilý mluvčí. <a href={href('/about')} class="underline">Víc a soukromí</a></p>
   </div>
   );
 };

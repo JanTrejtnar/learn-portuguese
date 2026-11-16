@@ -21,6 +21,9 @@ registerSW({
   },
 });
 
+// Požádá o trvalé úložiště: prohlížeč pak pokrok nesmaže při nedostatku místa. Odpověď se nijak nevynucuje.
+try { void navigator.storage?.persist?.(); } catch { /* nepodporováno */ }
+
 unlockAudio();
 unlockSpeech();
 render(<App />, document.getElementById('app')!);

@@ -6,7 +6,9 @@ import { AudioButton } from '../components/AudioButton';
 import { BuildQuestion, ChoiceQuestion, MatchQuestion, TypingQuestion, type Answer } from '../components/QuizQuestions';
 import { Celebrate } from '../components/Celebrate';
 import { VoiceWarning } from '../components/VoiceWarning';
-import { allWords, dedupeWords, getTestScope, units, unitUnlocked } from '../content';
+import { allWords, dedupeWords, getLesson, getTestScope, units, unitUnlocked } from '../content';
+import { LEARN_QUESTIONS, learnRemaining, pickLearnBatch } from '../lib/learn';
+import { LearnIntro } from '../components/LearnIntro';
 import { getVoiceStatus } from '../lib/audio';
 import { saveCard, saveDay, saveTest, type Progress, type TestResult } from '../lib/db';
 import { PASS_RATIO, collectCloze, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
@@ -34,6 +36,8 @@ interface Scope {
   unitId?: string;
   /** Zařazovací test: při splnění se přeskočí jednotky dané úrovně (a nižších). */
   placement?: Level;
+  /** Vedená relace „Projít lekci“: nová slova se nejdřív představí a pak procvičí. */
+  learn?: boolean;
   words: Word[];
   lessons: Lesson[];
   count: number;
@@ -42,7 +46,13 @@ interface Scope {
 
 const allLessons = (): Lesson[] => units.flatMap((u) => u.lessons);
 
-const resolveScope = (id: string, progress: Progress): Scope | 'empty' | undefined => {
+const resolveScope = (id: string, progress: Progress, learn: boolean): Scope | 'empty' | 'learned' | undefined => {
+  if (learn) {
+    const found = getLesson(id);
+    if (!found) return undefined;
+    if (learnRemaining(found.lesson.words, progress.cards) === 0) return 'learned';
+    return { id, title: `Projít lekci: ${found.lesson.title}`, graded: false, unlocks: false, unitId: found.unit.id, learn: true, words: found.lesson.words, lessons: [found.lesson], count: LEARN_QUESTIONS, back: { label: 'Zpět na lekci', to: `/lesson/${id}` } };
+  }
   if (id === 'quick') {
     const seen = allWords().filter((w) => progress.cards.has(w.id));
     if (seen.length < 4) return 'empty';
@@ -71,11 +81,27 @@ const resolveScope = (id: string, progress: Progress): Scope | 'empty' | undefin
   };
 };
 
-export const QuizPage = ({ id }: { id: string }) => {
+export const QuizPage = ({ id, learn = false }: { id: string; learn?: boolean }) => {
   const progress = useProgress();
   if (!progress) return <Loading />;
-  const scope = resolveScope(id, progress);
+  const scope = resolveScope(id, progress, learn);
   if (!scope) return <NotFoundPage />;
+  if (scope === 'learned') {
+    const found = getLesson(id)!;
+    const next = found.unit.lessons[found.unit.lessons.findIndex((l) => l.id === id) + 1];
+    return (
+      <div class="py-12 text-center">
+        <div class="text-5xl" aria-hidden="true">✅</div>
+        <h1 class="mt-3 text-xl font-bold">Všechna slova z lekce už znáš</h1>
+        <p class="mt-2 text-ink-soft">Zopakuj je v kartičkách, nebo si dej test lekce.</p>
+        <div class="mt-5 flex flex-wrap justify-center gap-2">
+          <a href={href(`/quiz/${id}`)} class="inline-block rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white">Test lekce</a>
+          {next && <a href={href(`/learn/${next.id}`)} class="inline-block rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Další lekce →</a>}
+          <a href={href(`/lesson/${id}`)} class="inline-block rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Zpět na lekci</a>
+        </div>
+      </div>
+    );
+  }
   if (scope === 'empty') {
     return (
       <div class="py-12 text-center">
@@ -96,17 +122,21 @@ export const QuizPage = ({ id }: { id: string }) => {
       </div>
     );
   }
-  return <Session key={id} scope={scope} progress={progress} />;
+  return <Session key={`${learn ? 'learn:' : ''}${id}`} scope={scope} progress={progress} />;
 };
 
 const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const [settings] = useStudySettings();
   const [attempt, setAttempt] = useState(0);
   const [skippedIds, setSkippedIds] = useState<string[]>([]);
+  // Vedená relace: dávka nových slov se zafixuje při každém pokusu (po splnění by se jinak změnila).
+  const batch = useMemo<Word[]>(() => (scope.learn ? pickLearnBatch(scope.words, progress.cards) : scope.words), [attempt]);
+  const [introDone, setIntroDone] = useState(!scope.learn);
   const allQuestions = useMemo<Question[]>(() => {
     const audio = getVoiceStatus();
-    const sentences = collectSentences(scope.lessons).filter((s) => scope.id !== 'quick' || (s.wordId && scope.words.some((w) => w.id === s.wordId)));
-    return generateQuiz({ words: scope.words, pool: allWords(), sentences, cloze: scope.id === 'quick' ? [] : collectCloze(scope.lessons), count: scope.count, audio: audio !== 'unsupported' && audio !== 'no-pt-pt' });
+    const narrow = scope.id === 'quick' || scope.learn;
+    const sentences = collectSentences(scope.lessons).filter((s) => !narrow || (s.wordId && batch.some((w) => w.id === s.wordId)));
+    return generateQuiz({ words: batch, pool: allWords(), sentences, cloze: scope.id === 'quick' ? [] : collectCloze(scope.lessons), count: scope.count, audio: audio !== 'unsupported' && audio !== 'no-pt-pt' });
   }, [attempt]);
 
   // „Nemohu poslouchat“: poslechové otázky se vyřadí a nepočítají se
@@ -172,6 +202,15 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       progress.cards.set(wid, next);
       void saveCard(next);
     }
+    if (scope.learn) {
+      // Nová slova, která uživatel nezpackal, vstupují do opakování (první interval 1 den).
+      for (const w of batch) {
+        if (progress.cards.has(w.id)) continue;
+        const card = schedule(undefined, w.id, 'good', now);
+        progress.cards.set(w.id, card);
+        void saveCard(card);
+      }
+    }
     let passed = ratio >= PASS_RATIO;
     let newlyUnlocked: { id: string; title: string } | null = null;
     let attempts = 0;
@@ -200,6 +239,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       passed = result.passed && ratio >= PASS_RATIO;
     }
     const award = awardXp(progress.days, now, xp, settings.dailyGoal);
+    if (scope.learn) award.day.newCards += batch.length;
     progress.days.set(award.day.date, award.day);
     void saveDay(award.day);
     if (award.goalJustReached) toast({ emoji: '🎯', title: `Denní cíl splněn! +${XP_GOAL_BONUS} XP` });
@@ -227,6 +267,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     saved.current = false;
     closed.current = null;
     setOutcome(null);
+    setIntroDone(!scope.learn);
     setResults([]);
     setIndex(0);
     setAnswer(null);
@@ -239,10 +280,12 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     <div class="mx-auto max-w-xl">
       <SessionBar exitTo={scope.back.to} confirm={!finished} progress={questions.length ? Math.min(1, index / questions.length) : 0}
         counter={!finished && q2 ? `${index + 1} / ${questions.length}` : undefined}
-        note={scope.graded || scope.placement ? 'Rozdělaný test se nezapočítá.' : 'Rozdělaný kvíz se nezapočítá.'} />
+        note={scope.graded || scope.placement ? 'Rozdělaný test se nezapočítá.' : scope.learn ? 'Rozdělaná relace se nezapočítá.' : 'Rozdělaný kvíz se nezapočítá.'} />
       <VoiceWarning />
 
-      {!finished && q2 && (
+      {scope.learn && !introDone && !finished && <LearnIntro words={batch} onDone={() => setIntroDone(true)} />}
+
+      {!finished && q2 && introDone && (
         <>
 
           <div key={q2.id}>
@@ -316,7 +359,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
                 <p class="mt-3 font-semibold text-amber-700 dark:text-amber-400">Na splnění je potřeba aspoň {Math.round(PASS_RATIO * 100)} %. Zkus to znovu!</p>
               )
             ) : (
-              <p class="mt-3 text-sm text-muted">{ratio >= PASS_RATIO ? 'Skvělé!' : 'Chybná slovíčka se vrátí do opakování.'}</p>
+              <p class="mt-3 text-sm text-muted">{scope.learn ? `Nových slov: ${batch.length}. Vrátí se v kartičkách k opakování.` : ratio >= PASS_RATIO ? 'Skvělé!' : 'Chybná slovíčka se vrátí do opakování.'}</p>
             )}
             {offerSkip && nextUnit && (
               <div class="mt-4 rounded-2xl border border-line bg-surface-2 p-4 text-left text-sm">
@@ -339,6 +382,17 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
                     <button type="button" onClick={retry} class="min-h-12 rounded-xl border border-line-strong px-4 py-3 font-bold">Zkusit test znovu</button>
                   </>
                 )}
+              </div>
+            </BottomBar>
+          ) : scope.learn ? (
+            <BottomBar>
+              <div class="grid gap-2">
+                {learnRemaining(scope.words, progress.cards) > 0 ? (
+                  <button type="button" onClick={retry} class={bigBtn}>Další slova ({learnRemaining(scope.words, progress.cards)} zbývá)</button>
+                ) : (
+                  <a href={href(`/quiz/${scope.id}`)} class={bigBtn}>Lekce probrána: test lekce →</a>
+                )}
+                <a href={href(scope.back.to)} class="flex min-h-12 items-center justify-center rounded-xl border border-line-strong px-4 py-3 font-bold">Zpět na lekci</a>
               </div>
             </BottomBar>
           ) : (

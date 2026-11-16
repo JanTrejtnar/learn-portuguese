@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { Breadcrumb } from '../components/Breadcrumb';
-import { BACKUP_VERSION, backupFilename, buildBackup, parseBackup, sanitizeSettings, summarizeBackup } from '../lib/backup';
-import { clearProgress, loadProgress, replaceProgress } from '../lib/db';
+import { BACKUP_VERSION, parseBackup, sanitizeSettings, summarizeBackup } from '../lib/backup';
+import { downloadBackup } from '../lib/backupFile';
+import { getLastBackup } from '../lib/backupReminder';
+import { clearProgress, replaceProgress } from '../lib/db';
+import { buildReminderIcs, isValidTime } from '../lib/reminder';
 import { useInstall } from '../lib/install';
-import { loadJson, saveJson } from '../lib/storage';
-import { loadShop, resetShop, saveShop } from '../lib/shop';
+import { saveJson } from '../lib/storage';
+import { resetShop, saveShop } from '../lib/shop';
 import { LearningSettings } from '../components/LearningSettings';
 import { useTheme, type Theme } from '../lib/theme';
 
@@ -39,16 +42,24 @@ export const SettingsPage = () => {
     navigator.storage?.persisted?.().then(setPersisted).catch(() => setPersisted(null));
   }, []);
 
+  const [lastBackup, setLastBackup] = useState(getLastBackup);
+  const [reminderTime, setReminderTime] = useState('19:00');
+
   const exportBackup = async () => {
-    const p = await loadProgress();
-    const backup = buildBackup(p, { settings: loadJson<Record<string, unknown>>(STUDY_KEY, {}), badgesSeen: loadJson<{ ids: string[] }>(SEEN_KEY, { ids: [] }).ids, shop: loadShop() }, new Date());
-    const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
+    const cards = await downloadBackup();
+    setLastBackup(getLastBackup());
+    setMessage({ ok: true, text: `Záloha uložena (${cards} karet).` });
+  };
+
+  const downloadReminder = () => {
+    const ics = buildReminderIcs(reminderTime, window.location.origin + window.location.pathname, new Date());
+    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = backupFilename(new Date());
+    a.download = 'portuglove-pripominka.ics';
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setMessage({ ok: true, text: `Záloha uložena (${backup.cards.length} karet).` });
+    setMessage({ ok: true, text: 'Připomínka stažena. Otevři soubor v kalendáři a přidej ho.' });
   };
 
   const importBackup = async (file: File) => {
@@ -131,16 +142,31 @@ export const SettingsPage = () => {
         </div>
       </Card>
 
+      <Card title="Denní připomínka">
+        <p class="text-sm text-ink-soft">Aplikace ti nemůže poslat upozornění sama (nemá server). Stáhni si denní událost do kalendáře a telefon ti připomene, že je čas se učit.</p>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <label class="text-sm font-semibold" for="remind-time">Čas</label>
+          <input id="remind-time" type="time" value={reminderTime} onInput={(e) => setReminderTime(e.currentTarget.value)} class="min-h-11 rounded-xl border border-line-strong bg-surface px-3" />
+          <button type="button" class={btn} disabled={!isValidTime(reminderTime)} onClick={downloadReminder}>📅 Stáhnout připomínku</button>
+        </div>
+      </Card>
+
       <Card title="Záloha pokroku">
         <p class="text-sm text-ink-soft">
           Pokrok je uložený jen v tomto prohlížeči. Záloha ti umožní přenést ho na jiné zařízení nebo ochránit před smazáním dat. Soubor obsahuje jen tvůj pokrok a nastavení (verze zálohy {BACKUP_VERSION}).
         </p>
+        <p class="mt-2 text-sm" data-testid="last-backup">{lastBackup ? `Poslední záloha: ${new Date(lastBackup).toLocaleDateString('cs-CZ')}.` : 'Zálohu jsi zatím nestáhl(a).'}</p>
         <div class="mt-3 flex flex-wrap gap-2">
           <button type="button" class={btn} onClick={exportBackup}>⬇️ Stáhnout zálohu</button>
           <button type="button" class={btn} onClick={() => fileRef.current?.click()}>⬆️ Obnovit ze zálohy</button>
           <input ref={fileRef} type="file" accept="application/json,.json" class="hidden" aria-label="Soubor zálohy"
             onChange={(e) => { const f = e.currentTarget.files?.[0]; e.currentTarget.value = ''; if (f) void importBackup(f); }} />
         </div>
+      </Card>
+
+      <Card title="O aplikaci a soukromí">
+        <p class="text-sm text-ink-soft">Co je v aplikaci neověřené, jaká data se ukládají a jak nahlásit chybu.</p>
+        <a href="#/about" class={`${btn} mt-3 inline-block`}>O aplikaci a soukromí</a>
       </Card>
 
       <Card title="Smazat pokrok">

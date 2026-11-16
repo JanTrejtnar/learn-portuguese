@@ -6,6 +6,14 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   // Relativní base: funguje na GitHub Pages i v podadresáři.
   base: './',
+  build: {
+    rolldownOptions: {
+      output: {
+        // Obsah lekcí a samotná aplikace jsou zvlášť: změna textu nebo kódu neznehodnotí cache druhé části.
+        codeSplitting: { groups: [{ name: 'obsah', test: /[\\/]src[\\/]content[\\/]/ }] },
+      },
+    },
+  },
   plugins: [
     preact(),
     tailwindcss(),

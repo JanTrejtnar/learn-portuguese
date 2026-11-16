@@ -390,3 +390,16 @@ Dnes existuje 3krokový úvod (`/welcome`: jak se učíme, denní cíl, kde zač
 - **Pohlednice:** 8 nových. **Odznak** „B1 Completo“ (50 mincí) a odměna v obchodě (Pastýřská vesta). **Scénáře:** Reklamace v obchodě (B1.5) a Rezervace pokoje (B1.6).
 - **Odemykání:** B1.1 se odemkne dokončením A2.8. Volba „Umím docela dost (A2)“ v průvodci přeskočí A1 i A2 a začíná na B1.
 - **Neověřeno:** veškerý obsah B1 je `reviewed: false` a čeká na rodilého mluvčího, zvlášť gramatika (conjuntivo, infinitivo pessoal, zájmena).
+
+## Hotovo: Fáze A (veřejná příprava) a pilot vedené relace
+
+Rozhodnutí z `docs/ANALYZA_DUOLINGO_A_PLAN_2.md`: aplikace je zatím osobní, ale má být připravená na veřejné nasazení; rodilý mluvčí nebude dlouho k dispozici; vedená relace začíná jako pilot (varianta B) vedle stávajících tlačítek.
+
+- **Ochrana dat (N3):** při startu se žádá `navigator.storage.persist()`. Úvodní stránka po `BACKUP_EVERY_DAYS` (14) dnech bez zálohy (a po aspoň 3 dnech aktivity) nabídne stažení zálohy, jde odložit o 7 dní. Nastavení ukazuje datum poslední zálohy. Logika: `src/lib/backupReminder.ts`, stažení souboru `src/lib/backupFile.ts`.
+- **Připomínka (N4):** Nastavení → Denní připomínka stáhne `.ics` s denním opakováním (`src/lib/reminder.ts`). Bez serveru nejde poslat upozornění samo.
+- **Veřejná důvěra:** stránka `/about` (O aplikaci a soukromí): neověřený obsah, co se ukládá, mikrofon a soukromí, odkaz „nahlásit chybu“ (`src/lib/config.ts`; funguje jen u veřejného repozitáře). Na úvodní stránce je drobná poznámka a na stránce Mluvení věta o rozpoznávání řeči.
+- **Velikost (N9):** build se rozdělil na chunk aplikace (184 kB) a chunk obsahu (374 kB), varování o 500 kB zmizelo. Celkový objem se nezměnil; skutečné lazy-loadování po úrovních nebylo provedeno (obsah se čte synchronně v celé aplikaci).
+- **Revize obsahu (N10):** `npm run export:review [-- soubor.csv]` vyexportuje slovíčka, gramatiku, dialogy a doplňování (≈ 1 700 řádků) se sloupci „oprava“ a „poznámka revizora“.
+- **Vedená relace (N1, pilot):** na stránce lekce tlačítko „Projít lekci“ (`/learn/:id`). Dávka `LEARN_BATCH` (6) nových slov: představení (PT, CZ, audio, příklad) → `LEARN_QUESTIONS` (12) cvičení → slova vstoupí do kartiček (zpackaná „znovu“, ostatní interval 1 den), XP jako u kvízu. Poté „Další slova“ nebo test lekce. Implementace je režim `learn` v `QuizPage` (`src/lib/learn.ts`, `src/components/LearnIntro.tsx`).
+- **Tutoriál:** doplněny položky „Projít lekci“ a „Záloha pokroku“; test hlídá hodnoty `LEARN_BATCH` a `BACKUP_EVERY_DAYS`.
+- **Zbývá z plánu:** cvičení nad dialogy (N2), rozhodnutí, zda se „Projít lekci“ stane hlavní cestou na úvodní stránce (po vyzkoušení), minikurz výslovnosti (N6), předgenerované audio (N11), licence a doména.

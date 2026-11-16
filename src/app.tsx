@@ -1,3 +1,4 @@
+import { AboutPage } from './pages/AboutPage';
 import { Layout } from './components/Layout';
 import { CardsPage } from './pages/CardsPage';
 import { GrammarPage } from './pages/GrammarPage';
@@ -35,6 +36,8 @@ export const App = () => {
       {route.name === 'study' && <StudyPage deckId={route.params.deck!} mode="srs" />}
       {route.name === 'free' && <StudyPage deckId={route.params.deck!} mode="free" />}
       {route.name === 'quizHub' && <QuizHubPage />}
+      {route.name === 'learn' && <QuizPage id={route.params.id!} learn />}
+      {route.name === 'about' && <AboutPage />}
       {route.name === 'quiz' && <QuizPage id={route.params.id!} />}
       {route.name === 'practice' && <PracticePage />}
       {route.name === 'roleplayHub' && <RoleplayHubPage />}
