@@ -1,6 +1,7 @@
 /** Záloha pokroku do souboru (JSON). Čistá logika včetně validace, aby šla testovat v Node. */
 import type { DayStats, TestResult } from './db';
 import type { CardState } from './srs';
+import { sanitizeShop, type ShopState } from './shop';
 
 export const BACKUP_APP = 'aprender-portugues';
 export const BACKUP_VERSION = 1;
@@ -17,6 +18,8 @@ export interface Backup {
   settings: Record<string, unknown>;
   /** ID už ohlášených odznaků (aby se po obnově znovu neoslavovaly). */
   badgesSeen: string[];
+  /** Obchod: koupené věci, avatar, zmrazení (volitelné, starší zálohy ho nemají). */
+  shop?: ShopState;
 }
 
 export interface BackupSource {
@@ -25,7 +28,7 @@ export interface BackupSource {
   tests: Map<string, TestResult>;
 }
 
-export const buildBackup = (p: BackupSource, local: { settings: Record<string, unknown>; badgesSeen: string[] }, now: Date): Backup => ({
+export const buildBackup = (p: BackupSource, local: { settings: Record<string, unknown>; badgesSeen: string[]; shop?: ShopState }, now: Date): Backup => ({
   app: BACKUP_APP,
   version: BACKUP_VERSION,
   exportedAt: now.toISOString(),
@@ -34,6 +37,7 @@ export const buildBackup = (p: BackupSource, local: { settings: Record<string, u
   tests: [...p.tests.values()],
   settings: local.settings,
   badgesSeen: local.badgesSeen,
+  ...(local.shop ? { shop: local.shop } : {}),
 });
 
 export type ParseResult = { ok: true; backup: Backup } | { ok: false; error: string };
@@ -82,6 +86,7 @@ export const parseBackup = (text: string): ParseResult => {
       tests: tests as TestResult[],
       settings: (settings as Record<string, unknown>) ?? {},
       badgesSeen: (badgesSeen as string[]) ?? [],
+      ...(data.shop !== undefined ? { shop: sanitizeShop(data.shop) } : {}),
     },
   };
 };

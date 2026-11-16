@@ -1,11 +1,15 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { units } from '../content';
 import { BADGES, earnedBadges } from '../lib/badges';
+import { coinsEarned } from '../lib/coins';
 import { loadProgress } from '../lib/db';
+import { consumeFreeze, loadShop, saveShop } from '../lib/shop';
+import { dayToFreeze } from '../lib/stats';
 import { loadJson, saveJson } from '../lib/storage';
 import { onProgressChanged, toast, useToasts } from '../lib/toast';
 
 const SEEN_KEY = 'ap:badges-seen';
+const COINS_SEEN_KEY = 'ap:coins-seen';
 
 /** Hlídá, zda uživatel získal nový odznak, a ukáže oznámení. */
 const useBadgeWatcher = (trigger: string) => {
@@ -18,10 +22,27 @@ const useBadgeWatcher = (trigger: string) => {
         const progress = await loadProgress();
         const seen = new Set(loadJson<{ ids: string[] }>(SEEN_KEY, { ids: [] }).ids);
         const fresh = earnedBadges(progress, units).filter((b) => !seen.has(b.id));
-        if (fresh.length === 0) return;
-        for (const b of fresh.slice(0, 2)) toast({ emoji: b.emoji, title: `Nový odznak: ${b.title}`, text: b.desc });
-        if (fresh.length > 2) toast({ emoji: '🎁', title: `…a další odznaky (${fresh.length - 2})`, text: 'Najdeš je v sekci Pokrok.' });
-        saveJson(SEEN_KEY, { ids: [...seen, ...fresh.map((b) => b.id)].filter((id) => BADGES.some((b) => b.id === id)) });
+        if (fresh.length > 0) {
+          for (const b of fresh.slice(0, 2)) toast({ emoji: b.emoji, title: `Nový odznak: ${b.title}`, text: b.desc });
+          if (fresh.length > 2) toast({ emoji: '🎁', title: `…a další odznaky (${fresh.length - 2})`, text: 'Najdeš je v sekci Pokrok.' });
+          saveJson(SEEN_KEY, { ids: [...seen, ...fresh.map((b) => b.id)].filter((id) => BADGES.some((b) => b.id === id)) });
+        }
+        // mince: ohlásí přírůstek od posledně
+        const total = coinsEarned(progress, units).total;
+        const lastCoins = loadJson<{ earned?: number }>(COINS_SEEN_KEY, {}).earned;
+        if (lastCoins !== total) {
+          saveJson(COINS_SEEN_KEY, { earned: total });
+          const gained = total - (lastCoins ?? 0);
+          if (gained > 0)
+            toast({ emoji: '🪙', title: lastCoins === undefined ? `Za dosavadní pokrok máš ${gained} mincí` : `+${gained} mincí`, text: 'Utratíš je v obchodě (Pokrok → Obchod).' });
+        }
+        // zmrazení: zachrání sérii, pokud by jinak přerušení vyhrálo
+        const shop = loadShop();
+        const date = dayToFreeze(progress.days, Date.now(), new Set(shop.frozen));
+        if (date && shop.freezesBought - shop.frozen.length > 0) {
+          saveShop(consumeFreeze(shop, date));
+          toast({ emoji: '❄️', title: 'Zmrazení zachránilo tvou sérii', text: 'Včerejší vynechaný den se nepočítá jako přerušení.' });
+        }
       } finally {
         busy.current = false;
       }

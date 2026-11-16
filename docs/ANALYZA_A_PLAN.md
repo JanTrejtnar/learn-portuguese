@@ -12,7 +12,9 @@ Stav k 16. 11. 2026. Doplňuje `docs/IMPROVEMENTS.md` (ten je široký katalog n
 
 **Také hotovo (rozhodnutí o navigaci):** N1 jsem neprovedl jako sloučení na čtyři záložky. Mapa a seznam jednotek jsou nyní dva pohledy přepínané tlačítky Seznam / Mapa pod záložkou „Lekce“ (záložek je 5, mapu uživatel oceňuje, tak zůstala). N2: testy jednotlivých lekcí jsou sbalené. P2: jeden vynechaný den se v sérii odpustí (nejvýš jednou za 7 dní) a Domů ukáže „Série je v ohrožení“. T2 už existovalo (výpis chyb po testu).
 
-**Zbývá:** M1–M4 (mince a avatar, viz kap. 6), T1 (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
+**Také hotovo (mince, obchod, avatar – kap. 6, M1–M3):** zůstatek mincí se odvozuje z pokroku (`src/lib/coins.ts`), obchod `/shop` (Pokrok → Obchod) prodává pozadí, oblečení, pokrývky hlavy, doplňky, barevné motivy a zmrazení série; avatar je SVG z vrstev (`src/components/Avatar.tsx`, 24 položek, 5 odměn za odznak/úroveň zdarma, základní vzhled postavy zdarma). Stav je v `localStorage` (`ap:shop`) a je součástí zálohy. Rozhodnutí: mince nejsou za kliknutí, takže strop nebyl potřeba; zůstatek se nikdy nezobrazí záporný; zmrazení se použije samo, jen když běžné odpuštění nestačí.
+
+**Zbývá:** M4 (sbírka, bonusové kapitoly, nápovědy v testech – podle zkušeností s mincemi), T1 (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
 
 ## 0. Shrnutí v jedné stránce
 

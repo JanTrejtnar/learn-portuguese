@@ -8,6 +8,7 @@ import { PairsPage } from './pages/PairsPage';
 import { PracticePage } from './pages/PracticePage';
 import { RoleplayHubPage } from './pages/RoleplayHubPage';
 import { RoleplayPage } from './pages/RoleplayPage';
+import { ShopPage } from './pages/ShopPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SpeakPage } from './pages/SpeakPage';
 import { QuizHubPage } from './pages/QuizHubPage';
@@ -37,6 +38,7 @@ export const App = () => {
       {route.name === 'roleplay' && <RoleplayPage id={route.params.id!} />}
       {route.name === 'pairs' && <PairsPage />}
       {route.name === 'settings' && <SettingsPage />}
+      {route.name === 'shop' && <ShopPage />}
       {route.name === 'speak' && <SpeakPage />}
       {route.name === 'map' && <MapPage />}
       {route.name === 'stats' && <StatsPage />}

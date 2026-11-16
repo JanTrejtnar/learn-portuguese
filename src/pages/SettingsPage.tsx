@@ -4,11 +4,13 @@ import { BACKUP_VERSION, backupFilename, buildBackup, parseBackup, sanitizeSetti
 import { clearProgress, loadProgress, replaceProgress } from '../lib/db';
 import { useInstall } from '../lib/install';
 import { loadJson, saveJson } from '../lib/storage';
+import { loadShop, resetShop, saveShop } from '../lib/shop';
 import { LearningSettings } from '../components/LearningSettings';
 import { useTheme, type Theme } from '../lib/theme';
 
 const STUDY_KEY = 'ap:study-settings';
 const SEEN_KEY = 'ap:badges-seen';
+const COINS_SEEN_KEY = 'ap:coins-seen';
 
 const themes: { id: Theme; label: string }[] = [
   { id: 'auto', label: 'Podle systému' },
@@ -39,7 +41,7 @@ export const SettingsPage = () => {
 
   const exportBackup = async () => {
     const p = await loadProgress();
-    const backup = buildBackup(p, { settings: loadJson<Record<string, unknown>>(STUDY_KEY, {}), badgesSeen: loadJson<{ ids: string[] }>(SEEN_KEY, { ids: [] }).ids }, new Date());
+    const backup = buildBackup(p, { settings: loadJson<Record<string, unknown>>(STUDY_KEY, {}), badgesSeen: loadJson<{ ids: string[] }>(SEEN_KEY, { ids: [] }).ids, shop: loadShop() }, new Date());
     const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
     const a = document.createElement('a');
     a.href = url;
@@ -61,6 +63,9 @@ export const SettingsPage = () => {
     await replaceProgress(parsed.backup);
     saveJson(STUDY_KEY, sanitizeSettings(parsed.backup.settings));
     saveJson(SEEN_KEY, { ids: parsed.backup.badgesSeen });
+    saveJson(COINS_SEEN_KEY, {});
+    if (parsed.backup.shop) saveShop(parsed.backup.shop);
+    else resetShop();
     setMessage({ ok: true, text: 'Záloha obnovena. Načítám znovu…' });
     setTimeout(() => window.location.reload(), 700);
   };
@@ -69,6 +74,8 @@ export const SettingsPage = () => {
     if (!window.confirm('Opravdu smazat veškerý pokrok (karty, XP, testy, odznaky)? Tuto akci nelze vrátit. Doporučujeme nejdřív udělat zálohu.')) return;
     await clearProgress();
     saveJson(SEEN_KEY, { ids: [] });
+    saveJson(COINS_SEEN_KEY, {});
+    resetShop();
     setMessage({ ok: true, text: 'Pokrok byl smazán. Načítám znovu…' });
     setTimeout(() => window.location.reload(), 700);
   };

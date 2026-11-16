@@ -14,7 +14,7 @@ export const FORGIVE_EVERY = 7;
  * Jeden vynechaný den uprostřed série se odpustí (nejvýš jednou za FORGIVE_EVERY dní);
  * odpuštěný den se do čísla série nepočítá.
  */
-export const streakOf = (days: Days, now: number): number => {
+export const streakOf = (days: Days, now: number, frozen?: ReadonlySet<string>): number => {
   let streak = 0;
   let cursor = dayStart(now);
   if (!isActive(days.get(dateKey(cursor)))) cursor -= DAY;
@@ -23,6 +23,8 @@ export const streakOf = (days: Days, now: number): number => {
     if (isActive(days.get(dateKey(cursor)))) {
       streak += 1;
       sinceGap += 1;
+    } else if (frozen?.has(dateKey(cursor))) {
+      sinceGap += 1; // zmrazený den sérii drží, ale nepočítá se
     } else if (streak > 0 && sinceGap >= FORGIVE_EVERY && isActive(days.get(dateKey(dayStart(cursor - 1))))) {
       sinceGap = 0; // vynechaný den se odpustí
     } else {
@@ -34,9 +36,9 @@ export const streakOf = (days: Days, now: number): number => {
 };
 
 /** Je série „v ohrožení“? Včera se nic nedělo a dnes zatím také ne. */
-export const streakAtRisk = (days: Days, now: number): boolean => {
+export const streakAtRisk = (days: Days, now: number, frozen?: ReadonlySet<string>): boolean => {
   const today = dayStart(now);
-  return streakOf(days, now) > 0 && !isActive(days.get(dateKey(today)));
+  return streakOf(days, now, frozen) > 0 && !isActive(days.get(dateKey(today)));
 };
 
 /** Nejdelší série za celou dobu. */
@@ -53,4 +55,18 @@ export const bestStreak = (days: Days): number => {
     prev = ts;
   }
   return best;
+};
+
+/**
+ * Který včerejší den by zmrazení zachránilo? Vrací jeho datum, pokud dnes už něco proběhlo,
+ * včera ne a zmrazení (na rozdíl od běžného odpuštění) sérii prodlouží. Jinak `null`.
+ */
+export const dayToFreeze = (days: Days, now: number, frozen: ReadonlySet<string>): string | null => {
+  const today = dayStart(now);
+  if (!isActive(days.get(dateKey(today)))) return null;
+  const yesterday = dateKey(today - DAY);
+  if (isActive(days.get(yesterday)) || frozen.has(yesterday)) return null;
+  const before = streakOf(days, now, frozen);
+  const after = streakOf(days, now, new Set([...frozen, yesterday]));
+  return after > before ? yesterday : null;
 };

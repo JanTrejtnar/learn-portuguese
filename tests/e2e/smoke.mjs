@@ -108,9 +108,28 @@ await test('přepínač Seznam / Mapa a pět záložek', async () => {
   await ctx.close();
 });
 
+await test('obchod: zůstatek 0, nákup zamčený, nasazení motivu přes uložený stav', async () => {
+  const { page, errors, ctx } = await newPage(true);
+  await page.goto(base + '#/shop');
+  await page.getByTestId('balance').waitFor();
+  assert.equal(await page.getByTestId('balance').innerText(), '0');
+  assert.ok(await page.locator('li button:disabled').first().isDisabled(), 'bez mincí nejde nic koupit');
+  // vlastněný motiv se použije: přepíše barvy značky
+  await page.evaluate(() => {
+    localStorage.setItem('ap:shop', JSON.stringify({ owned: ['theme-vinho'], theme: 'theme-vinho' }));
+    window.dispatchEvent(new Event('ap:shop-changed'));
+  });
+  const brand = await page.evaluate(() => document.documentElement.style.getPropertyValue('--color-brand-700'));
+  assert.ok(brand.startsWith('hsl(340'), brand);
+  await page.getByRole('radio', { name: 'Zmrazení' }).click();
+  await page.getByText('Máš: 0 / 2').waitFor();
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test('všechny hlavní stránky se načtou bez chyby', async () => {
   const { page, errors, ctx } = await newPage();
-  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/settings', '/roleplay', '/pairs', '/speak']) {
+  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/shop', '/settings', '/roleplay', '/pairs', '/speak']) {
     await page.goto(base + '#' + r);
     await page.waitForTimeout(150);
     assert.ok(await page.locator('main, #obsah, h1').first().isVisible(), r);

@@ -6,6 +6,9 @@ import { Breadcrumb } from '../components/Breadcrumb';
 import { units } from '../content';
 import { BADGES, badgeContext } from '../lib/badges';
 import { useStudySettings } from '../lib/settings';
+import { Coin } from '../components/Coin';
+import { coinsEarned } from '../lib/coins';
+import { balance, loadShop } from '../lib/shop';
 import { streakOf } from '../lib/stats';
 import { GOAL_OPTIONS, levelInfo, totalXp, xpToday } from '../lib/xp';
 
@@ -74,6 +77,11 @@ export const StatsPage = () => {
         <div class="mt-1 text-xs opacity-80">{lvl.span - lvl.into} XP do další úrovně</div>
       </div>
 
+      <a href="#/shop" class="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 shadow-soft hover:shadow-lift">
+        <span class="flex items-center gap-2 font-semibold"><Coin class="h-6 w-6" /> {balance(coinsEarned(progress, units).total, loadShop())} mincí</span>
+        <span class="text-sm font-semibold text-brand-700 dark:text-brand-200">Obchod a avatar →</span>
+      </a>
+
       <div class="mt-4 rounded-2xl border border-line bg-surface p-4">
         <div class="font-semibold">Denní cíl: {xpToday(progress.days, now)} / {settings.dailyGoal} XP</div>
         <div class="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Denní cíl">
@@ -87,7 +95,7 @@ export const StatsPage = () => {
       </div>
 
       <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Tile label="Série dní 🔥" value={streakOf(progress.days, now)} />
+        <Tile label="Série dní 🔥" value={streakOf(progress.days, now, new Set(loadShop().frozen))} />
         <Tile label="Dnes opakováno" value={today?.reviews ?? 0} hint={`nových: ${today?.newCards ?? 0}`} />
         <Tile label="K opakování teď" value={dueNow} />
         <Tile label="Úspěšnost (30 d)" value={retention === null ? '–' : `${retention} %`} hint={`${rev30} hodnocení`} />

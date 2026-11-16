@@ -17,7 +17,7 @@ const nav: NavItem[] = [
   { label: 'Karty', icon: 'cards', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') },
   { label: 'Testy', icon: 'check', to: '/quiz', active: (p) => p.startsWith('/quiz') },
   { label: 'Praxe', icon: 'chat', to: '/practice', active: (p) => ['/practice', '/roleplay', '/pairs', '/speak'].some((x) => p.startsWith(x)) },
-  { label: 'Pokrok', icon: 'chart', to: '/stats', active: (p) => p.startsWith('/stats') },
+  { label: 'Pokrok', icon: 'chart', to: '/stats', active: (p) => p.startsWith('/stats') || p.startsWith('/shop') },
 ];
 
 const SideLink = ({ item, path }: { item: NavItem; path: string }) => {
