@@ -39,8 +39,18 @@ test('XP: denní cíl dá bonus právě jednou', () => {
   assert.equal(totalXp(days), 30 + 15 + XP_GOAL_BONUS + 10);
 });
 
+test('série: jeden vynechaný den se odpustí, dva ne', () => {
+  const one = new Map<string, any>([day(1), day(2), day(4), day(5)]);
+  assert.equal(streakOf(one, now), 4);
+  const two = new Map<string, any>([day(1), day(2), day(5), day(6)]);
+  assert.equal(streakOf(two, now), 2);
+  // druhé odpuštění do týdne už ne
+  const again = new Map<string, any>([day(1), day(3), day(5)]);
+  assert.equal(streakOf(again, now), 2);
+});
+
 test('série: dnešek bez aktivity nepřeruší, mezera ano', () => {
-  const days = new Map<string, any>([day(1), day(2), day(3), day(5)]);
+  const days = new Map<string, any>([day(1), day(2), day(3), day(6)]);
   assert.equal(streakOf(days, now), 3);
   days.set(...day(0));
   assert.equal(streakOf(days, now), 4);

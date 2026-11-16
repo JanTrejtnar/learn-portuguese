@@ -26,8 +26,9 @@ const test = async (name, fn) => {
 
 await waitForServer();
 const browser = await chromium.launch();
-const newPage = async () => {
+const newPage = async (onboarded = false) => {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  if (onboarded) await ctx.addInitScript(() => localStorage.setItem('ap:onboarded', '1'));
   const page = await ctx.newPage();
   page.setDefaultTimeout(5000);
   const errors = [];
@@ -92,6 +93,18 @@ await test('hledání v kartách najde slovo bez diakritiky', async () => {
   await page.goto(base + '#/cards');
   await page.getByLabel('Hledat slovíčko').fill('obrigado');
   await page.getByText(/Nalezeno/).waitFor();
+  await ctx.close();
+});
+
+await test('přepínač Seznam / Mapa a pět záložek', async () => {
+  const { page, ctx } = await newPage(true);
+  await page.goto(base + '#/map');
+  await page.getByRole('heading', { name: 'Cesta Portugalskem' }).waitFor();
+  assert.equal(await page.getByRole('navigation').locator('a').count() >= 5, true);
+  await page.getByRole('link', { name: /Seznam/ }).click();
+  await page.waitForURL(/#\/$/);
+  await page.getByRole('link', { name: /Mapa/ }).click();
+  await page.waitForURL(/#\/map/);
   await ctx.close();
 });
 

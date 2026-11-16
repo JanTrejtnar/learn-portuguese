@@ -4,6 +4,7 @@ import { unitCode, units, unitUnlocked } from '../content';
 import type { TestResult } from '../lib/db';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
+import { ViewSwitch } from '../components/ViewSwitch';
 import type { Unit } from '../types';
 
 /* ───────── Zeměpis (lon/lat → SVG) ───────── */
@@ -132,6 +133,7 @@ export const MapPage = () => {
     <div class="mx-auto max-w-md">
       <h1 class="text-3xl font-extrabold">Cesta Portugalskem</h1>
       <p class="mt-1 text-ink-soft">Každá jednotka je jedno město. Splň její test a cesta se otevře dál.</p>
+      <ViewSwitch current="map" />
 
       <div class="mt-4 flex items-center gap-3">
         <div class="flex gap-2" role="tablist" aria-label="Úroveň">

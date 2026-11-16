@@ -1,5 +1,5 @@
 import type { Progress } from '../lib/db';
-import { streakOf } from '../lib/stats';
+import { streakAtRisk, streakOf } from '../lib/stats';
 import { levelInfo, totalXp, xpToday } from '../lib/xp';
 import { href } from '../router';
 import { Icon } from './Icon';
@@ -13,6 +13,7 @@ export const PlayerStrip = ({ progress, goal }: { progress: Progress; goal: numb
   const today = xpToday(progress.days, now);
   const streak = streakOf(progress.days, now);
   const done = today >= goal;
+  const risk = streakAtRisk(progress.days, now);
 
   return (
     <a href={href('/stats')} class="flex items-center gap-4 rounded-3xl border border-line bg-surface p-4 shadow-soft hover:shadow-lift">
@@ -36,6 +37,7 @@ export const PlayerStrip = ({ progress, goal }: { progress: Progress; goal: numb
         <div class="mt-1.5 text-xs text-muted">
           {xp} XP · denní cíl {done ? 'splněn 🎯' : `${today} / ${goal} XP`}
         </div>
+        {risk && <div class="mt-1 text-xs font-semibold text-flag-700 dark:text-flag-100">Série je v ohrožení: dnes ještě něco procvič.</div>}
       </div>
     </a>
   );

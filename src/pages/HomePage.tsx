@@ -5,6 +5,7 @@ import { useStudySettings } from '../lib/settings';
 import { useProgress } from '../lib/useProgress';
 import { xpToday } from '../lib/xp';
 import { Icon } from '../components/Icon';
+import { ViewSwitch } from '../components/ViewSwitch';
 import { PlayerStrip } from '../components/PlayerStrip';
 import { href } from '../router';
 import { useEffect } from 'preact/hooks';
@@ -86,6 +87,8 @@ export const HomePage = () => {
         </li>
       ))}
     </ul>
+
+    <ViewSwitch current="list" />
 
     {LEVELS.map(({ level, title }) => (
       <section key={level}>

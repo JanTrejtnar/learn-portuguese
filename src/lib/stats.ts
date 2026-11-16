@@ -6,16 +6,37 @@ type Days = Map<string, DayStats>;
 /** Den se počítá do série, pokud v něm bylo opakování nebo získané XP (např. test). */
 export const isActive = (d: DayStats | undefined): boolean => !!d && (d.reviews > 0 || (d.xp ?? 0) > 0);
 
-/** Aktuální série dní v řadě. Dnešek bez aktivity sérii nepřerušuje (ještě je čas). */
+/** Po kolika dnech se „odpuštění“ jednoho vynechaného dne obnoví. */
+export const FORGIVE_EVERY = 7;
+
+/**
+ * Aktuální série dní v řadě. Dnešek bez aktivity sérii nepřerušuje (ještě je čas).
+ * Jeden vynechaný den uprostřed série se odpustí (nejvýš jednou za FORGIVE_EVERY dní);
+ * odpuštěný den se do čísla série nepočítá.
+ */
 export const streakOf = (days: Days, now: number): number => {
   let streak = 0;
   let cursor = dayStart(now);
   if (!isActive(days.get(dateKey(cursor)))) cursor -= DAY;
-  while (isActive(days.get(dateKey(cursor)))) {
-    streak += 1;
+  let sinceGap = FORGIVE_EVERY; // dní od posledního odpuštění
+  for (;;) {
+    if (isActive(days.get(dateKey(cursor)))) {
+      streak += 1;
+      sinceGap += 1;
+    } else if (streak > 0 && sinceGap >= FORGIVE_EVERY && isActive(days.get(dateKey(dayStart(cursor - 1))))) {
+      sinceGap = 0; // vynechaný den se odpustí
+    } else {
+      break;
+    }
     cursor = dayStart(cursor - 1);
   }
   return streak;
+};
+
+/** Je série „v ohrožení“? Včera se nic nedělo a dnes zatím také ne. */
+export const streakAtRisk = (days: Days, now: number): boolean => {
+  const today = dayStart(now);
+  return streakOf(days, now) > 0 && !isActive(days.get(dateKey(today)));
 };
 
 /** Nejdelší série za celou dobu. */

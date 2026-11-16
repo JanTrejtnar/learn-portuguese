@@ -48,6 +48,9 @@ export const QuizHubPage = () => {
                   </span>
                   <Score best={t?.skipped && !t.best ? undefined : t?.best} passed={t?.passed} />
                 </a>
+                <details class="rounded-2xl border border-line bg-surface">
+                  <summary class="cursor-pointer list-none p-4 text-sm font-semibold text-ink-soft">Testy jednotlivých lekcí ({u.lessons.length})</summary>
+                  <div class="space-y-2 p-2 pt-0">
                 {u.lessons.map((l) => {
                   const lt = progress.tests.get(l.id);
                   return (
@@ -61,6 +64,8 @@ export const QuizHubPage = () => {
                     </a>
                   );
                 })}
+                  </div>
+                </details>
               </div>
             ) : (
               <p class="rounded-2xl border border-dashed border-line-strong p-4 text-sm text-muted">
