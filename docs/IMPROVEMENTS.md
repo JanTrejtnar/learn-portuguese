@@ -1,6 +1,6 @@
 # Nápady na zlepšení aplikace
 
-Živý seznam možných vylepšení. U každé položky je **dopad** (🟢 malý · 🟡 střední · 🔴 velký) a **pracnost** (S = hodiny, M = dny, L = týdny). Pořadí v rámci sekce je přibližně podle poměru dopad / pracnost.
+Živý seznam možných vylepšení. Konkrétní nálezy a pořadí prací jsou v `docs/ANALYZA_A_PLAN.md`. U každé položky je **dopad** (🟢 malý · 🟡 střední · 🔴 velký) a **pracnost** (S = hodiny, M = dny, L = týdny). Pořadí v rámci sekce je přibližně podle poměru dopad / pracnost.
 
 > **Rychlý přehled doporučeného pořadí** je na konci dokumentu.
 
