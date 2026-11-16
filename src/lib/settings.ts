@@ -7,10 +7,12 @@ export interface StudySettings {
   /** Automaticky přehrát portugalštinu, když se zobrazí. */
   autoplay: boolean;
   shuffle: boolean;
+  /** Maximum nových karet za den. */
+  newPerDay: number;
 }
 
 const KEY = 'ap:study-settings';
-const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true };
+const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10 };
 
 export const useStudySettings = (): [StudySettings, (patch: Partial<StudySettings>) => void] => {
   const [settings, setSettings] = useState<StudySettings>(() => loadJson(KEY, defaults));

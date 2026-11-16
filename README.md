@@ -8,6 +8,7 @@ Webová aplikace (PWA) pro učení **evropské portugalštiny (PT-PT)**, úrove�
 npm install
 npm run dev        # vývojový server
 npm run build      # typecheck + produkční build do dist/
+npm test           # unit testy SRS
 ```
 
 ## Stack
@@ -25,7 +26,7 @@ Vite · Preact · TypeScript · Tailwind CSS 4 · hash router (bez serveru) · o
 ## Plán
 1. ✅ Skeleton + data A1 (jednotky 1–2)
 2. ✅ Flashcards + audio (`pt-PT`)
-3. SRS + IndexedDB
+3. ✅ SRS + IndexedDB
 4. Kvízy a testy
 5. Zbytek A1 + gramatická cvičení + brazilismo alert
 6. Gamifikace · 7. Roleplay · 8. PWA/offline · 9. A2 · 10. AI konverzace

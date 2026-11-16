@@ -22,7 +22,7 @@ export const usePath = (): string => {
 export const href = (path: string): string => `#${path}`;
 
 export interface Match {
-  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'notFound';
+  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'notFound';
   params: Record<string, string>;
 }
 
@@ -35,5 +35,8 @@ export const matchRoute = (path: string): Match => {
   if (path === '/cards') return { name: 'cards', params: {} };
   const study = /^\/cards\/([\w-]+)$/.exec(path);
   if (study) return { name: 'study', params: { deck: study[1]! } };
+  const free = /^\/free\/([\w-]+)$/.exec(path);
+  if (free) return { name: 'free', params: { deck: free[1]! } };
+  if (path === '/stats') return { name: 'stats', params: {} };
   return { name: 'notFound', params: {} };
 };

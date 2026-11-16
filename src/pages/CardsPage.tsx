@@ -1,4 +1,5 @@
 import { units } from '../content';
+import { useStudySettings } from '../lib/settings';
 import { href } from '../router';
 
 const Row = ({ to, title, meta, emoji }: { to: string; title: string; meta: string; emoji: string }) => (
@@ -14,10 +15,24 @@ const Row = ({ to, title, meta, emoji }: { to: string; title: string; meta: stri
   </a>
 );
 
-export const CardsPage = () => (
+export const CardsPage = () => {
+  const [settings, update] = useStudySettings();
+  return (
   <div>
     <h1 class="text-2xl font-bold">Kartičky</h1>
-    <p class="mt-1 text-stone-600 dark:text-stone-400">Vyber, co chceš procvičovat.</p>
+    <p class="mt-1 text-stone-600 dark:text-stone-400">
+      Opakování řídí chytrý plán (SRS): karty se vrací v rostoucích odstupech. Vyber balíček.
+    </p>
+    <label class="mt-4 flex items-center gap-2 text-sm">
+      Nových karet denně:
+      <select
+        value={settings.newPerDay}
+        onChange={(e) => update({ newPerDay: Number(e.currentTarget.value) })}
+        class="rounded-lg border border-stone-300 bg-white px-2 py-1 dark:border-stone-700 dark:bg-stone-900"
+      >
+        {[5, 10, 15, 20, 30].map((n) => <option key={n} value={n}>{n}</option>)}
+      </select>
+    </label>
 
     <div class="mt-6">
       <Row to="/cards/all" emoji="🌍" title="Všechna slovíčka" meta={`${units.flatMap((u) => u.lessons.flatMap((l) => l.words)).length} karet`} />
@@ -37,4 +52,5 @@ export const CardsPage = () => (
       </section>
     ))}
   </div>
-);
+  );
+};
