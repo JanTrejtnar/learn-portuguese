@@ -8,6 +8,7 @@ export const unit2: Unit = {
   emoji: '🪪',
   title: 'Quem sou eu',
   subtitle: 'Sloveso ser, rodina, národnosti a povolání',
+  city: { name: 'Sintra', lon: -9.38, lat: 38.8 },
   lessons: [
     {
       id: 'a1-u2-l1',

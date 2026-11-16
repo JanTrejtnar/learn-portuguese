@@ -8,6 +8,7 @@ export const unit3: Unit = {
   emoji: '📍',
   title: 'Onde estou?',
   subtitle: 'Sloveso estar, předložky a místa ve městě',
+  city: { name: 'Óbidos', lon: -9.16, lat: 39.36 },
   lessons: [
     {
       id: 'a1-u3-l1',

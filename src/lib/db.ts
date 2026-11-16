@@ -6,6 +6,10 @@ export interface DayStats {
   reviews: number;
   again: number;
   newCards: number;
+  /** XP získané v tomto dni (včetně bonusů). */
+  xp?: number;
+  /** Denní cíl byl splněn (bonus už byl vyplacen). */
+  goalReached?: boolean;
 }
 
 /** Výsledek testu lekce / jednotky (klíč = id lekce nebo jednotky). */

@@ -8,6 +8,7 @@ export const unit7: Unit = {
   emoji: '🛍️',
   title: 'Na cidade',
   subtitle: 'Nákupy, Multibanco, přivlastňovací a ukazovací zájmena',
+  city: { name: 'Évora', lon: -7.91, lat: 38.57 },
   lessons: [
     {
       id: 'a1-u7-l1',

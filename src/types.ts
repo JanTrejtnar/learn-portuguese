@@ -55,6 +55,13 @@ export interface Lesson {
   reviewed: boolean;
 }
 
+/** Město na mapě Portugalska, které odpovídá jednotce (zeměpisné souřadnice). */
+export interface City {
+  name: string;
+  lon: number;
+  lat: number;
+}
+
 export interface Unit {
   id: string;
   level: Level;
@@ -62,5 +69,6 @@ export interface Unit {
   emoji: string;
   title: string;
   subtitle: string;
+  city?: City;
   lessons: Lesson[];
 }

@@ -1,5 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { href } from '../router';
+import { ToastHost } from './ToastHost';
 
 interface NavItem {
   label: string;
@@ -14,6 +15,7 @@ const nav: NavItem[] = [
   { label: 'Lekce', icon: '📚', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') },
   { label: 'Karty', icon: '🃏', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') },
   { label: 'Testy', icon: '✅', to: '/quiz', active: (p) => p.startsWith('/quiz') },
+  { label: 'Mapa', icon: '🗺️', to: '/map', active: (p) => p.startsWith('/map') },
   { label: 'Pokrok', icon: '📈', to: '/stats', active: (p) => p.startsWith('/stats') },
 ];
 
@@ -62,6 +64,8 @@ export const Layout = ({ path, children }: { path: string; children: ComponentCh
 
       <main class="flex-1 px-4 py-6 pb-28 md:py-8 md:pb-8">{children}</main>
     </div>
+
+    <ToastHost path={path} />
 
     {/* Mobil: spodní navigace */}
     <nav

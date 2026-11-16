@@ -22,7 +22,7 @@ export const usePath = (): string => {
 export const href = (path: string): string => `#${path}`;
 
 export interface Match {
-  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'notFound';
+  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'map' | 'notFound';
   params: Record<string, string>;
 }
 
@@ -40,6 +40,7 @@ export const matchRoute = (path: string): Match => {
   if (path === '/quiz') return { name: 'quizHub', params: {} };
   const quiz = /^\/quiz\/([\w-]+)$/.exec(path);
   if (quiz) return { name: 'quiz', params: { id: quiz[1]! } };
+  if (path === '/map') return { name: 'map', params: {} };
   if (path === '/stats') return { name: 'stats', params: {} };
   return { name: 'notFound', params: {} };
 };

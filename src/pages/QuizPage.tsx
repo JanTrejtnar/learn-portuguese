@@ -5,10 +5,13 @@ import { BuildQuestion, ChoiceQuestion, MatchQuestion, TypingQuestion, type Answ
 import { VoiceWarning } from '../components/VoiceWarning';
 import { allWords, getTestScope, units, unitUnlocked } from '../content';
 import { getVoiceStatus } from '../lib/audio';
-import { saveCard, saveTest, type Progress, type TestResult } from '../lib/db';
+import { saveCard, saveDay, saveTest, type Progress, type TestResult } from '../lib/db';
 import { PASS_RATIO, collectCloze, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
 import { schedule } from '../lib/srs';
 import { useKeydown } from '../lib/useKeydown';
+import { useStudySettings } from '../lib/settings';
+import { notifyProgress, toast } from '../lib/toast';
+import { XP_GOAL_BONUS, XP_PER_CORRECT_ANSWER, XP_TEST_FIRST_PASS, XP_TEST_PERFECT, XP_TEST_REPASS, awardXp } from '../lib/xp';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
 import type { Lesson, Word } from '../types';
@@ -17,8 +20,10 @@ import { NotFoundPage } from './NotFoundPage';
 interface Scope {
   id: string;
   title: string;
-  /** Ukládá se výsledek a může odemknout další jednotku. */
+  /** Výsledek se ukládá (testy lekcí a jednotek). */
   graded: boolean;
+  /** Splnění odemyká další jednotku (jen test jednotky). */
+  unlocks: boolean;
   unitId?: string;
   words: Word[];
   lessons: Lesson[];
@@ -34,14 +39,15 @@ const resolveScope = (id: string, progress: Progress): Scope | 'empty' | undefin
     if (seen.length < 4) return 'empty';
     // Nejslabší karty (nízký ease, hodně chyb) mají přednost.
     const weakest = [...seen].sort((a, b) => progress.cards.get(a.id)!.ease - progress.cards.get(b.id)!.ease + (Math.random() - 0.5)).slice(0, 14);
-    return { id, title: 'Rychlý kvíz', graded: false, words: weakest, lessons: allLessons(), count: 10, back: { label: 'Testy', to: '/quiz' } };
+    return { id, title: 'Rychlý kvíz', graded: false, unlocks: false, words: weakest, lessons: allLessons(), count: 10, back: { label: 'Testy', to: '/quiz' } };
   }
   const scope = getTestScope(id);
   if (!scope) return undefined;
   return {
     id,
     title: scope.title,
-    graded: scope.kind === 'unit',
+    graded: true,
+    unlocks: scope.kind === 'unit',
     unitId: scope.unitId,
     words: scope.words,
     lessons: scope.lessons,
@@ -79,6 +85,7 @@ export const QuizPage = ({ id }: { id: string }) => {
 };
 
 const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
+  const [settings] = useStudySettings();
   const [attempt, setAttempt] = useState(0);
   const questions = useMemo<Question[]>(() => {
     const audio = getVoiceStatus();
@@ -90,7 +97,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const [results, setResults] = useState<QuestionResult[]>([]);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const saved = useRef(false);
-  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: string | null } | null>(null);
+  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: string | null; xp: number } | null>(null);
 
   const q = questions[index];
   const finished = index >= questions.length;
@@ -128,6 +135,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     }
     let passed = ratio >= PASS_RATIO;
     let newlyUnlocked: string | null = null;
+    let xp = correctCount * XP_PER_CORRECT_ANSWER;
     if (scope.graded) {
       const old = progress.tests.get(scope.id);
       const result: TestResult = {
@@ -138,15 +146,22 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
         last: now,
         skipped: old?.skipped && !passed ? true : undefined,
       };
+      if (passed) xp += old?.passed && !old.skipped ? XP_TEST_REPASS : XP_TEST_FIRST_PASS;
+      if (ratio === 1) xp += XP_TEST_PERFECT;
       const wasUnlocked = (i: number) => (units[i] ? unitUnlocked(units[i]!.id, progress.tests) : false);
       const idx = units.findIndex((u) => u.id === scope.id);
-      const before = wasUnlocked(idx + 1);
+      const before = scope.unlocks && wasUnlocked(idx + 1);
       progress.tests.set(scope.id, result);
       void saveTest(result);
-      if (!before && wasUnlocked(idx + 1)) newlyUnlocked = units[idx + 1]!.title;
+      if (scope.unlocks && !before && wasUnlocked(idx + 1)) newlyUnlocked = units[idx + 1]!.title;
       passed = result.passed && ratio >= PASS_RATIO;
     }
-    setOutcome({ passed, newlyUnlocked });
+    const award = awardXp(progress.days, now, xp, settings.dailyGoal);
+    progress.days.set(award.day.date, award.day);
+    void saveDay(award.day);
+    if (award.goalJustReached) toast({ emoji: '🎯', title: 'Denní cíl splněn!', text: `Bonus +${XP_GOAL_BONUS} XP` });
+    notifyProgress();
+    setOutcome({ passed, newlyUnlocked, xp: award.gained });
   }, [finished]);
 
   const retry = () => {
@@ -217,6 +232,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             ) : (
               <p class="mt-3 text-sm text-stone-500">{ratio >= PASS_RATIO ? 'Skvělé!' : 'Chybná slovíčka se vrátí do opakování.'}</p>
             )}
+            {outcome && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{outcome.xp} XP ⭐</p>}
             <div class="mt-5 flex flex-wrap justify-center gap-3">
               <button type="button" onClick={retry} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Nový pokus</button>
               <a href={href('/quiz')} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Přehled testů</a>

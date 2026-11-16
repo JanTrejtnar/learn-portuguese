@@ -9,6 +9,8 @@ import { buildQueue, newIntroducedToday, shuffled } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
 import { dateKey, previewIntervals, schedule, type Rating } from '../lib/srs';
 import { useKeydown } from '../lib/useKeydown';
+import { notifyProgress, toast } from '../lib/toast';
+import { XP_GOAL_BONUS, awardXp, xpForRating } from '../lib/xp';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
 import type { Word } from '../types';
@@ -50,6 +52,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
   const cards = useRef(progress.cards); // průběžně aktualizovaný stav karet
   const days = useRef(progress.days);
   const [bonusNew, setBonusNew] = useState(0);
+  const [sessionXp, setSessionXp] = useState(0);
 
   const initialQueue = (bonus: number): { queue: Word[]; dueCount: number; newCount: number } => {
     const now = Date.now();
@@ -92,7 +95,12 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
       if (r === 'again') day.again += 1;
       if (!prev) day.newCards += 1;
       days.current.set(key, day);
-      void saveDay(day);
+      const award = awardXp(days.current, now, xpForRating[r], settings.dailyGoal);
+      days.current.set(key, award.day);
+      void saveDay(award.day);
+      setSessionXp((x) => x + award.gained);
+      if (award.goalJustReached) toast({ emoji: '🎯', title: 'Denní cíl splněn!', text: `Bonus +${XP_GOAL_BONUS} XP` });
+      notifyProgress();
     }
     setCounts((c) => ({ ...c, [r]: c[r] + 1 }));
     // „Znovu“ vrátí kartu na konec dnešní fronty (do SRS se zapíše i termín za 10 min).
@@ -106,6 +114,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     setQueue(next.queue);
     setFlipped(false);
     setCounts({ again: 0, hard: 0, good: 0, easy: 0 });
+    setSessionXp(0);
   };
 
   const learnMore = () => {
@@ -193,6 +202,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
           ) : (
             <p class="mt-2 text-sm text-stone-600 dark:text-stone-400">V tomto balíčku není nic k opakování a denní limit nových karet je vyčerpán.</p>
           )}
+          {srs && sessionXp > 0 && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{sessionXp} XP ⭐</p>}
           <div class="mt-6 flex flex-wrap justify-center gap-3">
             {srs && unseenLeft > 0 && (
               <button type="button" onClick={learnMore} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">

@@ -2,19 +2,11 @@ import { allWords } from '../content';
 import { DAY, dateKey, dayStart, maturity, type Maturity } from '../lib/srs';
 import { useProgress } from '../lib/useProgress';
 import { Breadcrumb } from '../components/Breadcrumb';
-import type { Progress } from '../lib/db';
-
-export const streakOf = (days: Progress['days'], now: number): number => {
-  let streak = 0;
-  // Dnešek bez aktivity sérii nepřerušuje (ještě je čas).
-  let cursor = dayStart(now);
-  if (!(days.get(dateKey(cursor))?.reviews ?? 0)) cursor -= DAY;
-  while ((days.get(dateKey(cursor))?.reviews ?? 0) > 0) {
-    streak += 1;
-    cursor = dayStart(cursor - 1);
-  }
-  return streak;
-};
+import { units } from '../content';
+import { BADGES, badgeContext } from '../lib/badges';
+import { useStudySettings } from '../lib/settings';
+import { streakOf } from '../lib/stats';
+import { GOAL_OPTIONS, levelInfo, totalXp, xpToday } from '../lib/xp';
 
 const Tile = ({ label, value, hint }: { label: string; value: string | number; hint?: string }) => (
   <div class="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
@@ -29,10 +21,15 @@ const bar: Record<Maturity, string> = { new: 'bg-stone-300 dark:bg-stone-700', l
 
 export const StatsPage = () => {
   const progress = useProgress();
+  const [settings, update] = useStudySettings();
   if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
 
   const now = Date.now();
   const words = allWords();
+  const xp = totalXp(progress.days);
+  const lvl = levelInfo(xp);
+  const ctx = badgeContext(progress, units.map((u) => u.id));
+  const earned = new Set(BADGES.filter((b) => b.earned(ctx)).map((b) => b.id));
   const counts: Record<Maturity, number> = { new: 0, learning: 0, young: 0, mature: 0 };
   for (const w of words) counts[maturity(progress.cards.get(w.id))] += 1;
 
@@ -66,6 +63,27 @@ export const StatsPage = () => {
     <div>
       <Breadcrumb items={[{ label: 'Pokrok' }]} />
       <h1 class="text-2xl font-bold">Můj pokrok</h1>
+
+      <div class="mt-5 rounded-2xl bg-brand-700 p-5 text-white">
+        <div class="flex items-baseline justify-between">
+          <div class="text-xl font-bold">Úroveň {lvl.level} · {lvl.name}</div>
+          <div class="text-sm opacity-80">{xp} XP</div>
+        </div>
+        <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-white/25"><div class="h-full bg-white" style={{ width: `${(lvl.into / lvl.span) * 100}%` }} /></div>
+        <div class="mt-1 text-xs opacity-80">{lvl.span - lvl.into} XP do další úrovně</div>
+      </div>
+
+      <div class="mt-4 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+        <div class="font-semibold">Denní cíl: {xpToday(progress.days, now)} / {settings.dailyGoal} XP</div>
+        <div class="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Denní cíl">
+          {GOAL_OPTIONS.map((g) => (
+            <button key={g.xp} type="button" role="radio" aria-checked={settings.dailyGoal === g.xp} onClick={() => update({ dailyGoal: g.xp })}
+              class={`rounded-xl border-2 px-3 py-2 text-left text-sm ${settings.dailyGoal === g.xp ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-stone-200 dark:border-stone-700'}`}>
+              <b>{g.label}</b> · {g.xp} XP<span class="block text-xs text-stone-500">{g.hint}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile label="Série dní 🔥" value={streakOf(progress.days, now)} />
@@ -103,6 +121,20 @@ export const StatsPage = () => {
           </div>
         ))}
       </div>
+
+      <h2 class="mt-8 mb-3 text-lg font-semibold">Odznaky ({earned.size} / {BADGES.length})</h2>
+      <ul class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {BADGES.map((b) => {
+          const got = earned.has(b.id);
+          return (
+            <li key={b.id} class={`rounded-2xl border p-3 text-center ${got ? 'border-brand-500 bg-white dark:bg-stone-900' : 'border-stone-200 opacity-50 dark:border-stone-800'}`} title={b.desc}>
+              <div class={`text-3xl ${got ? '' : 'grayscale'}`} aria-hidden="true">{got ? b.emoji : '🔒'}</div>
+              <div class="mt-1 text-sm font-semibold">{b.title}</div>
+              <div class="text-xs text-stone-500">{b.desc}</div>
+            </li>
+          );
+        })}
+      </ul>
 
       {hardest.length > 0 && (
         <>

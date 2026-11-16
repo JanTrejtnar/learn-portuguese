@@ -9,10 +9,12 @@ export interface StudySettings {
   shuffle: boolean;
   /** Maximum nových karet za den. */
   newPerDay: number;
+  /** Denní cíl v XP. */
+  dailyGoal: number;
 }
 
 const KEY = 'ap:study-settings';
-const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10 };
+const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10, dailyGoal: 40 };
 
 export const useStudySettings = (): [StudySettings, (patch: Partial<StudySettings>) => void] => {
   const [settings, setSettings] = useState<StudySettings>(() => loadJson(KEY, defaults));

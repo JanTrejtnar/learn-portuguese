@@ -8,6 +8,7 @@ export const unit8: Unit = {
   emoji: '🎸',
   title: 'Gostar e querer',
   subtitle: 'Záliby, počasí, barvy a průběhový čas estar a + infinitivo',
+  city: { name: 'Faro', lon: -7.93, lat: 37.02 },
   lessons: [
     {
       id: 'a1-u8-l1',

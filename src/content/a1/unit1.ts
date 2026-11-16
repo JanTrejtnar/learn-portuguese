@@ -8,6 +8,7 @@ export const unit1: Unit = {
   emoji: '👋',
   title: 'Olá!',
   subtitle: 'Pozdravy, představení, čísla 0–20',
+  city: { name: 'Lisboa', lon: -9.14, lat: 38.72 },
   lessons: [
     {
       id: 'a1-u1-l1',
