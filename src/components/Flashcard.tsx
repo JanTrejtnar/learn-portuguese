@@ -29,8 +29,21 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
       tabIndex={0}
       aria-label={flipped ? 'Karta otočená' : 'Otočit kartu'}
       onClick={onFlip}
-      class="flex min-h-80 cursor-pointer select-none flex-col items-center justify-center gap-4 rounded-3xl border border-line bg-surface p-6 text-center shadow-sm transition"
+      class="relative flex min-h-80 cursor-pointer select-none flex-col items-center justify-center gap-4 rounded-3xl border border-line bg-surface p-6 text-center shadow-sm transition"
     >
+      {flipped && hasInfo(word) && (
+        <button
+          type="button"
+          aria-expanded={info}
+          aria-label="Jak se to používá?"
+          title="Jak se to používá?"
+          onClick={(e) => { e.stopPropagation(); setInfo((v) => !v); }}
+          class={`absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-lg ${info ? 'bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-100' : 'text-muted hover:bg-surface-2'}`}
+        >
+          <span aria-hidden="true">ⓘ</span>
+        </button>
+      )}
+
       {/* Přední strana */}
       {ptFirst ? (
         <div class="flex flex-col items-center gap-3">
@@ -53,16 +66,6 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
               <PtText text={word.pt} />
               <AudioButton text={word.pt} size="md" withSlow />
             </div>
-          )}
-          {hasInfo(word) && (
-            <button
-              type="button"
-              aria-expanded={info}
-              onClick={(e) => { e.stopPropagation(); setInfo((v) => !v); }}
-              class="inline-flex items-center gap-1.5 rounded-full border border-gold-400 bg-gold-400/15 px-3 py-1 text-sm font-semibold hover:bg-gold-400/30"
-            >
-              <span aria-hidden="true">ⓘ</span> Jak se to používá?
-            </button>
           )}
           {info && hasInfo(word) && <div onClick={(e) => e.stopPropagation()} class="w-full"><div class="mx-auto w-full max-w-md"><WordInfo word={word} /></div></div>}
           {word.gender && <span class="text-xs text-muted">{{ m: 'mužský rod', f: 'ženský rod', 'm/f': 'mužský / ženský rod' }[word.gender]}</span>}

@@ -1,6 +1,5 @@
 import { useEffect } from 'preact/hooks';
 import { playChime } from '../lib/sound';
-import { useStudySettings } from '../lib/settings';
 
 const COLORS = ['var(--color-gold-400)', 'var(--color-flag-600)', 'var(--color-brand-500)', 'var(--color-brand-700)'];
 const PIECES = Array.from({ length: 22 }, (_, i) => ({
@@ -13,10 +12,8 @@ const PIECES = Array.from({ length: 22 }, (_, i) => ({
 
 /** Konfety a krátký zvuk při dokončení (respektuje „omezit pohyb“ i vypnutý zvuk). */
 export const Celebrate = () => {
-  const [settings] = useStudySettings();
   useEffect(() => {
-    if (settings.sounds) playChime();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    playChime();
   }, []);
   return (
     <div class="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl" aria-hidden="true">

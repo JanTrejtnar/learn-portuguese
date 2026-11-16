@@ -1,3 +1,4 @@
+import { unlockAudio } from './lib/sound';
 import { render } from 'preact';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './app';
@@ -19,4 +20,5 @@ registerSW({
   },
 });
 
+unlockAudio();
 render(<App />, document.getElementById('app')!);

@@ -83,7 +83,12 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
   const [value, setValue] = useState('');
   const ref = useRef<HTMLInputElement>(null);
   useAutoplay(q.kind === 'dictation' ? q.audio : undefined, true);
-  useEffect(() => ref.current?.focus(), []);
+  // Pole se hned zaktivní (i po překreslení a na mobilech, kde focus někdy zabere až o chvíli později).
+  useEffect(() => {
+    ref.current?.focus();
+    const t = setTimeout(() => ref.current?.focus(), 80);
+    return () => clearTimeout(t);
+  }, []);
 
   const submit = () => {
     // Čteme přímo z inputu: stav se po rychlém vložení + Enter nemusí stihnout překreslit.
@@ -107,6 +112,7 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
       <form onSubmit={(e) => { e.preventDefault(); submit(); }} class="flex gap-2">
         <input
           ref={ref}
+          autoFocus
           value={value}
           onInput={(e) => setValue(e.currentTarget.value)}
           disabled={!!answer}
@@ -119,7 +125,13 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
         />
         {!answer && <button type="submit" class="rounded-xl bg-brand-700 px-5 font-semibold text-white hover:bg-brand-600">Zkontrolovat</button>}
       </form>
-      <p class="mt-2 text-xs text-muted">Tip: přízvuky (á, ã, ç…) si můžeš zkopírovat z lekce, chybějící diakritika se jen upozorní.</p>
+      {answer && (
+        <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
+          <b lang="pt-PT">{q.display}</b>
+          <AudioButton text={q.audio ?? q.display} />
+          <span class="text-muted">= {q.cs}</span>
+        </p>
+      )}
     </div>
   );
 };

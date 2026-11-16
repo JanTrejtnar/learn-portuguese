@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
 import { Breadcrumb } from '../components/Breadcrumb';
-import { AudioButton } from '../components/AudioButton';
 import { Celebrate } from '../components/Celebrate';
 import { Flashcard } from '../components/Flashcard';
 import { TypingQuestion, type Answer } from '../components/QuizQuestions';
@@ -15,6 +14,7 @@ import { recallVariant } from '../lib/recall';
 import { buildQueue, shuffled } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
 import { dateKey, schedule, type Rating } from '../lib/srs';
+import { playCorrect, playWrong } from '../lib/sound';
 import { useKeydown } from '../lib/useKeydown';
 import { notifyProgress, toast } from '../lib/toast';
 import { XP_GOAL_BONUS, awardXp, xpForRating } from '../lib/xp';
@@ -93,6 +93,9 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
   // Pojistka proti dvojímu hodnocení téže karty (dva rychlé stisky před překreslením).
   const locked = useRef(false);
   locked.current = false; // při každém překreslení se odemkne
+  useEffect(() => {
+    if (recallAns) (recallAns.correct ? playCorrect : playWrong)();
+  }, [recallAns]);
   const rate = (r: Rating, fromRecall = false) => {
     if (!current || (!flipped && !fromRecall) || locked.current) return;
     locked.current = true;
@@ -199,7 +202,6 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
             {recallAns && (
               <div class={`mt-4 rounded-xl p-3 text-sm ${recallAns.correct ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100' : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'}`} role="status">
                 <p class="font-semibold">{recallAns.correct ? (recallAns.note ?? 'Správně!') : 'Zatím ne.'}</p>
-                <p class="mt-1 flex items-center gap-2">Správně: <b lang="pt-PT">{current.pt}</b> <AudioButton text={current.pt} /></p>
               </div>
             )}
           </div>

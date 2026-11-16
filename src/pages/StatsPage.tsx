@@ -4,6 +4,7 @@ import { DAY, dateKey, dayStart, maturity, type Maturity } from '../lib/srs';
 import { useProgress } from '../lib/useProgress';
 import { units } from '../content';
 import { BADGES, badgeContext } from '../lib/badges';
+import { BADGE_COINS } from '../lib/coins';
 import { useStudySettings } from '../lib/settings';
 import { Coin } from '../components/Coin';
 import { coinsEarned } from '../lib/coins';
@@ -153,6 +154,9 @@ export const StatsPage = () => {
               <div class={`text-3xl ${got ? '' : 'grayscale'}`} aria-hidden="true">{got ? b.emoji : '🔒'}</div>
               <div class="mt-1 text-sm font-semibold">{b.title}</div>
               <div class="text-xs text-muted">{b.desc}</div>
+              <div class={`mt-1.5 inline-flex items-center gap-1 text-xs font-bold ${got ? 'text-muted' : 'text-gold-600 dark:text-gold-400'}`}>
+                <Coin class="h-3.5 w-3.5" />+{BADGE_COINS[b.id] ?? 10}
+              </div>
             </li>
           );
         })}

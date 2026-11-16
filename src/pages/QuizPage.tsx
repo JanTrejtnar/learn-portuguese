@@ -10,6 +10,7 @@ import { getVoiceStatus } from '../lib/audio';
 import { saveCard, saveDay, saveTest, type Progress, type TestResult } from '../lib/db';
 import { PASS_RATIO, collectCloze, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
 import { schedule } from '../lib/srs';
+import { playCorrect, playWrong } from '../lib/sound';
 import { useKeydown } from '../lib/useKeydown';
 import { useStudySettings } from '../lib/settings';
 import { notifyProgress, toast } from '../lib/toast';
@@ -119,6 +120,10 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     setAnswer(null);
     setIndex((i) => i + 1);
   };
+
+  useEffect(() => {
+    if (answer) (answer.correct ? playCorrect : playWrong)();
+  }, [answer]);
 
   // Enter = další otázka
   useKeydown((e) => {
@@ -234,7 +239,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             <div role="status" class={`mt-5 rounded-2xl p-4 ${answer.correct ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100' : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'}`}>
               <p class="font-bold">{answer.correct ? '✅ Správně!' : '❌ Chyba'}</p>
               {answer.note && <p class="mt-1 text-sm">{answer.note}</p>}
-              {!answer.correct && correctText(q2, answer.missed) && (
+              {!answer.correct && q2.kind !== 'typing' && q2.kind !== 'dictation' && correctText(q2, answer.missed) && (
                 <p class="mt-1 flex items-center gap-2 text-sm">
                   Správně:
                   <b lang={q2.kind === 'pt-to-cs' ? 'cs' : 'pt-PT'}>{correctText(q2, answer.missed)}</b>

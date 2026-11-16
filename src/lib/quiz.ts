@@ -37,6 +37,8 @@ export interface TypingQ extends Base {
   audio?: string;
   accepted: string[];
   display: string;
+  /** České znění (pro ukázku správné odpovědi). */
+  cs: string;
 }
 
 export interface MatchQ extends Base {
@@ -191,6 +193,7 @@ export const typingQuestion = (word: Word, pool: Word[], kind: TypingQ['kind'], 
   // Uznej i jiná slovíčka se stejným překladem (např. dvě různé správné fráze pro „Kolik to stojí?“).
   accepted: [...new Set([word.pt, ...pool.filter((x) => key(x.cs) === key(word.cs)).map((x) => x.pt)].flatMap(answerVariants))],
   display: word.pt,
+  cs: word.cs,
 });
 
 export const collectCloze = (lessons: Lesson[]): ClozeItem[] => lessons.flatMap((l) => l.cloze ?? []);

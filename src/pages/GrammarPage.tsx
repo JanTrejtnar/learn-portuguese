@@ -1,8 +1,9 @@
-import { useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { units, unitUnlocked } from '../content';
 import { AudioButton } from '../components/AudioButton';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { Loading } from '../components/Loading';
+import { playCorrect, playWrong } from '../lib/sound';
 import { ChoiceQuestion, type Answer } from '../components/QuizQuestions';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { saveCard, saveDay, type DayStats, type Progress } from '../lib/db';
@@ -40,6 +41,9 @@ const Session = ({ progress }: { progress: Progress }) => {
   const [init, setInit] = useState(build);
   const [queue, setQueue] = useState<GrammarCard[]>(init.queue);
   const [answer, setAnswer] = useState<Answer | null>(null);
+  useEffect(() => {
+    if (answer) (answer.correct ? playCorrect : playWrong)();
+  }, [answer]);
   const [right, setRight] = useState(0);
   const [wrong, setWrong] = useState(0);
   const [xp, setXp] = useState(0);
