@@ -300,3 +300,75 @@ Odhad: M1 S, M2 M, M3 L, M4 podle výběru. Navrhuji začít M1 a M2, pak se roz
 - „Test jednotky“ → „Dokončit jednotku“; po dokončení nabídka prokliku na nově odemčenou jednotku.
 - Zvuky se renderují do WAV a hrají přes `<audio>` (funguje i na iPhonu s vypnutým zvonkem).
 - Mapa na jednu obrazovku s přesnějším obrysem; ikona ozubeného kola pro Nastavení.
+
+## Plán: úroveň B1 (zatím jen návrh, nic není implementováno)
+
+**Rozhodnutí o pořadí:** B1 se připravuje jako návrh a **nevydává se, dokud uživatel neprojde obsah A1+A2** (viz „Rizika“). Důvod: veškerý text je zatím psaný AI a čeká na revizi rodilým mluvčím. Další úroveň by nasypala další neověřený obsah. Technicky ale jde B1 připravit tak, aby po schválení stačilo přepnout příznak.
+
+### Rozsah
+- 8 jednotek × 3 lekce (shodná struktura jako A2), cca 40 slovíček/frází na lekci, tedy zhruba 950 nových položek. Každá lekce: slovíčka s příkladem, gramatický blok, dialog, věty s mezerou (cloze), scénář k jednotce.
+- Striktně **PT-PT**. Testy zakazující brazilské tvary platí i pro B1 (v textech B1 se navíc hlídá „a + infinitivo“ místo gerundia: *estou a comer*, ne *estou comendo*).
+- Každý nový obsah má `reviewed: false` (štítek „neověřeno“), dokud ho nepotvrdí rodilý mluvčí.
+
+### Osnova jednotek (návrh, k úpravě)
+| Jednotka | Město na mapě | Téma | Hlavní gramatika |
+|---|---|---|---|
+| B1.1 | Viana do Castelo | Vyprávění a vzpomínky | pretérito imperfeito × perfeito, mais-que-perfeito |
+| B1.2 | Bragança | Tradice, svátky, počasí a příroda | konjuntiv přítomný po „espero que“, „talvez“, „é preciso que“ |
+| B1.3 | Nazaré | Plány, sny, hypotézy | futuro, condicional, „se“ + imperfeito |
+| B1.4 | Castelo Branco | Práce, kariéra, školství | infinitivo pessoal (typicky PT-PT), vztažné věty (*que, quem, onde*) |
+| B1.5 | Peniche | Zdraví, problémy na cestách, reklamace | zájmena (clitics): pořadí a poloha, „-lo/-la“, „o, a, lhe“ |
+| B1.6 | Funchal (Madeira) | Cestování, ubytování, doporučení | imperativ, zdvořilé prosby a rady |
+| B1.7 | Ponta Delgada (Azory) | Média, technologie, názory | trpný rod, nepřímá řeč, souvětí s „embora“, „apesar de“ |
+| B1.8 | Beja | Občanství, úřady, společnost | konjuntiv imperfektu a budoucí, souslednost časů |
+
+### Co se musí v aplikaci udělat
+1. **Typy a obsah:** `Level = 'A1' | 'A2' | 'B1'`, složka `src/content/b1/`, registrace v `content/index.ts`, `unitCode` (B1.1…), titulky a podtitulky.
+2. **Mapa:** třetí záložka B1. Madeira a Azory jako dva vložené „ostrovy“ v rohu mapy (inset), aby se pevninské Portugalsko nezmenšovalo. Souřadnice a `NUDGE` pro nová města.
+3. **Sbírka pohlednic:** 8 nových pohlednic (zajímavost + věta v PT-PT), sekce B1 ve sbírce.
+4. **Odznaky a mince:** odznak „B1 Completo“ (50 mincí), nový odznak za 1000 slovíček; vázané odměny v obchodě (`b1-done`).
+5. **Odemykání:** B1 se odemkne dokončením A2 nebo přes volbu úrovně v úvodním tutoriálu (viz dále).
+6. **Testy:** jednotkové testy struktury obsahu (každé slovo má id, B1 nemá zakázané tvary), rozšíření E2E (mapa B1, odemčení).
+7. **Odhad:** infrastruktura 0,5 dne; obsah 8 jednotek ≈ 8 samostatných dávek (jedna jednotka ≈ 1 dávka se samokontrolou PT-PT).
+
+### Rizika
+- **Kvalita obsahu:** B1 gramatika (konjuntiv, infinitivo pessoal, clitics) je nejnáchylnější na chyby. Proto je ke každé lekci nutná revize rodilým mluvčím před označením „ověřeno“.
+- **Velikost aplikace:** ~950 položek navíc zvětší balíček; pokud přesáhne ≈ 1 MB, vrátit se k lazy-loadu obsahu po úrovních (K2).
+- **Mapa:** ostrovy mimo pevninu vyžadují úpravu rozložení; ověřit na mobilu.
+
+### Otevřené otázky na uživatele
+1. Souhlasí osnova a města? Chceš jiné téma nebo pořadí?
+2. Má se B1 vydat hned (s příznakem „neověřeno“), nebo až po revizi A1+A2?
+3. Zahrnout Madeiru a Azory na mapě (ostrovy), nebo zůstat jen na pevnině?
+
+## Plán: vstupní tutoriál a výběr úrovně (zatím jen návrh)
+
+Dnes existuje 3krokový úvod (`/welcome`: jak se učíme, denní cíl, kde začít). Navrhuje se ho rozšířit tak, aby vysvětlil celou aplikaci a umožnil zkušenějším uživatelům přeskočit začátek.
+
+### Obsah tutoriálu (krátký, 5 obrazovek, každou jde přeskočit)
+1. **Vítej:** co se naučíš (evropská portugalština, česky), jak dlouho to zabere denně.
+2. **Jak fungují lekce:** jednotka → lekce → slovíčka, gramatika, dialog; mapa a seznam; „Dokončit jednotku“ (test, hranice `PASS_RATIO`) odemkne další jednotku a dá pohlednici.
+3. **Procvičování:** kartičky s opakováním (SRS), kvízy, scénáře, mluvení; denní cíl a XP.
+4. **Odměny:** mince (za co se získávají), obchod, avatar, pohlednice, série (a zmrazení).
+5. **Kde začít (výběr úrovně):**
+   - **Úplný začátečník:** začne se od A1.1, nic se nepřeskakuje.
+   - **Něco už umím (A1):** nabídne se krátký *zařazovací test* (cca 12 otázek ze slovíček A1); při ≥ 80 % se jednotky A1 označí jako přeskočené a začíná se od A2.
+   - **Pokročilejší (A2) / B1 (až bude):** stejný princip pro vyšší úroveň.
+   - Možnost „Přeskočit bez testu a jen odemknout vše“ není, aby se nerozbil postup; místo toho jde kdykoli použít „Už to umím“ u konkrétní jednotky.
+
+### Pravidla přeskočení
+- Přeskočené jednotky se uloží jako `skipped: true` (stejný mechanismus jako dnes „Už to umím“). Nedávají hvězdy, mince ani pohlednice (ty se dají získat později, když je uživatel splní).
+- Slovíčka přeskočených jednotek se **nepřidávají** do karet; kdo chce, najde je v lekcích.
+- Tutoriál lze otevřít znovu z Nastavení („Zobrazit úvodního průvodce“) a výběr úrovně lze změnit.
+
+### Aby tutoriál nezastaral (závazné pravidlo)
+- Všechny číselné údaje a pravidla v tutoriálu se **berou z konstant v kódu** (`PASS_RATIO`, hodnoty mincí `COINS_PER_*`, denní cíle…), ne z ručně psaných čísel.
+- Texty jsou na jednom místě (`src/content/tutorial.ts`), aby se při změně aplikace daly snadno najít a upravit.
+- Jednotkový test hlídá, že tutoriál zmiňuje aktuální hodnoty z konstant; E2E test projde tutoriálem.
+- Pravidlo je zapsáno v `CLAUDE.md`: při každé změně chování aplikace (lekce, odměny, odemykání, navigace) je součástí práce kontrola a úprava tutoriálu.
+
+### Postup
+1. Přepsat `WelcomePage` na krokový průvodce nad `content/tutorial.ts`.
+2. Zařazovací test (využije generátor kvízů z `lib/quiz.ts`).
+3. Uložení volby úrovně a přeskočených jednotek; testy.
+4. Odkaz v Nastavení; E2E; aktualizace tohoto plánu.
