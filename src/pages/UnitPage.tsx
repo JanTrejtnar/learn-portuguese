@@ -18,6 +18,10 @@ export const UnitPage = ({ id }: { id: string }) => {
         </div>
       </div>
 
+      <a href={href(`/cards/${unit.id}`)} class="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">
+        🃏 Procvičit celou jednotku
+      </a>
+
       <ol class="mt-6 space-y-3">
         {unit.lessons.map((l, i) => (
           <li key={l.id}>

@@ -22,7 +22,7 @@ export const usePath = (): string => {
 export const href = (path: string): string => `#${path}`;
 
 export interface Match {
-  name: 'home' | 'unit' | 'lesson' | 'notFound';
+  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'notFound';
   params: Record<string, string>;
 }
 
@@ -32,5 +32,8 @@ export const matchRoute = (path: string): Match => {
   if (unit) return { name: 'unit', params: { id: unit[1]! } };
   const lesson = /^\/lesson\/([\w-]+)$/.exec(path);
   if (lesson) return { name: 'lesson', params: { id: lesson[1]! } };
+  if (path === '/cards') return { name: 'cards', params: {} };
+  const study = /^\/cards\/([\w-]+)$/.exec(path);
+  if (study) return { name: 'study', params: { deck: study[1]! } };
   return { name: 'notFound', params: {} };
 };
