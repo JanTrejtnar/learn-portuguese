@@ -298,7 +298,7 @@ await test('přehled gramatiky: hledání najde lekci a týdenní souhrn je vid�
 
 await test('všechny hlavní stránky se načtou bez chyby', async () => {
   const { page, errors, ctx } = await newPage();
-  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/shop', '/grammar', '/gramatika', '/settings', '/roleplay', '/pairs', '/speak']) {
+  for (const r of ['/', '/cards', '/quiz', '/practice', '/map', '/stats', '/shop', '/grammar', '/gramatika', '/settings', '/roleplay', '/pairs']) {
     await page.goto(base + '#' + r);
     await page.waitForTimeout(150);
     assert.ok(await page.locator('main, #obsah, h1').first().isVisible(), r);
@@ -364,7 +364,7 @@ const axeViolations = async (page) => {
 };
 
 await test('přístupnost (axe, WCAG AA): hlavní stránky ve světlém i tmavém režimu', async () => {
-  const routes = ['/', '/practice', '/stats', '/settings', '/shop', '/collection', '/gramatika', '/cards', '/quiz', '/roleplay', '/pairs', '/map', '/unit/a1-u1', '/lesson/a1-u1-l1', '/cards/a1-u1-l1', '/quiz/a1-u1-l1', '/roleplay/hotel', '/about', '/learn/a1-u1-l1'];
+  const routes = ['/', '/practice', '/stats', '/settings', '/shop', '/collection', '/gramatika', '/cards', '/quiz', '/roleplay', '/pairs', '/map', '/unit/a1-u1', '/lesson/a1-u1-l1', '/cards/a1-u1-l1', '/quiz/a1-u1-l1', '/roleplay/hotel', '/about', '/learn/a1-u1-l1', '/vyslovnost'];
   const bad = [];
   for (const dark of [false, true]) {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });

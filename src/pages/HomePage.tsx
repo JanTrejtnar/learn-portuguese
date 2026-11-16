@@ -1,6 +1,7 @@
 import { unitCode, units, unitUnlocked, unlockedWords } from '../content';
 import type { Progress } from '../lib/db';
 import { useStudySettings } from '../lib/settings';
+import { nextLearnTarget } from '../lib/learn';
 import { useProgress } from '../lib/useProgress';
 import { xpToday } from '../lib/xp';
 import { Icon } from '../components/Icon';
@@ -28,23 +29,29 @@ const TodayCard = ({ progress }: { progress: Progress }) => {
   const now = Date.now();
   const words = unlockedWords(progress.tests);
   const due = words.filter((w) => (progress.cards.get(w.id)?.due ?? Infinity) <= now).length;
-  const unseen = words.filter((w) => !progress.cards.has(w.id)).length;
-  const fresh = Math.min(unseen, settings.newPerDay);
-  const todo = due + fresh;
+  const target = nextLearnTarget(units, progress.cards, (id) => unitUnlocked(id, progress.tests), (id) => !!progress.tests.get(id)?.passed);
   const goalMissing = xpToday(progress.days, now) < settings.dailyGoal;
   const btn = 'inline-flex min-h-11 items-center gap-2 rounded-xl bg-gold-400 px-5 py-2.5 font-bold text-brand-950 shadow-soft hover:bg-gold-300';
+  const btn2 = 'inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 px-5 py-2.5 font-bold text-white hover:bg-white/10';
+  const first = progress.cards.size === 0;
+  const heading = target?.kind === 'learn'
+    ? (first ? 'Začni první lekcí' : `Další lekce: ${target.lessonTitle}`)
+    : target?.kind === 'test' ? 'Všechna slova jsou probraná'
+    : due > 0 ? `${due} k opakování` : 'Na dnes hotovo 🎉';
   return (
     <div class="relative mt-4 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 to-brand-900 p-5 text-white shadow-lift">
       <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border-[18px] border-gold-400/25" aria-hidden="true" />
       <div class="pointer-events-none absolute -bottom-9 -right-3 h-24 w-24 rounded-full border-[10px] border-flag-600/55" aria-hidden="true" />
       <div class="relative">
         <div class="text-sm font-semibold uppercase tracking-wide text-brand-100">Dnešní plán</div>
-        <div class="mt-1 text-2xl font-extrabold">{fresh > 0 && progress.cards.size === 0 ? 'Začni první lekcí' : todo > 0 ? `${due} k opakování · ${fresh} nových` : 'Na dnes hotovo 🎉'}</div>
+        <div class="mt-1 text-2xl font-extrabold">{heading}</div>
+        {target?.kind === 'learn' && due > 0 && <div class="mt-1 text-sm text-brand-100">{due} slov čeká na opakování</div>}
         <div class="mt-4 flex flex-wrap gap-3">
-          {progress.cards.size === 0 && <a href={href('/lesson/a1-u1-l1')} class={btn}>Otevřít lekci<Icon name="arrow" class="h-5 w-5" /></a>}
-          {progress.cards.size > 0 && todo > 0 && <a href={href('/cards/all')} class={btn}>Začít<Icon name="arrow" class="h-5 w-5" /></a>}
-          {todo === 0 && goalMissing && <a href={href('/quiz/quick')} class={btn}>⚡ Rychlý kvíz za XP</a>}
-          {todo === 0 && !goalMissing && <a href={href('/roleplay')} class={btn}>🎭 Zkus scénář<Icon name="arrow" class="h-5 w-5" /></a>}
+          {target?.kind === 'learn' && <a href={href(`/learn/${target.lessonId}`)} class={btn}>▶ Pokračovat<Icon name="arrow" class="h-5 w-5" /></a>}
+          {target?.kind === 'test' && <a href={href(`/quiz/${target.unitId}`)} class={btn}>🏆 Dokončit jednotku<Icon name="arrow" class="h-5 w-5" /></a>}
+          {due > 0 && <a href={href('/cards/all')} class={target ? btn2 : btn}>🃏 Opakovat ({due})</a>}
+          {!target && due === 0 && goalMissing && <a href={href('/quiz/quick')} class={btn}>⚡ Rychlý kvíz za XP</a>}
+          {!target && due === 0 && !goalMissing && <a href={href('/roleplay')} class={btn}>🎭 Zkus scénář<Icon name="arrow" class="h-5 w-5" /></a>}
         </div>
       </div>
     </div>

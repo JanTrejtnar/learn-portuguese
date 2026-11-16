@@ -22,7 +22,7 @@ export const usePath = (): string => {
 export const href = (path: string): string => `#${path}`;
 
 export interface Match {
-  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'map' | 'practice' | 'roleplayHub' | 'roleplay' | 'pairs' | 'speak' | 'settings' | 'welcome' | 'shop' | 'collection' | 'grammar' | 'grammarRef' | 'about' | 'learn' | 'notFound';
+  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'map' | 'practice' | 'roleplayHub' | 'roleplay' | 'pairs' | 'speak' | 'settings' | 'welcome' | 'shop' | 'collection' | 'grammar' | 'grammarRef' | 'about' | 'pronunciation' | 'learn' | 'notFound';
   params: Record<string, string>;
 }
 
@@ -49,6 +49,7 @@ export const matchRoute = (path: string): Match => {
   if (path === '/grammar') return { name: 'grammar', params: {} };
   if (path === '/shop') return { name: 'shop', params: {} };
   if (path === '/collection') return { name: 'collection', params: {} };
+  if (path === '/vyslovnost') return { name: 'pronunciation', params: {} };
   if (path === '/about') return { name: 'about', params: {} };
   const learn = /^\/learn\/([\w-]+)$/.exec(path);
   if (learn) return { name: 'learn', params: { id: learn[1]! } };

@@ -13,7 +13,7 @@ interface NavItem {
 
 const nav: NavItem[] = [
   { label: 'Lekce', icon: 'book', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') || p.startsWith('/learn') || p.startsWith('/map') },
-  { label: 'Procvičit', icon: 'cards', to: '/practice', active: (p) => ['/practice', '/cards', '/free', '/grammar', '/quiz', '/roleplay', '/pairs', '/speak', '/gramatika'].some((x) => p.startsWith(x)) },
+  { label: 'Procvičit', icon: 'cards', to: '/practice', active: (p) => ['/practice', '/cards', '/free', '/grammar', '/quiz', '/roleplay', '/pairs', '/speak', '/gramatika', '/vyslovnost'].some((x) => p.startsWith(x)) },
   { label: 'Pokrok', icon: 'chart', to: '/stats', active: (p) => p.startsWith('/stats') || p.startsWith('/shop') },
 ];
 

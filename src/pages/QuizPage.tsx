@@ -7,11 +7,11 @@ import { BuildQuestion, ChoiceQuestion, MatchQuestion, TypingQuestion, type Answ
 import { Celebrate } from '../components/Celebrate';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { allWords, dedupeWords, getLesson, getTestScope, units, unitUnlocked } from '../content';
-import { LEARN_QUESTIONS, learnRemaining, pickLearnBatch } from '../lib/learn';
+import { DIALOGUE_QUESTIONS, LEARN_QUESTIONS, learnRemaining, pickLearnBatch } from '../lib/learn';
 import { LearnIntro } from '../components/LearnIntro';
 import { getVoiceStatus } from '../lib/audio';
 import { saveCard, saveDay, saveTest, type Progress, type TestResult } from '../lib/db';
-import { PASS_RATIO, collectCloze, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
+import { PASS_RATIO, collectCloze, collectSentences, correctText, generateDialogueQuestions, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
 import { schedule } from '../lib/srs';
 import { playChime, playCorrect, playWrong } from '../lib/sound';
 import { PostcardScreen } from '../components/PostcardScreen';
@@ -136,7 +136,11 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     const audio = getVoiceStatus();
     const narrow = scope.id === 'quick' || scope.learn;
     const sentences = collectSentences(scope.lessons).filter((s) => !narrow || (s.wordId && batch.some((w) => w.id === s.wordId)));
-    return generateQuiz({ words: batch, pool: allWords(), sentences, cloze: scope.id === 'quick' ? [] : collectCloze(scope.lessons), count: scope.count, audio: audio !== 'unsupported' && audio !== 'no-pt-pt' });
+    const hasAudio = audio !== 'unsupported' && audio !== 'no-pt-pt';
+    const main = generateQuiz({ words: batch, pool: allWords(), sentences, cloze: scope.id === 'quick' ? [] : collectCloze(scope.lessons), count: scope.count, audio: hasAudio });
+    // Poslední dávka lekce se zakončí cvičením nad dialogem lekce.
+    const lastBatch = scope.learn && learnRemaining(scope.words, progress.cards) <= batch.length;
+    return lastBatch ? [...main, ...generateDialogueQuestions(scope.lessons, DIALOGUE_QUESTIONS, hasAudio)] : main;
   }, [attempt]);
 
   // „Nemohu poslouchat“: poslechové otázky se vyřadí a nepočítají se
@@ -289,18 +293,18 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
         <>
 
           <div key={q2.id}>
-            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
+            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze' || q2.kind === 'dlg-listen' || q2.kind === 'dlg-reply') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
             {(q2.kind === 'typing' || q2.kind === 'dictation') && <TypingQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
             {q2.kind === 'match' && <MatchQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
             {q2.kind === 'build' && <BuildQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
           </div>
 
-          {!answer && (q2.kind === 'listen' || q2.kind === 'dictation') && (
+          {!answer && (q2.kind === 'listen' || q2.kind === 'dictation' || q2.kind === 'dlg-listen') && (
             <button
               type="button"
               class="mt-4 text-sm text-muted underline"
               onClick={() => {
-                const ids = allQuestions.filter((x) => x.kind === 'listen' || x.kind === 'dictation').map((x) => x.id);
+                const ids = allQuestions.filter((x) => x.kind === 'listen' || x.kind === 'dictation' || x.kind === 'dlg-listen').map((x) => x.id);
                 setSkippedIds((s) => [...new Set([...s, ...ids])]);
               }}
             >
@@ -316,8 +320,8 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
                 {!answer.correct && q2.kind !== 'typing' && q2.kind !== 'dictation' && correctText(q2, answer.missed) && (
                   <p class="mt-1 flex items-center gap-2 text-sm">
                     Správně:
-                    <b lang={q2.kind === 'pt-to-cs' ? 'cs' : 'pt-PT'}>{correctText(q2, answer.missed)}</b>
-                    {q2.kind !== 'match' && q2.kind !== 'pt-to-cs' && q2.kind !== 'cloze' && <AudioButton text={q2.kind === 'build' ? q2.sentence : correctText(q2)} />}
+                    <b lang={q2.kind === 'pt-to-cs' || q2.kind === 'dlg-listen' ? 'cs' : 'pt-PT'}>{correctText(q2, answer.missed)}</b>
+                    {q2.kind !== 'match' && q2.kind !== 'pt-to-cs' && q2.kind !== 'cloze' && q2.kind !== 'dlg-listen' && <AudioButton text={q2.kind === 'build' ? q2.sentence : correctText(q2)} />}
                   </p>
                 )}
                 <button type="button" onClick={next} class={`${bigBtn} mt-3`}>

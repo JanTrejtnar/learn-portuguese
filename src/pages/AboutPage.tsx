@@ -1,5 +1,5 @@
 import { Breadcrumb } from '../components/Breadcrumb';
-import { REPORT_URL } from '../lib/config';
+import { REPORT_URL, REPO_URL, SPEAKING_ENABLED } from '../lib/config';
 
 const Section = ({ title, children }: { title: string; children: preact.ComponentChildren }) => (
   <section class="mt-6">
@@ -26,10 +26,15 @@ export const AboutPage = () => (
       <ul class="list-disc space-y-1 pl-5">
         <li><b>Žádné účty, žádné sledování.</b> Aplikace neposílá nikam tvůj pokrok, nepoužívá analytiku ani cookies.</li>
         <li>Pokrok a nastavení jsou uložené <b>jen v tomto prohlížeči</b> (IndexedDB a localStorage). Když data prohlížeče smažeš, pokrok zmizí. Proto je v Nastavení záloha do souboru.</li>
-        <li><b>Výslovnost a mikrofon:</b> rozpoznávání řeči zajišťuje tvůj prohlížeč (v Chrome a Edge se zvuk posílá na servery jeho výrobce, například Google). Aplikace sama žádný zvuk neukládá ani neodesílá. Mluvení je volitelné.</li>
+        {SPEAKING_ENABLED && <li><b>Výslovnost a mikrofon:</b> rozpoznávání řeči zajišťuje tvůj prohlížeč (v Chrome a Edge se zvuk posílá na servery jeho výrobce, například Google). Aplikace sama žádný zvuk neukládá ani neodesílá. Mluvení je volitelné.</li>}
+        {!SPEAKING_ENABLED && <li><b>Mikrofon se nepoužívá.</b> Aplikace nikdy nežádá o přístup k mikrofonu ani ke kameře.</li>}
         <li><b>Audio slovíček</b> přehrává hlas tvého zařízení (syntéza řeči). Kvalita závisí na tom, zda má zařízení portugalský hlas z Portugalska.</li>
         <li>Aplikaci poskytuje statický hosting (GitHub Pages). Poskytovatel hostingu může podle svých pravidel zaznamenávat IP adresy návštěvníků; aplikace k tomu nepřidává nic.</li>
       </ul>
+    </Section>
+
+    <Section title="Licence">
+      <p>Kód aplikace je pod licencí MIT, studijní obsah pod <a class="font-semibold text-brand-700 underline dark:text-brand-100" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.cs" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a> (sdílet a upravovat lze nekomerčně se stejnou licencí). Zdrojový kód je na <a class="font-semibold text-brand-700 underline dark:text-brand-100" href={REPO_URL} target="_blank" rel="noopener noreferrer">GitHubu</a>.</p>
     </Section>
 
     <Section title="Dostupnost">

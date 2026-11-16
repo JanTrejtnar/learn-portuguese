@@ -59,7 +59,7 @@ const useAutoplay = (text: string | undefined, enabled: boolean) => {
 /* ───────── výběr z možností (PT→CZ, CZ→PT, poslech) ───────── */
 
 export const ChoiceQuestion = ({ q, answer, onAnswer, hints }: Props<ChoiceQ>) => {
-  useAutoplay(q.kind === 'listen' ? q.audio : undefined, true);
+  useAutoplay(q.kind === 'listen' || q.kind === 'dlg-listen' || q.kind === 'dlg-reply' ? q.audio : undefined, true);
 
   // Nápověda 50:50: vyřadí dvě špatné možnosti.
   const [hidden, setHidden] = useState<number[]>([]);
@@ -79,11 +79,16 @@ export const ChoiceQuestion = ({ q, answer, onAnswer, hints }: Props<ChoiceQ>) =
   return (
     <div>
       <p class="mb-1 text-sm text-muted">
-        {q.kind === 'pt-to-cs' ? 'Co to znamená česky?' : q.kind === 'cs-to-pt' ? 'Jak se to řekne portugalsky (PT-PT)?' : q.kind === 'cloze' ? 'Doplň správný tvar:' : 'Co slyšíš?'}
+        {q.kind === 'dlg-listen' ? 'Co to znamenalo?' : q.kind === 'dlg-reply' ? 'Co odpovíš?' : q.kind === 'pt-to-cs' ? 'Co to znamená česky?' : q.kind === 'cs-to-pt' ? 'Jak se to řekne portugalsky (PT-PT)?' : q.kind === 'cloze' ? 'Doplň správný tvar:' : 'Co slyšíš?'}
       </p>
       <div class="mb-5 flex items-center gap-3">
-        {q.kind === 'listen' ? (
+        {q.kind === 'listen' || q.kind === 'dlg-listen' ? (
           <AudioButton text={q.audio!} size="md" withSlow />
+        ) : q.kind === 'dlg-reply' ? (
+          <div class="flex items-center gap-3">
+            <span lang="pt-PT" class="text-2xl font-bold text-brand-700 dark:text-brand-100">„{q.prompt}“</span>
+            <AudioButton text={q.audio!} size="md" />
+          </div>
         ) : q.kind === 'cloze' ? (
           <div>
             <span lang="pt-PT" class="text-2xl font-bold text-brand-700 dark:text-brand-100">{q.prompt.replace('___', answer ? q.options[q.answer]! : '＿＿＿')}</span>
@@ -96,6 +101,13 @@ export const ChoiceQuestion = ({ q, answer, onAnswer, hints }: Props<ChoiceQ>) =
           </>
         )}
       </div>
+      {answer && q.kind === 'dlg-listen' && (
+        <p class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
+          <b lang="pt-PT">{q.hint}</b>
+          <AudioButton text={q.audio!} />
+        </p>
+      )}
+      {answer && q.kind === 'dlg-reply' && q.hint && <p class="mb-4 text-sm text-muted">{q.hint}</p>}
       {answer && q.kind === 'listen' && q.cs && (
         <p class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
           <b lang="pt-PT">{q.options[q.answer]}</b>

@@ -20,9 +20,9 @@ interface Base {
 }
 
 export interface ChoiceQ extends Base {
-  kind: 'pt-to-cs' | 'cs-to-pt' | 'listen' | 'cloze';
+  kind: 'pt-to-cs' | 'cs-to-pt' | 'listen' | 'cloze' | 'dlg-listen' | 'dlg-reply';
   prompt: string;
-  /** Český překlad jako nápověda (cloze). */
+  /** Dialog: předchozí replika (dlg-reply) nebo řádek k poslechu (dlg-listen), jejich český překlad se ukáže po odpovědi. */
   hint?: string;
   /** Text k přečtení nahlas (PT). */
   audio?: string;
@@ -218,6 +218,40 @@ export const typingQuestion = (word: Word, pool: Word[], kind: TypingQ['kind'], 
   cs: word.cs,
 });
 
+/**
+ * Cvičení nad dialogy lekce: „Co odpovíš?“ (vyber správnou repliku) a poslech řádku bez textu s výběrem českého významu.
+ * Žádné ID slovíček: dialog nemění opakování karet.
+ */
+export const generateDialogueQuestions = (lessons: Lesson[], count: number, audio: boolean, rng: Rng = Math.random): Question[] => {
+  const out: Question[] = [];
+  let n = 0;
+  for (const l of lessons) {
+    const lines = (l.dialogue ?? []).filter((d) => d.pt.trim() && d.cs.trim());
+    if (lines.length < 3) continue;
+    // Odpovědi: řádek, který následuje po jiném řádku (jiný mluvčí než předchozí replika).
+    const replyIdx = shuffle(lines.map((_, i) => i).filter((i) => i > 0 && lines[i]!.speaker !== lines[i - 1]!.speaker), rng);
+    for (const i of replyIdx.slice(0, Math.ceil(count / 2))) {
+      const prev = lines[i - 1]!;
+      const right = lines[i]!;
+      const wrong = shuffle(lines.filter((d, j) => j !== i && normalize(d.pt) !== normalize(right.pt) && normalize(d.pt) !== normalize(prev.pt)), rng).slice(0, 3);
+      if (wrong.length < 2) continue;
+      const options = shuffle([right.pt, ...wrong.map((d) => d.pt)], rng);
+      out.push({ id: `d${n++}`, kind: 'dlg-reply', wordIds: [], prompt: prev.pt, hint: `${prev.cs} → ${right.cs}`, audio: prev.pt, options, optionsLang: 'pt', answer: options.indexOf(right.pt) });
+    }
+    if (audio) {
+      const pickLines = shuffle(lines.filter((d) => d.pt.split(/\s+/).length >= 2), rng).slice(0, Math.floor(count / 2));
+      for (const d of pickLines) {
+        const wrong = shuffle(lines.filter((x) => normalize(x.cs) !== normalize(d.cs)), rng).slice(0, 3).map((x) => x.cs);
+        if (wrong.length < 2) continue;
+        const options = shuffle([d.cs, ...wrong], rng);
+        out.push({ id: `d${n++}`, kind: 'dlg-listen', wordIds: [], prompt: '', audio: d.pt, cs: d.cs, hint: d.pt, options, optionsLang: 'cs', answer: options.indexOf(d.cs) });
+      }
+    }
+  }
+  // střídavě: nejdřív poslech, pak odpovědi (jde o souvislý rozhovor); pořadí v rámci druhu je náhodné
+  return out.slice(0, count).sort((a, b) => Number(a.kind === 'dlg-reply') - Number(b.kind === 'dlg-reply'));
+};
+
 export const collectCloze = (lessons: Lesson[]): ClozeItem[] => lessons.flatMap((l) => l.cloze ?? []);
 
 const WORD_KINDS: (ChoiceQ['kind'] | TypingQ['kind'])[] = ['pt-to-cs', 'cs-to-pt', 'listen', 'typing', 'dictation'];
@@ -301,6 +335,8 @@ export const promptText = (q: Question): string => {
     case 'pt-to-cs': return q.prompt;
     case 'cs-to-pt': return q.prompt;
     case 'listen': return `🔊 ${q.options[q.answer]}`;
+    case 'dlg-listen': return `🔊 ${q.hint ?? ''}`;
+    case 'dlg-reply': return q.prompt;
     case 'cloze': return q.prompt;
     case 'typing': return q.prompt;
     case 'dictation': return `🔊 ${q.display}`;
@@ -314,6 +350,8 @@ export const correctText = (q: Question, missed: string[] = []): string => {
     case 'pt-to-cs':
     case 'cs-to-pt':
     case 'listen':
+    case 'dlg-listen':
+    case 'dlg-reply':
     case 'cloze': return q.options[q.answer]!;
     case 'typing':
     case 'dictation': return q.display;

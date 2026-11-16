@@ -1,4 +1,6 @@
 import { AboutPage } from './pages/AboutPage';
+import { SPEAKING_ENABLED } from './lib/config';
+import { PronunciationPage } from './pages/PronunciationPage';
 import { Layout } from './components/Layout';
 import { CardsPage } from './pages/CardsPage';
 import { GrammarPage } from './pages/GrammarPage';
@@ -37,6 +39,7 @@ export const App = () => {
       {route.name === 'free' && <StudyPage deckId={route.params.deck!} mode="free" />}
       {route.name === 'quizHub' && <QuizHubPage />}
       {route.name === 'learn' && <QuizPage id={route.params.id!} learn />}
+      {route.name === 'pronunciation' && <PronunciationPage />}
       {route.name === 'about' && <AboutPage />}
       {route.name === 'quiz' && <QuizPage id={route.params.id!} />}
       {route.name === 'practice' && <PracticePage />}
@@ -48,7 +51,7 @@ export const App = () => {
       {route.name === 'grammar' && <GrammarPage />}
       {route.name === 'shop' && <ShopPage />}
       {route.name === 'collection' && <CollectionPage />}
-      {route.name === 'speak' && <SpeakPage />}
+      {route.name === 'speak' && (SPEAKING_ENABLED ? <SpeakPage /> : <NotFoundPage />)}
       {route.name === 'map' && <MapPage />}
       {route.name === 'stats' && <StatsPage />}
       {route.name === 'welcome' && <WelcomePage />}

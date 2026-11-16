@@ -403,3 +403,12 @@ Rozhodnutí z `docs/ANALYZA_DUOLINGO_A_PLAN_2.md`: aplikace je zatím osobní, a
 - **Vedená relace (N1, pilot):** na stránce lekce tlačítko „Projít lekci“ (`/learn/:id`). Dávka `LEARN_BATCH` (6) nových slov: představení (PT, CZ, audio, příklad) → `LEARN_QUESTIONS` (12) cvičení → slova vstoupí do kartiček (zpackaná „znovu“, ostatní interval 1 den), XP jako u kvízu. Poté „Další slova“ nebo test lekce. Implementace je režim `learn` v `QuizPage` (`src/lib/learn.ts`, `src/components/LearnIntro.tsx`).
 - **Tutoriál:** doplněny položky „Projít lekci“ a „Záloha pokroku“; test hlídá hodnoty `LEARN_BATCH` a `BACKUP_EVERY_DAYS`.
 - **Zbývá z plánu:** cvičení nad dialogy (N2), rozhodnutí, zda se „Projít lekci“ stane hlavní cestou na úvodní stránce (po vyzkoušení), minikurz výslovnosti (N6), předgenerované audio (N11), licence a doména.
+
+## Hotovo: rozhodnutí z 2. kola (úvodní stránka, dialogy, výslovnost, licence, mikrofon)
+
+- **Hlavní cesta:** karta „Dnešní plán“ vede tlačítkem „Pokračovat“ do další lekce (`nextLearnTarget` v `src/lib/learn.ts`: první odemčená nesplněná jednotka, první lekce s nenaučenými slovy; po probrání všech slov „Dokončit jednotku“). Opakování karet je vedlejší tlačítko „Opakovat (N)“.
+- **Dialogy (N2):** poslední dávka lekce končí `DIALOGUE_QUESTIONS` (4) cvičeními nad dialogem: „Co odpovíš?“ (výběr repliky) a poslech řádku s výběrem českého významu (`generateDialogueQuestions` v `src/lib/quiz.ts`). Nemění karty.
+- **Výslovnost a pasti (N6):** stránka `/vyslovnost` (Procvičit → Výslovnost a pasti): 7 témat výslovnosti PT-PT pro Čechy a 11 falešných přátel (`src/content/pronunciation.ts`). Neověřeno rodilým mluvčím; český přepis je jen přibližný.
+- **Licence:** kód MIT (`LICENSE`), obsah CC BY-NC-SA 4.0 (`LICENSE-CONTENT.md`), zmíněno na stránce O aplikaci.
+- **Mikrofon schovaný:** příznak `SPEAKING_ENABLED = false` v `src/lib/config.ts` skryje Mluvení v Procvičit a v tutoriálu, trasa `/speak` vrací „nenalezeno“, O aplikaci říká, že se mikrofon nepoužívá. Kód zůstal; zapnutí = změna příznaku a kontrola soukromí a tutoriálu.
+- **Křížová kontrola A1 (bez rodilého mluvčího):** čtyři nezávislé průchody jiným modelem, výstup `docs/revize/A1-*.md` (celkem 86 nálezů, z toho 18 „chyb“). Nálezy se zatím **neuplatnily**: jsou to návrhy AI a potřebují lidské rozhodnutí.

@@ -3,6 +3,7 @@
  * (hlídá to tests/tutorial.test.mts). Při změně chování aplikace tento soubor zkontroluj a uprav.
  */
 import { COINS_PER_GOAL_DAY, COINS_PER_LEVEL, COINS_PER_SCENARIO, COINS_PER_TEST, COINS_PER_WEEK_STREAK } from '../lib/coins';
+import { SPEAKING_ENABLED } from '../lib/config';
 import { BACKUP_EVERY_DAYS } from '../lib/backupReminder';
 import { LEARN_BATCH } from '../lib/learn';
 import { PASS_RATIO } from '../lib/quiz';
@@ -37,7 +38,7 @@ export const tutorialSteps = (): TutorialStep[] => [
     intro: 'Naučíš se evropskou portugalštinu (A1–B1) v češtině, stačí pár minut denně.',
     items: [
       { emoji: '📚', title: 'Jednotky a lekce', text: 'Cesta vede po městech Portugalska. Každá jednotka má několik lekcí: slovíčka s výslovností, gramatiku a dialog.' },
-      { emoji: '▶', title: 'Projít lekci', text: `Tlačítko „Projít lekci“ tě provede po ${LEARN_BATCH} nových slovech: nejdřív je uvidíš a uslyšíš, pak je hned procvičíš. Hotová slova se objeví v kartičkách k opakování.` },
+      { emoji: '▶', title: 'Projít lekci', text: `Tlačítko „Projít lekci“ tě provede po ${LEARN_BATCH} nových slovech: nejdřív je uvidíš a uslyšíš, pak je hned procvičíš. Na konci lekce si ještě procvičíš dialog. Hotová slova se objeví v kartičkách k opakování. Na úvodní stránce tě tlačítko „Pokračovat“ vede na další lekci.` },
       { emoji: '🗺️', title: 'Mapa i seznam', text: 'Na úvodní stránce můžeš přepínat mezi mapou a seznamem lekcí.' },
       { emoji: '✅', title: 'Dokončení jednotky', text: `Na konci jednotky je test. Při ${passPercent()} % a více odemkneš další jednotku a získáš pohlednici z daného města.` },
     ],
@@ -50,7 +51,8 @@ export const tutorialSteps = (): TutorialStep[] => [
     items: [
       { emoji: '🃏', title: 'Kartičky', text: 'Slovíčka se vracejí ve chvíli, kdy bys je začal(a) zapomínat. Čím líp je znáš, tím řidčeji se objeví.' },
       { emoji: '🧩', title: 'Kvízy a hry', text: `Kvízy, doplňování vět a přiřazování párů. U kvízů a testů můžeš za ${HINT_PRICE} mince použít nápovědu. Slovíčko s nápovědou se ještě vrátí do opakování.` },
-      { emoji: '🎭', title: 'Scénáře a mluvení', text: 'Procvičíš si rozhovory z běžného života a výslovnost přes mikrofon.' },
+      { emoji: '🗣️', title: 'Výslovnost a pasti', text: 'Krátký přehled, jak se evropská portugalština vyslovuje a čeho se Češi nejčastěji chytí. K tomu najdeš falešné přátele (slova, která znějí povědomě, ale znamenají jinak).' },
+      { emoji: '🎭', title: SPEAKING_ENABLED ? 'Scénáře a mluvení' : 'Scénáře', text: SPEAKING_ENABLED ? 'Procvičíš si rozhovory z běžného života a výslovnost přes mikrofon.' : 'Procvičíš si rozhovory z běžného života: vybíráš odpovědi a posloucháš, co říká druhá strana.' },
     ],
   },
   {

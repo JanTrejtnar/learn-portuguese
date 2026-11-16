@@ -1,3 +1,4 @@
+import { SPEAKING_ENABLED } from '../lib/config';
 import { href } from '../router';
 
 const Item = ({ to, emoji, title, text, primary }: { to: string; emoji: string; title: string; text: string; primary?: boolean }) => (
@@ -23,7 +24,8 @@ export const PracticePage = () => (
       <Item to="/gramatika" emoji="📖" title="Přehled gramatiky" text="Pravidla z odemčených lekcí s vyhledáváním" />
       <Item to="/grammar" emoji="🧩" title="Doplňování vět" text="Gramatika: věty s mezerou z lekcí" />
       <Item to="/roleplay" emoji="🎭" title="Scénáře" text="Rozhovory z reálných situací" />
-      <Item to="/speak" emoji="🎤" title="Mluvení" text="Zopakuj větu nahlas a dostaneš zpětnou vazbu" />
+      {SPEAKING_ENABLED && <Item to="/speak" emoji="🎤" title="Mluvení" text="Zopakuj větu nahlas a dostaneš zpětnou vazbu" />}
+      <Item to="/vyslovnost" emoji="🗣️" title="Výslovnost a pasti" text="Čím se PT-PT liší pro Čechy, falešní přátelé" />
       <Item to="/pairs" emoji="👂" title="Minimální páry" text="Rozlišuj podobně znějící slova" />
     </ul>
   </div>
