@@ -48,6 +48,7 @@ export const useVoiceStatus = (): VoiceStatus => {
 export const speechParts = (pt: string): string[] =>
   pt
     .replace(/^(o|a|os|as)\/(o|a|os|as) /i, '$1 ') // „o/a estudante“ → „o estudante“
+    .replace(/\s*\([^)]*\)/g, '') // vysvětlivky v závorkách se nečtou („ao (a + o)“ → „ao“)
     .split(/\s*\/\s*/)
     .map((p) => p.replace(/…/g, '').replace(/\s+/g, ' ').trim())
     .filter(Boolean);

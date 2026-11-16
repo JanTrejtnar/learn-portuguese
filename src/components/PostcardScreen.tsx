@@ -7,6 +7,34 @@ import { Celebrate } from './Celebrate';
 
 export const TRAVEL_KEY = 'ap:map-travel';
 
+/** Pohlednice jako dopis s letecky červenozeleným okrajem a razítkem. */
+export const PostcardCard = ({ unitId, tilt = true }: { unitId: string; tilt?: boolean }) => {
+  const unit = units.find((u) => u.id === unitId);
+  const card = postcards[unitId];
+  if (!unit?.city || !card) return null;
+  return (
+        <article class={`pop mt-5 ${tilt ? 'rotate-[-1.5deg]' : ''} rounded-xl bg-[#fffdf6] p-2 text-[#14221a] shadow-lift`} style={{ backgroundImage: 'repeating-linear-gradient(135deg, #da291c 0 14px, #fffdf6 14px 24px, #046a38 24px 38px, #fffdf6 38px 48px)', padding: '7px' }}>
+          <div class="rounded-md bg-[#fffdf6] p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="text-xs font-bold uppercase tracking-wide text-[#556659]">Saudações de</div>
+                <h2 class="text-3xl font-extrabold leading-tight" lang="pt-PT">{unit.city.name}</h2>
+              </div>
+              <div class="flex h-16 w-14 shrink-0 items-center justify-center rounded-sm border-2 border-dashed border-flag-600 bg-gold-200 text-3xl" aria-hidden="true">{unit.city.icon ?? '📮'}</div>
+            </div>
+            <p class="mt-3 text-sm">{card.fact}</p>
+            <p class="mt-3 flex items-center gap-2 border-t border-[#e2dece] pt-3 text-sm">
+              <AudioButton text={card.pt} />
+              <span>
+                <span lang="pt-PT" class="block font-semibold italic">{card.pt}</span>
+                <span class="block text-[#556659]">{card.cs}</span>
+              </span>
+            </p>
+          </div>
+        </article>
+  );
+};
+
 /** Celoobrazovková oslava nově získané pohlednice (po prvním splnění jednotky). */
 export const PostcardScreen = ({ unitId, next, onClose }: { unitId: string; next: { id: string; title: string } | null; onClose: () => void }) => {
   const unit = units.find((u) => u.id === unitId);
@@ -30,25 +58,7 @@ export const PostcardScreen = ({ unitId, next, onClose }: { unitId: string; next
         <p class="text-center text-sm font-bold uppercase tracking-widest text-gold-300">Jednotka {unitCode(unit)} dokončena</p>
         <h1 class="mt-1 text-center text-3xl font-extrabold">Nová pohlednice! 💌</h1>
 
-        <article class="pop mt-5 rotate-[-1.5deg] rounded-xl bg-[#fffdf6] p-2 text-[#14221a] shadow-lift" style={{ backgroundImage: 'repeating-linear-gradient(135deg, #da291c 0 14px, #fffdf6 14px 24px, #046a38 24px 38px, #fffdf6 38px 48px)', padding: '7px' }}>
-          <div class="rounded-md bg-[#fffdf6] p-4">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <div class="text-xs font-bold uppercase tracking-wide text-[#556659]">Saudações de</div>
-                <h2 class="text-3xl font-extrabold leading-tight" lang="pt-PT">{unit.city.name}</h2>
-              </div>
-              <div class="flex h-16 w-14 shrink-0 items-center justify-center rounded-sm border-2 border-dashed border-flag-600 bg-gold-200 text-3xl" aria-hidden="true">{unit.city.icon ?? '📮'}</div>
-            </div>
-            <p class="mt-3 text-sm">{card.fact}</p>
-            <p class="mt-3 flex items-center gap-2 border-t border-[#e2dece] pt-3 text-sm">
-              <AudioButton text={card.pt} />
-              <span>
-                <span lang="pt-PT" class="block font-semibold italic">{card.pt}</span>
-                <span class="block text-[#556659]">{card.cs}</span>
-              </span>
-            </p>
-          </div>
-        </article>
+        <PostcardCard unitId={unitId} />
 
         <div class="mt-7 grid gap-2">
           <a ref={go} href={href('/map')} onClick={toMap} class={`${btn} bg-gold-400 text-brand-950 shadow-soft hover:bg-gold-300`}>

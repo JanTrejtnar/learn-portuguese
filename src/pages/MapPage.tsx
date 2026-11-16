@@ -176,6 +176,16 @@ export const MapPage = () => {
   };
 
   const selState = sel?.st;
+  // Lehký přiblížení na vybrané město (město se posune do horní poloviny, aby ho nezakryl dialog).
+  const ZOOM = 1.5;
+  const zoomStyle = (() => {
+    const base = { transformOrigin: '0 0', transition: 'transform .7s cubic-bezier(.2,.8,.2,1)', willChange: 'transform' };
+    if (!sel) return { ...base, transform: 'translate(0,0) scale(1)' };
+    const px = (sel.p[0] + 50) / 375;
+    const py = (sel.p[1] + 20) / 590;
+    const clamp = (v: number) => Math.min(0, Math.max(1 - ZOOM, v));
+    return { ...base, transform: `translate(${clamp(0.5 - ZOOM * px) * 100}%, ${clamp(0.38 - ZOOM * py) * 100}%) scale(${ZOOM})` };
+  })();
   const selResult = sel ? progress.tests.get(sel.u.id) : undefined;
   const selStars = starsForResult(selResult);
 
@@ -207,7 +217,7 @@ export const MapPage = () => {
 
       {/* Mapa je hlavní prvek obrazovky: plná šířka, bez okrajů; zbytek se případně doscrolluje. */}
       <div class="-mx-4 mt-3 overflow-hidden border-y border-line shadow-lift md:mx-0 md:rounded-3xl md:border">
-        <svg viewBox="-50 -20 375 590" class="block h-auto w-full" role="group" aria-label={`Herní mapa Portugalska, úroveň ${level}`}>
+        <svg viewBox="-50 -20 375 590" class="block h-auto w-full" style={zoomStyle} role="group" aria-label={`Herní mapa Portugalska, úroveň ${level}`}>
           <defs>
             <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: var(--sea-1)" /><stop offset="1" style="stop-color: var(--sea-2)" /></linearGradient>
             <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color: var(--land-1)" /><stop offset="1" style="stop-color: var(--land-2)" /></linearGradient>
