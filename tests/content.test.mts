@@ -63,3 +63,20 @@ test('každá jednotka má 3–4 lekce a aspoň 12 cvičení', () => {
     assert.ok(n >= 6, `${u.id}: málo doplňovacích cvičení (${n})`);
   }
 });
+
+import { dedupeWords } from '../src/content/index.ts';
+test('souhrnné balíčky neobsahují duplicitní slovíčka (stejné pt + cs)', () => {
+  const words = allWords();
+  const keys = words.map((w) => `${w.pt.toLowerCase()}|${w.cs.toLowerCase()}`);
+  assert.equal(new Set(keys).size, keys.length);
+  const a = { id: '1', pt: 'ontem', cs: 'včera' };
+  const b = { id: '2', pt: 'Ontem', cs: 'Včera' };
+  assert.deepEqual(dedupeWords([a, b]).map((w) => w.id), ['1']);
+});
+
+test('v jedné lekci se slovíčka neopakují', () => {
+  for (const l of units.flatMap((u) => u.lessons)) {
+    const keys = l.words.map((w) => `${w.pt.toLowerCase()}|${w.cs.toLowerCase()}`);
+    assert.equal(new Set(keys).size, keys.length, `${l.id}: duplicitní slovíčko`);
+  }
+});
