@@ -14,6 +14,14 @@ npm test           # unit testy SRS
 ## Stack
 Vite · Preact · TypeScript · Tailwind CSS 4 · hash router (bez serveru) · obsah v typovaných modulech `src/content/`.
 
+## Offline, instalace a záloha
+- Aplikace je **PWA**: po prvním načtení funguje offline a jde nainstalovat na plochu (Nastavení → Aplikace).
+- Pokrok je uložený v prohlížeči (IndexedDB). **Nastavení → Záloha** umožní export/import do JSON souboru (přenos mezi zařízeními).
+- Tmavý/světlý vzhled: Nastavení → Vzhled.
+
+## Nasazení
+Statický build (`npm run build` → `dist/`) lze nahrát kamkoli. Workflow `.github/workflows/deploy.yml` buildí a testuje při každém pushi a z větve `main` nasazuje na GitHub Pages (v repozitáři zapni *Settings → Pages → Source: GitHub Actions*).
+
 ## Struktura
 - `src/content/a1/` – jednotky a lekce (slovíčka, gramatika, dialogy). Každé slovíčko má stabilní `id`.
 - `src/pages/`, `src/components/` – UI.
@@ -30,4 +38,4 @@ Vite · Preact · TypeScript · Tailwind CSS 4 · hash router (bez serveru) · o
 3. ✅ SRS + IndexedDB
 4. ✅ Kvízy a testy
 5. ✅ Kompletní A1 (jednotky 1–8) + gramatická cvičení (doplňování vět)
-6. ✅ Gamifikace (XP, úrovně, denní cíl, odznaky, mapa) · 7. ✅ Roleplay, minimální páry a mluvení · 8. PWA/offline · 9. A2 · 10. AI konverzace
+6. ✅ Gamifikace (XP, úrovně, denní cíl, odznaky, mapa) · 7. ✅ Roleplay, minimální páry a mluvení · 8. ✅ PWA/offline, záloha, nasazení · 9. A2 · 10. AI konverzace

@@ -95,3 +95,30 @@ export const loadProgress = async (): Promise<Progress> => {
 export const saveCard = (state: CardState): Promise<void> => put('cards', state);
 export const saveDay = (day: DayStats): Promise<void> => put('days', day);
 export const saveTest = (result: TestResult): Promise<void> => put('tests', result);
+
+const clearStore = async (store: StoreName): Promise<void> => {
+  const db = await open();
+  if (!db) {
+    memory[store].clear();
+    return;
+  }
+  return new Promise((resolve) => {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+};
+
+/** Smaže veškerý pokrok (karty, dny, testy). */
+export const clearProgress = async (): Promise<void> => {
+  await Promise.all((['cards', 'days', 'tests'] as const).map(clearStore));
+};
+
+/** Nahradí veškerý pokrok daty ze zálohy. */
+export const replaceProgress = async (data: { cards: CardState[]; days: DayStats[]; tests: TestResult[] }): Promise<void> => {
+  await clearProgress();
+  for (const c of data.cards) await put('cards', c);
+  for (const d of data.days) await put('days', d);
+  for (const t of data.tests) await put('tests', t);
+};

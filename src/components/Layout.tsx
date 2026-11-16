@@ -54,13 +54,17 @@ export const Layout = ({ path, children }: { path: string; children: ComponentCh
       </a>
       <nav class="flex flex-col gap-1" aria-label="Hlavní navigace">
         {nav.map((item) => <NavLink key={item.to} item={item} path={path} vertical />)}
+        <a href={href('/settings')} class={`mt-4 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium ${path === '/settings' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900 dark:text-brand-100' : 'text-stone-600 hover:text-brand-700 dark:text-stone-400'}`}>
+          <span class="text-xl leading-none" aria-hidden="true">⚙️</span><span>Nastavení</span>
+        </a>
       </nav>
     </aside>
 
     <div class="flex min-w-0 flex-1 flex-col">
       {/* Mobil: horní lišta */}
-      <header class="sticky top-0 z-10 border-b border-stone-200 bg-stone-50/90 px-4 py-3 backdrop-blur md:hidden dark:border-stone-800 dark:bg-stone-950/90">
+      <header class="sticky top-0 z-10 flex items-center justify-between border-b border-stone-200 bg-stone-50/90 px-4 py-3 backdrop-blur md:hidden dark:border-stone-800 dark:bg-stone-950/90">
         <a href={href('/')} class="text-lg font-bold text-brand-700 dark:text-brand-100">Aprender 🇵🇹</a>
+        <a href={href('/settings')} aria-label="Nastavení" class="text-xl leading-none">⚙️</a>
       </header>
 
       <main class="flex-1 px-4 py-6 pb-28 md:py-8 md:pb-8">{children}</main>
