@@ -11,10 +11,12 @@ export interface StudySettings {
   newPerDay: number;
   /** Denní cíl v XP. */
   dailyGoal: number;
+  /** Ukazovat české překlady v roleplayi. */
+  showTranslations: boolean;
 }
 
 const KEY = 'ap:study-settings';
-const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10, dailyGoal: 40 };
+const defaults: StudySettings = { direction: 'pt-cs', autoplay: true, shuffle: true, newPerDay: 10, dailyGoal: 40, showTranslations: true };
 
 export const useStudySettings = (): [StudySettings, (patch: Partial<StudySettings>) => void] => {
   const [settings, setSettings] = useState<StudySettings>(() => loadJson(KEY, defaults));

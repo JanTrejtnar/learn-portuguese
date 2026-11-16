@@ -15,6 +15,7 @@ const nav: NavItem[] = [
   { label: 'Lekce', icon: '📚', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') },
   { label: 'Karty', icon: '🃏', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') },
   { label: 'Testy', icon: '✅', to: '/quiz', active: (p) => p.startsWith('/quiz') },
+  { label: 'Praxe', icon: '🎭', to: '/practice', active: (p) => ['/practice', '/roleplay', '/pairs', '/speak'].some((x) => p.startsWith(x)) },
   { label: 'Mapa', icon: '🗺️', to: '/map', active: (p) => p.startsWith('/map') },
   { label: 'Pokrok', icon: '📈', to: '/stats', active: (p) => p.startsWith('/stats') },
 ];

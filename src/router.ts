@@ -22,7 +22,7 @@ export const usePath = (): string => {
 export const href = (path: string): string => `#${path}`;
 
 export interface Match {
-  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'map' | 'notFound';
+  name: 'home' | 'unit' | 'lesson' | 'cards' | 'study' | 'free' | 'stats' | 'quizHub' | 'quiz' | 'map' | 'practice' | 'roleplayHub' | 'roleplay' | 'pairs' | 'speak' | 'notFound';
   params: Record<string, string>;
 }
 
@@ -40,6 +40,12 @@ export const matchRoute = (path: string): Match => {
   if (path === '/quiz') return { name: 'quizHub', params: {} };
   const quiz = /^\/quiz\/([\w-]+)$/.exec(path);
   if (quiz) return { name: 'quiz', params: { id: quiz[1]! } };
+  if (path === '/practice') return { name: 'practice', params: {} };
+  if (path === '/roleplay') return { name: 'roleplayHub', params: {} };
+  const rp = /^\/roleplay\/([\w-]+)$/.exec(path);
+  if (rp) return { name: 'roleplay', params: { id: rp[1]! } };
+  if (path === '/pairs') return { name: 'pairs', params: {} };
+  if (path === '/speak') return { name: 'speak', params: {} };
   if (path === '/map') return { name: 'map', params: {} };
   if (path === '/stats') return { name: 'stats', params: {} };
   return { name: 'notFound', params: {} };

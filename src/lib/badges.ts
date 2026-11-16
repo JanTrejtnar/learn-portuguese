@@ -13,6 +13,7 @@ export interface BadgeContext {
   totalUnits: number;
   goalDays: number;
   level: number;
+  scenariosDone: number;
 }
 
 export interface BadgeDef {
@@ -39,11 +40,15 @@ export const BADGES: BadgeDef[] = [
   { id: 'perfect', emoji: '💯', title: 'Perfeito!', desc: 'Test na 100 %.', earned: (c) => c.perfectTests >= 1 },
   { id: 'units-4', emoji: '🚋', title: 'A Meio Caminho', desc: 'Splněné testy 4 jednotek.', earned: (c) => c.unitTestsPassed >= 4 },
   { id: 'a1-done', emoji: '🎓', title: 'A1 Completo', desc: 'Splněné testy všech jednotek A1.', earned: (c) => c.totalUnits > 0 && c.unitTestsPassed >= c.totalUnits },
+  { id: 'actor', emoji: '🎭', title: 'Ator', desc: 'Dokončil jsi první roleplay scénář.', earned: (c) => c.scenariosDone >= 1 },
+  { id: 'actor-5', emoji: '🎬', title: 'Elenco Completo', desc: 'Dokončil jsi všech 5 roleplay scénářů.', earned: (c) => c.scenariosDone >= 5 },
   { id: 'level-5', emoji: '⭐', title: 'Conversador', desc: 'Dosáhl jsi 5. úrovně.', earned: (c) => c.level >= 5 },
 ];
 
 export const badgeContext = (p: Progress, unitIds: string[]): BadgeContext => {
-  const tests = [...p.tests.values()].filter((t) => t.passed && !t.skipped);
+  const passedAll = [...p.tests.values()].filter((t) => t.passed && !t.skipped);
+  // Výsledky scénářů se ukládají s předponou „rp:“ a nepočítají se jako testy lekcí.
+  const tests = passedAll.filter((t) => !t.id.startsWith('rp:'));
   const unitSet = new Set(unitIds);
   return {
     seen: p.cards.size,
@@ -55,6 +60,7 @@ export const badgeContext = (p: Progress, unitIds: string[]): BadgeContext => {
     totalUnits: unitIds.length,
     goalDays: [...p.days.values()].filter((d) => d.goalReached).length,
     level: levelInfo(totalXp(p.days)).level,
+    scenariosDone: passedAll.filter((t) => t.id.startsWith('rp:')).length,
   };
 };
 

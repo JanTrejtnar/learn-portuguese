@@ -4,6 +4,11 @@ import { HomePage } from './pages/HomePage';
 import { LessonPage } from './pages/LessonPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { MapPage } from './pages/MapPage';
+import { PairsPage } from './pages/PairsPage';
+import { PracticePage } from './pages/PracticePage';
+import { RoleplayHubPage } from './pages/RoleplayHubPage';
+import { RoleplayPage } from './pages/RoleplayPage';
+import { SpeakPage } from './pages/SpeakPage';
 import { QuizHubPage } from './pages/QuizHubPage';
 import { QuizPage } from './pages/QuizPage';
 import { StatsPage } from './pages/StatsPage';
@@ -25,6 +30,11 @@ export const App = () => {
       {route.name === 'free' && <StudyPage deckId={route.params.deck!} mode="free" />}
       {route.name === 'quizHub' && <QuizHubPage />}
       {route.name === 'quiz' && <QuizPage id={route.params.id!} />}
+      {route.name === 'practice' && <PracticePage />}
+      {route.name === 'roleplayHub' && <RoleplayHubPage />}
+      {route.name === 'roleplay' && <RoleplayPage id={route.params.id!} />}
+      {route.name === 'pairs' && <PairsPage />}
+      {route.name === 'speak' && <SpeakPage />}
       {route.name === 'map' && <MapPage />}
       {route.name === 'stats' && <StatsPage />}
       {route.name === 'notFound' && <NotFoundPage />}
