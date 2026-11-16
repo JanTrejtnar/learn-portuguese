@@ -209,6 +209,8 @@ await test('test: nápověda stojí mince a slovíčko se vrátí do opakování
   let used = false;
   for (let i = 0; i < 20 && !used; i++) {
     await page.waitForTimeout(400);
+    // Přiřazování párů skript neumí vyřešit a pořadí otázek je náhodné: načti nový test.
+    if (await page.getByText('Spoj portugalské výrazy').count()) { await page.reload(); continue; }
     if (await hint.count()) {
       await hint.first().click();
       used = true;
