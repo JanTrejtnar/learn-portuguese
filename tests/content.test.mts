@@ -107,7 +107,8 @@ test('PT-PT: žádná typicky brazilská slova ani tvary v obsahu, scénářích
   const { examples } = await import('../src/content/examples.ts');
   const { minimalPairs } = await import('../src/content/pairs.ts');
   // „vocês“ (množné vy) je v pořádku; gramatika smí varovat před slovem „você“ (výslovně vysvětleno jako nevhodné).
-  const corpus = JSON.stringify([units, scenarios, usage, examples, minimalPairs])
+  const { postcards } = await import('../src/content/postcards.ts');
+  const corpus = JSON.stringify([units, scenarios, usage, examples, minimalPairs, postcards])
     .toLowerCase()
     .replace(/vocês/g, '')
     .replace(/slovo „você“/g, '');
@@ -123,4 +124,14 @@ test('PT-PT: žádná typicky brazilská slova ani tvary v obsahu, scénářích
   }
   // gerundium po estar (v PT-PT: estar a + infinitiv)
   assert.ok(!/\b(estou|estás|está|estamos|estão|estava|estavam)\s+\w+ndo\b/.test(corpus), 'gerundium po estar');
+});
+
+test('sbírka: každá jednotka s městem má pohlednici a naopak', async () => {
+  const { postcards } = await import('../src/content/postcards.ts');
+  for (const u of units) {
+    assert.ok(u.city, `${u.id}: chybí město`);
+    const c = postcards[u.id];
+    assert.ok(c && c.fact.trim() && c.pt.trim() && c.cs.trim(), `${u.id}: chybí pohlednice`);
+  }
+  for (const id of Object.keys(postcards)) assert.ok(units.some((u) => u.id === id), `pohlednice pro neexistující jednotku ${id}`);
 });

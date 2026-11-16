@@ -215,7 +215,7 @@ const axeViolations = async (page) => {
 };
 
 await test('přístupnost (axe, WCAG AA): hlavní stránky ve světlém i tmavém režimu', async () => {
-  const routes = ['/', '/practice', '/stats', '/settings', '/shop', '/gramatika', '/cards', '/quiz', '/roleplay', '/pairs', '/map', '/unit/a1-u1', '/lesson/a1-u1-l1', '/cards/a1-u1-l1', '/quiz/a1-u1-l1', '/roleplay/hotel'];
+  const routes = ['/', '/practice', '/stats', '/settings', '/shop', '/collection', '/gramatika', '/cards', '/quiz', '/roleplay', '/pairs', '/map', '/unit/a1-u1', '/lesson/a1-u1-l1', '/cards/a1-u1-l1', '/quiz/a1-u1-l1', '/roleplay/hotel'];
   const bad = [];
   for (const dark of [false, true]) {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });

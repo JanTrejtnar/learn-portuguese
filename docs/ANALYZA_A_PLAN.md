@@ -282,3 +282,12 @@ Odhad: M1 S, M2 M, M3 L, M4 podle výběru. Navrhuji začít M1 a M2, pak se roz
 - Upozornění: malé nenápadné bubliny dole, jen odznak, denní cíl a zmrazení.
 - Šipka zpět místo drobečkové navigace. Zpráva o neověření rodilým mluvčím se uživateli nezobrazuje.
 - Dokončení karet nebo úspěšného testu: konfety a krátký zvuk (jde vypnout v Nastavení).
+
+## Další dávka (po UX úklidu)
+
+- **C3 příkladové věty:** nový soubor `src/content/examples.ts` (ID slovíčka → věta PT-PT + překlad), připojuje se přes `w()`. Pokryto 527 z 754 slovíček; zbylé jsou fráze a citoslovce, které samy tvoří větu. Čeká na revizi rodilým mluvčím.
+- **C4 scénáře:** přibyly Check-in v hotelu (A2.3), Na farmácia (A2.4), Pozvání po telefonu (A2.5), Pronájem bytu a Pracovní pohovor (A2.7).
+- **C5 kontrola PT-PT:** jeden test prochází obsah, scénáře, páry, vysvětlení, příklady i pohlednice a hledá typická brazilská slova a gerundium po „estar“.
+- **D1 přístupnost:** `axe-core` v E2E (WCAG 2 A/AA, 16 stránek, světlý i tmavý režim). Opraveno: kontrast šedého textu, zamčené karty a odznaky bez průhlednosti, vnořené ovládací prvky na kartě.
+- **M4 sbírka:** stránka „Sbírka pohlednic“ (z Pokroku). Za splněný test jednotky se odemkne pohlednice s městem, zajímavostí a větou s audiem (`src/content/postcards.ts`, bez ukládání, odvozeno z výsledků testů). Role „bonusových kapitol“ je tím naplněna; nápovědy v testech zatím ne.
+- **Nezařazeno:** vlastní nahrané audio (A1), revize rodilým mluvčím (C1).

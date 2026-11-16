@@ -81,6 +81,10 @@ export const StatsPage = () => {
         <span class="flex items-center gap-2 font-semibold"><Coin class="h-6 w-6" /> {balance(coinsEarned(progress, units).total, loadShop())} mincí</span>
         <span class="text-sm font-semibold text-brand-700 dark:text-brand-200">Obchod a avatar →</span>
       </a>
+      <a href="#/collection" class="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 shadow-soft hover:shadow-lift">
+        <span class="flex items-center gap-2 font-semibold"><span aria-hidden="true">📮</span> Sbírka pohlednic</span>
+        <span class="text-sm font-semibold text-brand-700 dark:text-brand-200">{units.filter((u) => progress.tests.get(u.id)?.passed).length} / {units.length} →</span>
+      </a>
 
       <div class="mt-4 rounded-2xl border border-line bg-surface p-4">
         <div class="font-semibold">Denní cíl: {xpToday(progress.days, now)} / {settings.dailyGoal} XP</div>

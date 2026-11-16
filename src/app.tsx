@@ -11,6 +11,7 @@ import { PracticePage } from './pages/PracticePage';
 import { RoleplayHubPage } from './pages/RoleplayHubPage';
 import { RoleplayPage } from './pages/RoleplayPage';
 import { ShopPage } from './pages/ShopPage';
+import { CollectionPage } from './pages/CollectionPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SpeakPage } from './pages/SpeakPage';
 import { QuizHubPage } from './pages/QuizHubPage';
@@ -43,6 +44,7 @@ export const App = () => {
       {route.name === 'grammarRef' && <GrammarRefPage />}
       {route.name === 'grammar' && <GrammarPage />}
       {route.name === 'shop' && <ShopPage />}
+      {route.name === 'collection' && <CollectionPage />}
       {route.name === 'speak' && <SpeakPage />}
       {route.name === 'map' && <MapPage />}
       {route.name === 'stats' && <StatsPage />}
