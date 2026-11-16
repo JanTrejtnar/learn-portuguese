@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
-import { Breadcrumb } from '../components/Breadcrumb';
+import { SessionBar } from '../components/SessionBar';
+import { BottomBar, bigBtn } from '../components/BottomBar';
 import { AudioButton } from '../components/AudioButton';
 import { BuildQuestion, ChoiceQuestion, MatchQuestion, TypingQuestion, type Answer } from '../components/QuizQuestions';
 import { Celebrate } from '../components/Celebrate';
@@ -103,7 +104,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const [results, setResults] = useState<QuestionResult[]>([]);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const saved = useRef(false);
-  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: string | null; xp: number; attempts: number } | null>(null);
+  const [outcome, setOutcome] = useState<{ passed: boolean; newlyUnlocked: { id: string; title: string } | null; xp: number; attempts: number } | null>(null);
   const [skippedNow, setSkippedNow] = useState(false);
 
   const q = questions[index];
@@ -145,7 +146,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       void saveCard(next);
     }
     let passed = ratio >= PASS_RATIO;
-    let newlyUnlocked: string | null = null;
+    let newlyUnlocked: { id: string; title: string } | null = null;
     let attempts = 0;
     let xp = correctCount * XP_PER_CORRECT_ANSWER;
     if (scope.graded) {
@@ -166,7 +167,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       attempts = result.attempts;
       progress.tests.set(scope.id, result);
       void saveTest(result);
-      if (scope.unlocks && !before && wasUnlocked(idx + 1)) newlyUnlocked = units[idx + 1]!.title;
+      if (scope.unlocks && !before && wasUnlocked(idx + 1)) newlyUnlocked = { id: units[idx + 1]!.id, title: units[idx + 1]!.title };
       passed = result.passed && ratio >= PASS_RATIO;
     }
     const award = awardXp(progress.days, now, xp, settings.dailyGoal);
@@ -189,6 +190,9 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     setSkippedNow(true);
   };
 
+  // Nově odemčená jednotka (výsledkem testu, nebo ručně po třech neúspěších) – nabídne se prokliknutí
+  const unlockedNext = outcome?.newlyUnlocked ?? (skippedNow && nextUnit ? { id: nextUnit.id, title: nextUnit.title } : null);
+
   const retry = () => {
     saved.current = false;
     closed.current = null;
@@ -203,17 +207,13 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
   const q2 = q;
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: scope.back.label, to: scope.back.to }, { label: scope.title }]} />
+      <SessionBar exitTo={scope.back.to} confirm={!finished} progress={questions.length ? Math.min(1, index / questions.length) : 0}
+        counter={!finished && q2 ? `${index + 1} / ${questions.length}` : undefined}
+        note={scope.graded ? 'Rozdělaný test se nezapočítá.' : 'Rozdělaný kvíz se nezapočítá.'} />
       <VoiceWarning />
 
       {!finished && q2 && (
         <>
-          <div class="mb-5">
-            <div class="h-2 overflow-hidden rounded-full bg-track">
-              <div class="h-full bg-brand-500 transition-all" style={{ width: `${(index / questions.length) * 100}%` }} />
-            </div>
-            <p class="mt-1 text-right text-xs text-muted">Otázka {index + 1} / {questions.length}</p>
-          </div>
 
           <div key={q2.id}>
             {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
@@ -236,20 +236,22 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
           )}
 
           {answer && (
-            <div role="status" class={`mt-5 rounded-2xl p-4 ${answer.correct ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100' : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'}`}>
-              <p class="font-bold">{answer.correct ? '✅ Správně!' : '❌ Chyba'}</p>
-              {answer.note && <p class="mt-1 text-sm">{answer.note}</p>}
-              {!answer.correct && q2.kind !== 'typing' && q2.kind !== 'dictation' && correctText(q2, answer.missed) && (
-                <p class="mt-1 flex items-center gap-2 text-sm">
-                  Správně:
-                  <b lang={q2.kind === 'pt-to-cs' ? 'cs' : 'pt-PT'}>{correctText(q2, answer.missed)}</b>
-                  {q2.kind !== 'match' && q2.kind !== 'pt-to-cs' && q2.kind !== 'cloze' && <AudioButton text={correctText(q2)} />}
-                </p>
-              )}
-              <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-                {index + 1 === questions.length ? 'Zobrazit výsledek' : 'Další'}
-              </button>
-            </div>
+            <BottomBar tone={answer.correct ? 'right' : 'wrong'}>
+              <div role="status">
+                <p class="font-bold">{answer.correct ? '✅ Správně!' : '❌ Chyba'}</p>
+                {answer.note && <p class="mt-1 text-sm">{answer.note}</p>}
+                {!answer.correct && q2.kind !== 'typing' && q2.kind !== 'dictation' && correctText(q2, answer.missed) && (
+                  <p class="mt-1 flex items-center gap-2 text-sm">
+                    Správně:
+                    <b lang={q2.kind === 'pt-to-cs' ? 'cs' : 'pt-PT'}>{correctText(q2, answer.missed)}</b>
+                    {q2.kind !== 'match' && q2.kind !== 'pt-to-cs' && q2.kind !== 'cloze' && <AudioButton text={q2.kind === 'build' ? q2.sentence : correctText(q2)} />}
+                  </p>
+                )}
+                <button type="button" onClick={next} class={`${bigBtn} mt-3`}>
+                  {index + 1 === questions.length ? 'Zobrazit výsledek' : 'Další'}
+                </button>
+              </div>
+            </BottomBar>
           )}
         </>
       )}
@@ -264,7 +266,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             {scope.graded ? (
               ratio >= PASS_RATIO ? (
                 <p class="mt-3 font-semibold text-green-700 dark:text-green-400">
-                  Test splněn!{outcome?.newlyUnlocked ? ` Odemčena jednotka „${outcome.newlyUnlocked}“ 🔓` : ''}
+                  {scope.unlocks ? 'Jednotka dokončena!' : 'Test splněn!'}{outcome?.newlyUnlocked ? ` Odemčena jednotka „${outcome.newlyUnlocked.title}“ 🔓` : ''}
                 </p>
               ) : (
                 <p class="mt-3 font-semibold text-amber-700 dark:text-amber-400">Na splnění je potřeba aspoň {Math.round(PASS_RATIO * 100)} %. Zkus to znovu!</p>
@@ -281,11 +283,19 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             )}
             {skippedNow && nextUnit && <p class="mt-3 text-sm font-semibold text-green-700 dark:text-green-400">Odemčena jednotka „{nextUnit.title}“ 🔓</p>}
             {outcome && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{outcome.xp} XP ⭐</p>}
-            <div class="mt-5 flex flex-wrap justify-center gap-3">
-              <button type="button" onClick={retry} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Nový pokus</button>
-              <a href={href('/quiz')} class="rounded-xl border border-line-strong px-4 py-2.5 font-semibold">Přehled testů</a>
-            </div>
           </div>
+          <BottomBar>
+            <div class="grid gap-2">
+              {unlockedNext && (
+                <a href={href(`/unit/${unlockedNext.id}`)} class={bigBtn}>Pokračovat: {unlockedNext.title} →</a>
+              )}
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onClick={retry} class={`min-h-12 rounded-xl px-4 py-3 font-bold ${unlockedNext ? 'border border-line-strong' : 'col-span-2 bg-brand-700 text-white shadow-soft'}`}>Nový pokus</button>
+                {unlockedNext && <a href={href(scope.back.to)} class="flex min-h-12 items-center justify-center rounded-xl border border-line-strong px-4 py-3 font-bold">Zpět</a>}
+                {!unlockedNext && <a href={href(scope.back.to)} class="col-span-2 flex min-h-12 items-center justify-center rounded-xl border border-line-strong px-4 py-3 font-bold">Zpět</a>}
+              </div>
+            </div>
+          </BottomBar>
 
           {results.some((r) => !r.correct) && (
             <section class="mt-8">

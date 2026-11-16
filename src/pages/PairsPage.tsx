@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
 import { AudioButton } from '../components/AudioButton';
-import { Breadcrumb } from '../components/Breadcrumb';
+import { SessionBar } from '../components/SessionBar';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { minimalPairs } from '../content/pairs';
 import { speak } from '../lib/audio';
@@ -22,7 +22,7 @@ export const PairsPage = () => {
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Minimální páry' }]} />
+      <SessionBar exitTo="/practice" confirm={false} />
       <h1 class="text-2xl font-bold">Minimální páry 👂</h1>
       <p class="mt-1 text-ink-soft">Slova, která se liší jediným zvukem. Naučit se je rozlišit je klíč k dobré výslovnosti.</p>
       <VoiceWarning />

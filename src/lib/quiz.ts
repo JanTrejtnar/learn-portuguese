@@ -26,6 +26,8 @@ export interface ChoiceQ extends Base {
   hint?: string;
   /** Text k přečtení nahlas (PT). */
   audio?: string;
+  /** České znění slovíčka (po vyhodnocení poslechu). */
+  cs?: string;
   options: string[];
   optionsLang: 'pt' | 'cs';
   answer: number;
@@ -52,6 +54,8 @@ export const tokenKey = (t: string): string => t.toLowerCase().replace(/[^\p{L}\
 export interface BuildQ extends Base {
   kind: 'build';
   prompt: string;
+  /** Původní věta včetně interpunkce (ukáže se po vyhodnocení). */
+  sentence: string;
   tokens: string[];
   bank: string[];
 }
@@ -90,6 +94,16 @@ export const checkTyped = (input: string, accepted: string[]): TypedVerdict => {
   const loose = stripMarks(given);
   return norm.some((a) => stripMarks(a) === loose) ? 'diacritics' : 'wrong';
 };
+
+/** Slovíčko s variantami („obrigado / obrigada“): v poslechu a diktátu se použije jen první. */
+export const oneVariant = (pt: string): string => pt.split(/\s*\/\s*/)[0]!.trim();
+
+/** Token do skládání věty: bez interpunkce a bez velkého písmene na začátku (nenapovídá). */
+export const bareToken = (t: string): string => t.replace(/[.,!?…¿¡;:"„“”()]/g, '');
+
+/** Rozdělí větu na slova do banky: bez interpunkce, první slovo malým písmenem. */
+export const splitSentence = (pt: string): string[] =>
+  pt.split(/\s+/).map((t, i) => (i === 0 ? bareToken(t).toLowerCase() : bareToken(t))).filter(Boolean);
 
 const ARTICLE = /^(o|a|os|as|um|uma)\s+/i;
 
@@ -171,14 +185,15 @@ const pickDistractors = (word: Word, text: (w: Word) => string, scope: Word[], p
 
 const choice = (kind: ChoiceQ['kind'], word: Word, scope: Word[], pool: Word[], rng: Rng, id: string): ChoiceQ => {
   const toPt = kind !== 'pt-to-cs';
-  const text = (w: Word) => (toPt ? w.pt : w.cs);
+  const text = (w: Word) => (kind === 'listen' ? oneVariant(w.pt) : toPt ? w.pt : w.cs);
   const options = shuffle([text(word), ...pickDistractors(word, text, scope, pool, rng, toPt)], rng);
   return {
     id,
     kind,
     wordIds: [word.id],
     prompt: kind === 'pt-to-cs' ? word.pt : kind === 'cs-to-pt' ? word.cs : '',
-    audio: kind === 'cs-to-pt' ? undefined : word.pt,
+    audio: kind === 'cs-to-pt' ? undefined : kind === 'listen' ? oneVariant(word.pt) : word.pt,
+    cs: word.cs,
     options,
     optionsLang: toPt ? 'pt' : 'cs',
     answer: options.indexOf(text(word)),
@@ -189,10 +204,10 @@ const choice = (kind: ChoiceQ['kind'], word: Word, scope: Word[], pool: Word[], 
 export const typingQuestion = (word: Word, pool: Word[], kind: TypingQ['kind'], id: string): TypingQ => ({
   id, kind, wordIds: [word.id],
   prompt: kind === 'typing' ? word.cs : '',
-  audio: kind === 'dictation' ? word.pt : undefined,
+  audio: kind === 'dictation' ? oneVariant(word.pt) : undefined,
   // Uznej i jiná slovíčka se stejným překladem (např. dvě různé správné fráze pro „Kolik to stojí?“).
   accepted: [...new Set([word.pt, ...pool.filter((x) => key(x.cs) === key(word.cs)).map((x) => x.pt)].flatMap(answerVariants))],
-  display: word.pt,
+  display: kind === 'dictation' ? oneVariant(word.pt) : word.pt,
   cs: word.cs,
 });
 
@@ -228,8 +243,8 @@ export const generateQuiz = (opts: GenerateOptions): Question[] => {
   // Skládání vět
   const nBuild = Math.min(sentences.length, Math.ceil(count / 5));
   for (const s of shuffle(sentences, rng).slice(0, nBuild)) {
-    const tokens = s.pt.split(/\s+/);
-    const others = sentences.filter((o) => o.pt !== s.pt).flatMap((o) => o.pt.split(/\s+/));
+    const tokens = splitSentence(s.pt);
+    const others = sentences.filter((o) => o.pt !== s.pt).flatMap((o) => splitSentence(o.pt));
     const used = new Set(tokens.map(tokenKey));
     const seenKeys = new Set<string>();
     const extras = shuffle([...new Set(others)], rng)
@@ -240,7 +255,7 @@ export const generateQuiz = (opts: GenerateOptions): Question[] => {
         return true;
       })
       .slice(0, 2);
-    questions.push({ id: nextId(), kind: 'build', wordIds: s.wordId ? [s.wordId] : [], prompt: s.cs, tokens, bank: shuffle([...tokens, ...extras], rng) });
+    questions.push({ id: nextId(), kind: 'build', wordIds: s.wordId ? [s.wordId] : [], prompt: s.cs, sentence: s.pt, tokens, bank: shuffle([...tokens, ...extras], rng) });
   }
 
   // Doplňování vět (gramatika)
@@ -295,7 +310,7 @@ export const correctText = (q: Question, missed: string[] = []): string => {
     case 'cloze': return q.options[q.answer]!;
     case 'typing':
     case 'dictation': return q.display;
-    case 'build': return q.tokens.join(' ');
+    case 'build': return q.sentence;
     case 'match': return q.pairs.filter((p) => missed.includes(p.id)).map((p) => `${p.pt} = ${p.cs}`).join(' · ');
   }
 };

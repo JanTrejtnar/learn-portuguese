@@ -3,6 +3,7 @@ import { speak } from '../lib/audio';
 import { useKeydown } from '../lib/useKeydown';
 import { checkTyped, tokenKey, type BuildQ, type ChoiceQ, type MatchQ, type QuestionResult, type TypingQ } from '../lib/quiz';
 import { AudioButton } from './AudioButton';
+import { BottomBar, bigBtn } from './BottomBar';
 
 export type Answer = Pick<QuestionResult, 'correct' | 'given' | 'missed' | 'note'>;
 
@@ -54,6 +55,13 @@ export const ChoiceQuestion = ({ q, answer, onAnswer }: Props<ChoiceQ>) => {
           </>
         )}
       </div>
+      {answer && q.kind === 'listen' && q.cs && (
+        <p class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
+          <b lang="pt-PT">{q.options[q.answer]}</b>
+          <AudioButton text={q.audio!} />
+          <span class="text-muted">= {q.cs}</span>
+        </p>
+      )}
       <ul class="grid gap-2">
         {q.options.map((opt, i) => {
           const state = !answer ? 'idle' : i === q.answer ? 'right' : opt === answer.given ? 'wrong' : 'dim';
@@ -109,7 +117,7 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
       <div class="mb-5 flex items-center gap-3">
         {q.kind === 'typing' ? <span class="text-3xl font-bold">{q.prompt}</span> : <AudioButton text={q.audio!} size="md" withSlow />}
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); submit(); }} class="flex gap-2">
+      <form id="typing-form" onSubmit={(e) => { e.preventDefault(); submit(); }} class="flex gap-2">
         <input
           ref={ref}
           autoFocus
@@ -123,8 +131,10 @@ export const TypingQuestion = ({ q, answer, onAnswer }: Props<TypingQ>) => {
           placeholder="Tvoje odpověď…"
           class="min-w-0 flex-1 rounded-xl border-2 border-line bg-surface px-4 py-3 text-lg disabled:opacity-60"
         />
-        {!answer && <button type="submit" class="rounded-xl bg-brand-700 px-5 font-semibold text-white hover:bg-brand-600">Zkontrolovat</button>}
       </form>
+      {!answer && (
+        <BottomBar><button type="submit" form="typing-form" class={bigBtn}>Zkontrolovat</button></BottomBar>
+      )}
       {answer && (
         <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
           <b lang="pt-PT">{q.display}</b>
@@ -228,7 +238,7 @@ export const BuildQuestion = ({ q, answer, onAnswer }: Props<BuildQ>) => {
         ))}
       </div>
       {!answer && (
-        <button type="button" onClick={check} disabled={picked.length === 0} class="mt-5 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600 disabled:opacity-40">Zkontrolovat</button>
+        <BottomBar><button type="button" onClick={check} disabled={picked.length === 0} class={bigBtn}>Zkontrolovat</button></BottomBar>
       )}
     </div>
   );

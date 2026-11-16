@@ -80,7 +80,7 @@ export interface TestScope {
 
 export const getTestScope = (id: string): TestScope | undefined => {
   const unit = getUnit(id);
-  if (unit) return { id, kind: 'unit', title: `Test jednotky ${unitCode(unit)}: ${unit.title}`, unitId: unit.id, lessons: unit.lessons, words: unit.lessons.flatMap((l) => l.words) };
+  if (unit) return { id, kind: 'unit', title: `Dokončit jednotku ${unitCode(unit)}: ${unit.title}`, unitId: unit.id, lessons: unit.lessons, words: unit.lessons.flatMap((l) => l.words) };
   const found = getLesson(id);
   if (found) return { id, kind: 'lesson', title: `Test lekce: ${found.lesson.title}`, unitId: found.unit.id, lessons: [found.lesson], words: found.lesson.words };
   return undefined;

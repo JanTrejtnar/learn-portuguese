@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact';
-import { href } from '../router';
+import { href, isFocusRoute } from '../router';
 import { Icon } from './Icon';
 import { Logo } from './Logo';
 import { ToastHost } from './ToastHost';
@@ -43,7 +43,19 @@ const TabLink = ({ item, path }: { item: NavItem; path: string }) => {
   );
 };
 
-export const Layout = ({ path, children }: { path: string; children: ComponentChildren }) => (
+export const Layout = ({ path, children }: { path: string; children: ComponentChildren }) => {
+  if (isFocusRoute(path)) {
+    return (
+      <div class="min-h-full">
+        <div class="flag-stripe fixed inset-x-0 top-0 z-40 h-1" aria-hidden="true" />
+        <main id="obsah" tabIndex={-1} class="mx-auto max-w-xl px-4 pb-56 pt-4 outline-none md:pt-8">
+          <div key={path} class="page-in">{children}</div>
+        </main>
+        <ToastHost path={path} />
+      </div>
+    );
+  }
+  return (
   <div class="min-h-full">
     <a href="#obsah" class="skip-link" onClick={(e) => { e.preventDefault(); document.getElementById('obsah')?.focus(); }}>Přeskočit na obsah</a>
     <div class="flag-stripe fixed inset-x-0 top-0 z-40 h-1" aria-hidden="true" />
@@ -65,7 +77,7 @@ export const Layout = ({ path, children }: { path: string; children: ComponentCh
           <div class="mt-auto flex items-center gap-1">
             <a href={href('/settings')} aria-label="Nastavení" aria-current={path === '/settings' ? 'page' : undefined}
               class={`flex h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold ${path === '/settings' ? 'bg-brand-700 text-white' : 'text-ink-soft hover:bg-surface-2'}`}>
-              <Icon name="sliders" class="h-5 w-5" />Nastavení
+              <Icon name="gear" class="h-5 w-5" />Nastavení
             </a>
           </div>
         </div>
@@ -80,7 +92,7 @@ export const Layout = ({ path, children }: { path: string; children: ComponentCh
           </a>
           <div class="flex items-center">
             <a href={href('/settings')} aria-label="Nastavení" class="flex h-11 w-11 items-center justify-center rounded-full text-ink-soft hover:bg-surface-2">
-              <Icon name="sliders" class="h-5 w-5" />
+              <Icon name="gear" class="h-5 w-5" />
             </a>
           </div>
         </header>
@@ -98,4 +110,5 @@ export const Layout = ({ path, children }: { path: string; children: ComponentCh
       {nav.map((item) => <TabLink key={item.to} item={item} path={path} />)}
     </nav>
   </div>
-);
+  );
+};

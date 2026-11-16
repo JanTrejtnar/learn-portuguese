@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
-import { Breadcrumb } from '../components/Breadcrumb';
+import { SessionBar } from '../components/SessionBar';
+import { BottomBar, bigBtn } from '../components/BottomBar';
 import { Celebrate } from '../components/Celebrate';
 import { Flashcard } from '../components/Flashcard';
 import { TypingQuestion, type Answer } from '../components/QuizQuestions';
@@ -48,7 +49,7 @@ interface SessionProps {
   progress: Progress;
 }
 
-const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
+const Session = ({ deckId, words, mode, progress }: SessionProps) => {
   const [settings] = useStudySettings();
   const srs = mode === 'srs';
   const cards = useRef(progress.cards); // průběžně aktualizovaný stav karet
@@ -175,7 +176,8 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: title }]} />
+      <SessionBar exitTo="/practice" confirm={!sessionDone && !nothingToDo} progress={total > 0 ? Math.min(1, done / total) : undefined}
+        counter={total > 0 ? `${done} / ${total}` : undefined} note={srs ? 'Co jsi už ohodnotil(a), zůstane uložené.' : 'Volné procvičování se neukládá.'} />
       <VoiceWarning />
 
       {!srs && <p class="mb-3 text-xs text-muted">Volné procvičování (pokrok se neukládá)</p>}
@@ -186,29 +188,16 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
         </p>
       )}
 
-      {total > 0 && (
-        <div class="mb-4" aria-label={`Hotovo ${done} z ${total}`}>
-          <div class="h-2 overflow-hidden rounded-full bg-track">
-            <div class="h-full bg-brand-500 transition-all" style={{ width: `${(done / total) * 100}%` }} />
-          </div>
-          <p class="mt-1 text-right text-xs text-muted">{done} / {total}</p>
-        </div>
-      )}
-
       {current && variant && recallQ && (
         <div>
           <div class="rounded-3xl border border-line bg-surface p-5 shadow-soft">
             <TypingQuestion key={recallQ.id} q={recallQ} answer={recallAns} onAnswer={setRecallAns} />
-            {recallAns && (
-              <div class={`mt-4 rounded-xl p-3 text-sm ${recallAns.correct ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100' : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'}`} role="status">
-                <p class="font-semibold">{recallAns.correct ? (recallAns.note ?? 'Správně!') : 'Zatím ne.'}</p>
-              </div>
-            )}
           </div>
           {recallAns ? (
-            <button type="button" onClick={() => rate(recallAns.correct ? 'good' : 'again', true)} class="mt-4 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-              Další
-            </button>
+            <BottomBar tone={recallAns.correct ? 'right' : 'wrong'}>
+              <p class="mb-2 font-bold">{recallAns.correct ? (recallAns.note ?? '✅ Správně!') : '❌ Zatím ne.'}</p>
+              <button type="button" onClick={() => rate(recallAns.correct ? 'good' : 'again', true)} class={bigBtn}>Další</button>
+            </BottomBar>
           ) : (
             <button type="button" onClick={() => setNoTyping(true)} class="mt-3 text-xs text-muted underline">Dnes bez psaní (jen otáčet karty)</button>
           )}
@@ -225,12 +214,12 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
             </div>
           )}
           {learning ? (
-            <div class="mt-4">
-              <p class="mb-2 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm"><b>Nové slovíčko.</b> Prohlédni si ho a poslechni výslovnost. Za chvíli se tě na něj zeptám.</p>
-              <button type="button" onClick={learnNext} class="w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">Rozumím, dál</button>
-            </div>
+            <>
+              <p class="mt-4 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm"><b>Nové slovíčko.</b> Prohlédni si ho a poslechni výslovnost. Za chvíli se tě na něj zeptám.</p>
+              <BottomBar><button type="button" onClick={learnNext} class={bigBtn}>Rozumím, dál</button></BottomBar>
+            </>
           ) : flipped ? (
-            <div class="mt-4">
+            <BottomBar>
               <div class="grid grid-cols-2 gap-2">
                 {ratings.map((r) => (
                   <button key={r.id} type="button" onClick={() => rate(r.id)} class={`min-h-14 rounded-xl px-2 py-3 text-base font-bold shadow-soft ${r.tone}`}>
@@ -238,11 +227,9 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
                   </button>
                 ))}
               </div>
-            </div>
+            </BottomBar>
           ) : (
-            <button type="button" onClick={() => setFlipped(true)} class="mt-4 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-              Otočit
-            </button>
+            <BottomBar><button type="button" onClick={() => setFlipped(true)} class={bigBtn}>Otočit</button></BottomBar>
           )}
         </>
       )}

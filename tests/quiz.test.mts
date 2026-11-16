@@ -118,3 +118,28 @@ test('rozdělení variant pro audio: lomítko dělá pauzu', async () => {
   assert.deepEqual(speechParts('divertido / divertida'), ['divertido', 'divertida']);
   assert.deepEqual(speechParts('Chamo-me…'), ['Chamo-me']);
 });
+
+test('poslech a diktát: jen jedna varianta (ne „obrigado / obrigada“)', () => {
+  const only = [words[6]!, words[0]!, words[1]!, words[2]!];
+  for (let i = 0; i < 80; i++) {
+    for (const q of generateQuiz({ words: only, pool: words, sentences: [], count: 4, audio: true })) {
+      if (q.kind === 'listen') {
+        assert.ok(q.options.every((o) => !o.includes('/')), 'možnosti poslechu bez lomítka');
+        assert.ok(!q.audio!.includes('/'));
+        assert.ok(q.cs);
+      }
+      if (q.kind === 'dictation') assert.ok(!q.audio!.includes('/') && !q.display.includes('/'));
+    }
+  }
+});
+
+test('skládání věty: slova bez interpunkce a bez velkého prvního písmene', () => {
+  const qs = generateQuiz({ words, pool: words, sentences, count: 8, audio: false }).filter((q) => q.kind === 'build');
+  assert.ok(qs.length > 0);
+  for (const q of qs) {
+    if (q.kind !== 'build') continue;
+    assert.ok(q.bank.every((t) => !/[.,!?…]/.test(t)), 'bez interpunkce');
+    assert.ok(q.tokens[0] === q.tokens[0]!.toLowerCase());
+    assert.ok(q.sentence.endsWith('.'));
+  }
+});

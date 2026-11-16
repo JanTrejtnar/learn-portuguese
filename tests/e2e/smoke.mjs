@@ -128,6 +128,26 @@ await test('mapa: detail města je dialog přes mapu, zavře se křížkem i Esc
   await ctx.close();
 });
 
+await test('cvičení: bez spodní navigace, křížek se ptá na potvrzení, hlavní akce je dole', async () => {
+  const { page, ctx } = await newPage(true);
+  await page.goto(base + '#/cards/a1-u1-l1');
+  await page.getByRole('button', { name: 'Opustit cvičení' }).waitFor();
+  assert.equal(await page.getByRole('navigation', { name: 'Hlavní navigace' }).count(), 0);
+  assert.equal(await page.getByRole('link', { name: /Procvičit/ }).count(), 0);
+  const btn = page.getByRole('button', { name: /Rozumím|Otočit/ }).last();
+  await btn.waitFor();
+  const box = await btn.boundingBox();
+  assert.ok(box.y + box.height > 844 - 120, 'tlačítko je ve spodní části: ' + JSON.stringify(box));
+  await page.getByRole('button', { name: 'Opustit cvičení' }).click();
+  await page.getByRole('dialog').waitFor();
+  await page.getByRole('button', { name: 'Zůstat' }).click();
+  await page.getByRole('dialog').waitFor({ state: 'detached' });
+  await page.getByRole('button', { name: 'Opustit cvičení' }).click();
+  await page.getByRole('button', { name: 'Odejít' }).click();
+  await page.waitForURL(/#\/practice/);
+  await ctx.close();
+});
+
 await test('obchod: zůstatek 0, nákup zamčený, nasazení motivu přes uložený stav', async () => {
   const { page, errors, ctx } = await newPage(true);
   await page.goto(base + '#/shop');

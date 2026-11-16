@@ -1,68 +1,101 @@
-/** Krátké zvuky bez audio souborů (WebAudio). Selhání je tiché, zvuky jdou vypnout v Nastavení. */
+/** Krátké zvuky generované v kódu (WAV přes <audio>). Selhání je tiché, zvuky jdou vypnout v Nastavení. */
 import { loadJson } from './storage';
-
-let ctx: AudioContext | undefined;
 
 const soundsOn = (): boolean => loadJson<{ sounds?: boolean }>('ap:study-settings', {}).sounds !== false;
 
-const getCtx = (): AudioContext | undefined => {
+interface Note { f: number; at: number; len: number; vol?: number; type?: 'sine' | 'triangle' }
+
+const RATE = 22050;
+
+/** Zvuk se předem „vyrenderuje“ do WAV a přehrává přes <audio>: to funguje i na iPhonu s vypnutým zvonkem
+ *  (WebAudio se tam ztlumí) a po prvním dotyku bez dalších triků. */
+const renderWav = (notes: Note[]): string => {
+  const total = Math.max(...notes.map((n) => n.at + n.len)) + 0.1;
+  const n = Math.ceil(total * RATE);
+  const data = new Float32Array(n);
+  for (const note of notes) {
+    const start = Math.floor(note.at * RATE);
+    const len = Math.floor(note.len * RATE);
+    const vol = note.vol ?? 0.5;
+    for (let i = 0; i < len && start + i < n; i++) {
+      const t = i / RATE;
+      const ph = 2 * Math.PI * note.f * t;
+      const wave = note.type === 'sine' ? Math.sin(ph) : (2 / Math.PI) * Math.asin(Math.sin(ph));
+      const env = Math.min(1, t / 0.015) * Math.exp((-3.2 * i) / len);
+      data[start + i]! += wave * env * vol;
+    }
+  }
+  const buf = new ArrayBuffer(44 + n * 2);
+  const v = new DataView(buf);
+  const str = (o: number, t: string) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+  str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVE'); str(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, RATE, true); v.setUint32(28, RATE * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, 'data'); v.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, data[i]!)) * 32767, true);
+  return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+};
+
+const cache = new Map<string, HTMLAudioElement>();
+
+const SOUNDS: Record<string, Note[]> = {
+  chime: [
+    { f: 523.25, at: 0, len: 0.3 }, { f: 659.25, at: 0.14, len: 0.3 }, { f: 783.99, at: 0.28, len: 0.3 },
+    { f: 1046.5, at: 0.42, len: 1.0, vol: 0.55 }, { f: 1318.5, at: 0.42, len: 1.0, vol: 0.25 },
+  ],
+  correct: [{ f: 880, at: 0, len: 0.18, vol: 0.6 }, { f: 1318.5, at: 0.1, len: 0.34, vol: 0.6 }],
+  wrong: [{ f: 330, at: 0, len: 0.2, type: 'sine', vol: 0.5 }, { f: 247, at: 0.14, len: 0.36, type: 'sine', vol: 0.5 }],
+};
+
+const element = (name: string): HTMLAudioElement | undefined => {
   try {
-    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AC) return undefined;
-    ctx ??= new AC();
-    if (ctx.state === 'suspended') void ctx.resume();
-    return ctx;
+    let a = cache.get(name);
+    if (!a) {
+      a = new Audio(renderWav(SOUNDS[name]!));
+      a.preload = 'auto';
+      cache.set(name, a);
+    }
+    return a;
   } catch {
     return undefined;
   }
 };
 
-/** Prohlížeče pustí zvuk až po prvním dotyku; tohle kontext „odemkne“ hned při první interakci. */
+/** Prohlížeče pustí zvuk až po prvním dotyku; při první interakci přehrávače „odemkneme“ (tiše). */
 export const unlockAudio = (): void => {
   const go = () => {
-    getCtx();
     window.removeEventListener('pointerdown', go);
     window.removeEventListener('keydown', go);
+    for (const name of Object.keys(SOUNDS)) {
+      const a = element(name);
+      if (!a) continue;
+      a.muted = true;
+      void a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; });
+    }
   };
   window.addEventListener('pointerdown', go);
   window.addEventListener('keydown', go);
 };
 
-interface Note { f: number; at: number; len: number; vol?: number; type?: OscillatorType }
-
-const play = (notes: Note[]): void => {
+const play = (name: string): void => {
   if (!soundsOn()) return;
-  const c = getCtx();
-  if (!c) return;
+  const a = element(name);
+  if (!a) return;
   try {
-    const t0 = c.currentTime + 0.03;
-    for (const n of notes) {
-      const osc = c.createOscillator();
-      const gain = c.createGain();
-      osc.type = n.type ?? 'triangle';
-      osc.frequency.value = n.f;
-      const start = t0 + n.at;
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(n.vol ?? 0.18, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + n.len);
-      osc.connect(gain).connect(c.destination);
-      osc.start(start);
-      osc.stop(start + n.len + 0.05);
-    }
+    a.muted = false;
+    a.volume = 1;
+    a.currentTime = 0;
+    void a.play().catch(() => undefined);
   } catch {
     /* zvuk je bonus */
   }
 };
 
 /** Dokončení lekce / testu: stoupající fanfára. */
-export const playChime = (): void =>
-  play([
-    { f: 523.25, at: 0, len: 0.25 }, { f: 659.25, at: 0.12, len: 0.25 }, { f: 783.99, at: 0.24, len: 0.25 },
-    { f: 1046.5, at: 0.36, len: 0.9, vol: 0.22 }, { f: 1318.5, at: 0.36, len: 0.9, vol: 0.1 },
-  ]);
+export const playChime = (): void => play('chime');
 
 /** Správná odpověď: veselé „ding“. */
-export const playCorrect = (): void => play([{ f: 880, at: 0, len: 0.14 }, { f: 1318.5, at: 0.09, len: 0.28 }]);
+export const playCorrect = (): void => play('correct');
 
-/** Špatná odpověď: jemné, nepříjemně neznějící klesnutí. */
-export const playWrong = (): void => play([{ f: 330, at: 0, len: 0.16, type: 'sine', vol: 0.16 }, { f: 247, at: 0.12, len: 0.3, type: 'sine', vol: 0.16 }]);
+/** Špatná odpověď: jemné klesnutí. */
+export const playWrong = (): void => play('wrong');

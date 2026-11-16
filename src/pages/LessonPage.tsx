@@ -36,7 +36,7 @@ export const LessonPage = ({ id }: { id: string }) => {
         <a href={href(`/quiz/${lesson.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-brand-700 px-4 py-2 font-semibold text-brand-700 dark:text-brand-100">Test lekce</a>
         {nextLesson
           ? <a href={href(`/lesson/${nextLesson.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 py-2 font-semibold">Další →</a>
-          : <a href={href(`/quiz/${unit.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 py-2 font-semibold">🏆 Test jednotky →</a>}
+          : <a href={href(`/quiz/${unit.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 py-2 font-semibold">🏆 Dokončit jednotku →</a>}
       </div>
 
       {tabs.length > 1 && (

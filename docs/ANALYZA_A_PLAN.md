@@ -291,3 +291,12 @@ Odhad: M1 S, M2 M, M3 L, M4 podle výběru. Navrhuji začít M1 a M2, pak se roz
 - **D1 přístupnost:** `axe-core` v E2E (WCAG 2 A/AA, 16 stránek, světlý i tmavý režim). Opraveno: kontrast šedého textu, zamčené karty a odznaky bez průhlednosti, vnořené ovládací prvky na kartě.
 - **M4 sbírka:** stránka „Sbírka pohlednic“ (z Pokroku). Za splněný test jednotky se odemkne pohlednice s městem, zajímavostí a větou s audiem (`src/content/postcards.ts`, bez ukládání, odvozeno z výsledků testů). Role „bonusových kapitol“ je tím naplněna; nápovědy v testech zatím ne.
 - **Nezařazeno:** vlastní nahrané audio (A1), revize rodilým mluvčím (C1).
+
+## Soustředěný režim cvičení a další úpravy (UX)
+- Cvičení (karty, kvíz, gramatika, scénáře, páry, mluvení) běží bez hlavní navigace a záhlaví: jen křížek s potvrzením „Opravdu chceš odejít?“ a pruh postupu.
+- Hlavní akce (Zkontrolovat, Další, hodnocení karty) i zpětná vazba jsou ve spodní liště (`BottomBar`).
+- Poslech a diktát čtou jen jednu variantu („obrigado“, ne „obrigado / obrigada“); po poslechu se ukáže český překlad.
+- Skládání vět: slova bez interpunkce a bez velkého prvního písmene.
+- „Test jednotky“ → „Dokončit jednotku“; po dokončení nabídka prokliku na nově odemčenou jednotku.
+- Zvuky se renderují do WAV a hrají přes `<audio>` (funguje i na iPhonu s vypnutým zvonkem).
+- Mapa na jednu obrazovku s přesnějším obrysem; ikona ozubeného kola pro Nastavení.

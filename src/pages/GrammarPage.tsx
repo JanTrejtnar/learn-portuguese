@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { units, unitUnlocked } from '../content';
 import { AudioButton } from '../components/AudioButton';
-import { Breadcrumb } from '../components/Breadcrumb';
+import { SessionBar } from '../components/SessionBar';
+import { BottomBar, bigBtn } from '../components/BottomBar';
 import { Loading } from '../components/Loading';
 import { playCorrect, playWrong } from '../lib/sound';
 import { ChoiceQuestion, type Answer } from '../components/QuizQuestions';
@@ -99,32 +100,22 @@ const Session = ({ progress }: { progress: Progress }) => {
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Gramatika' }]} />
+      <SessionBar exitTo="/cards" confirm={!!current} progress={total > 0 ? Math.min(1, right / total) : undefined} counter={total > 0 ? `${right} / ${total}` : undefined} note="Co jsi už zodpověděl(a), zůstane uložené." />
       <VoiceWarning />
-      <h1 class="text-2xl font-bold">Gramatika: doplňování vět</h1>
-      <p class="mt-1 text-sm text-ink-soft">Věty s mezerou z lekcí se opakují stejným plánem jako slovíčka. K opakování: <b>{init.dueCount}</b> · nové: <b>{init.newCount}</b></p>
-
-      {total > 0 && (
-        <div class="mt-4" aria-label={`Hotovo ${right} z ${total}`}>
-          <div class="h-2 overflow-hidden rounded-full bg-track"><div class="h-full bg-brand-500 transition-all" style={{ width: `${Math.min(100, (right / total) * 100)}%` }} /></div>
-          <p class="mt-1 text-right text-xs text-muted">{right} / {total}</p>
-        </div>
-      )}
+      <h1 class="text-xl font-bold">Gramatika: doplňování vět</h1>
 
       {current && question && (
         <div class="mt-4">
           <p class="mb-2 text-xs text-muted">Z lekce: {current.lessonTitle}</p>
           <ChoiceQuestion key={`${question.id}-${queue.length}`} q={question} answer={answer} onAnswer={setAnswer} />
           {answer && (
-            <div class={`mt-4 rounded-xl p-3 text-sm ${answer.correct ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100' : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'}`} role="status">
-              <p class="font-semibold">{answer.correct ? 'Správně!' : 'Zatím ne. Vrátí se na konec sady.'}</p>
-              <p class="mt-1 flex items-center gap-2"><span lang="pt-PT">{filled}</span> <AudioButton text={filled} /></p>
-            </div>
-          )}
-          {answer && (
-            <button type="button" onClick={next} class="mt-3 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-              Další
-            </button>
+            <BottomBar tone={answer.correct ? 'right' : 'wrong'}>
+              <div role="status">
+                <p class="font-bold">{answer.correct ? '✅ Správně!' : '❌ Zatím ne. Vrátí se na konec sady.'}</p>
+                <p class="mt-1 flex items-center gap-2 text-sm"><span lang="pt-PT">{filled}</span> <AudioButton text={filled} /></p>
+                <button type="button" onClick={next} class={`${bigBtn} mt-3`}>Další</button>
+              </div>
+            </BottomBar>
           )}
         </div>
       )}

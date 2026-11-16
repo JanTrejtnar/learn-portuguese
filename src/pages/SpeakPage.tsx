@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
 import { AudioButton } from '../components/AudioButton';
-import { Breadcrumb } from '../components/Breadcrumb';
+import { SessionBar } from '../components/SessionBar';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { units, unitUnlocked } from '../content';
 import { grantXp } from '../lib/award';
@@ -21,7 +21,7 @@ export const SpeakPage = () => {
   const progress = useProgress();
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Mluvení' }]} />
+      <SessionBar exitTo="/practice" confirm={false} />
       <h1 class="text-2xl font-bold">Mluvení 🎤</h1>
       <p class="mt-1 text-ink-soft">Poslechni si větu, zopakuj ji nahlas a uvidíš, která slova zazněla.</p>
       <VoiceWarning />

@@ -21,7 +21,7 @@ export const QuizHubPage = () => {
       <Breadcrumb items={[{ label: 'Procvičit', to: '/practice' }, { label: 'Testy' }]} />
       <h1 class="text-2xl font-bold">Testy a kvízy</h1>
       <p class="mt-1 text-ink-soft">
-        Test jednotky odemyká další jednotku (minimum {Math.round(PASS_RATIO * 100)} %). Chybná slovíčka se vrací do opakování.
+        Dokončení jednotky odemkne další jednotku (minimum {Math.round(PASS_RATIO * 100)} %). Chybná slovíčka se vrací do opakování.
       </p>
 
       <a href={href('/quiz/quick')} class="mt-6 flex items-center gap-4 rounded-2xl bg-brand-700 p-5 text-white hover:bg-brand-600">
@@ -45,7 +45,7 @@ export const QuizHubPage = () => {
                 <a href={href(`/quiz/${u.id}`)} class="flex items-center gap-3 rounded-2xl border-2 border-brand-500 bg-surface p-4">
                   <span class="text-2xl" aria-hidden="true">🏆</span>
                   <span>
-                    <span class="block font-semibold">Test jednotky</span>
+                    <span class="block font-semibold">Dokončit jednotku</span>
                     <span class="block text-sm text-ink-soft">20 otázek · odemyká další jednotku</span>
                   </span>
                   <Score best={t?.skipped && !t.best ? undefined : t?.best} passed={t?.passed} />

@@ -56,3 +56,9 @@ export const matchRoute = (path: string): Match => {
   if (path === '/stats') return { name: 'stats', params: {} };
   return { name: 'notFound', params: {} };
 };
+
+/** Cvičení a testy: běží v „soustředěném“ režimu bez navigace (jen křížek k odchodu). */
+export const isFocusRoute = (path: string): boolean => {
+  const n = matchRoute(path).name;
+  return n === 'study' || n === 'free' || n === 'quiz' || n === 'roleplay' || n === 'grammar' || n === 'pairs' || n === 'speak';
+};

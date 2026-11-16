@@ -14,19 +14,26 @@ const proj = (lon: number, lat: number): [number, number] => [(lon + 9.8) * SX, 
 const pts = (list: [number, number][]) => list.map(([lon, lat]) => proj(lon, lat));
 const fmt = (p: [number, number]) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
 
-// Zjednodušený obrys pevninského Portugalska: pobřeží shora dolů, pak hranice se Španělskem zdola nahoru.
-const OUTLINE: [number, number][] = [
-  [-8.85, 41.87], [-8.83, 41.69], [-8.65, 41.15], [-8.75, 40.64], [-8.87, 40.15], [-9.07, 39.6], [-9.4, 39.36],
-  [-9.5, 38.78], [-8.9, 38.52], [-8.88, 37.95], [-8.99, 37.02], [-8.67, 37.1], [-7.93, 37.02], [-7.42, 37.19],
-  [-7.45, 37.55], [-7.5, 38.2], [-7.0, 38.2], [-7.2, 38.9], [-7.0, 39.3], [-7.35, 39.65], [-6.95, 39.95],
-  [-7.0, 40.2], [-6.85, 40.9], [-6.2, 41.5], [-6.55, 41.95], [-8.15, 42.15],
+// Obrys pevninského Portugalska: pobřeží shora dolů, pak hranice se Španělskem zdola nahoru (Minho, Douro, Tejo, Guadiana).
+const COAST: [number, number][] = [
+  [-8.87, 41.87], [-8.84, 41.69], [-8.78, 41.54], [-8.77, 41.38], [-8.67, 41.15], [-8.65, 41.0], [-8.66, 40.85], [-8.75, 40.64],
+  [-8.8, 40.45], [-8.88, 40.15], [-8.95, 39.93], [-9.07, 39.6], [-9.2, 39.44], [-9.38, 39.36], [-9.35, 39.15], [-9.42, 38.96],
+  [-9.5, 38.78], [-9.42, 38.69], [-9.2, 38.69], [-9.08, 38.78], [-8.97, 38.9], [-8.9, 38.8], [-8.95, 38.7], [-9.15, 38.65],
+  [-9.22, 38.42], [-9.1, 38.44], [-8.95, 38.48], [-8.88, 38.52], [-8.78, 38.48], [-8.78, 38.3], [-8.78, 38.1], [-8.88, 37.95],
+  [-8.82, 37.6], [-8.8, 37.44], [-8.85, 37.2], [-8.99, 37.02], [-8.67, 37.1], [-8.53, 37.12], [-8.3, 37.08], [-7.93, 37.0],
+  [-7.65, 37.12], [-7.42, 37.19],
 ];
-const outline = pts(OUTLINE);
+const BORDER: [number, number][] = [
+  [-7.43, 37.55], [-7.52, 37.95], [-7.28, 38.17], [-6.96, 38.2], [-7.1, 38.52], [-6.96, 38.9], [-7.3, 39.1], [-7.05, 39.5],
+  [-7.5, 39.65], [-6.95, 39.9], [-7.05, 40.2], [-6.85, 40.45], [-6.85, 40.9], [-6.7, 41.2], [-6.2, 41.55], [-6.55, 41.8],
+  [-6.8, 41.98], [-7.5, 41.88], [-8.15, 41.82], [-8.2, 42.15], [-8.6, 42.0],
+];
+const outline = pts([...COAST, ...BORDER]);
 const landPath = 'M' + outline.map(fmt).join(' L') + ' Z';
-const borderPts = outline.slice(13);
+const borderPts = pts([COAST[COAST.length - 1]!, ...BORDER]);
 const borderPath = 'M' + borderPts.map(fmt).join(' L');
-const spainPath =
-  'M' + borderPts.map(fmt).join(' L') + ` L${(proj(-3.5, 42.3)[0]).toFixed(1)} ${proj(-3.5, 42.3)[1].toFixed(1)} L${proj(-3.5, 37.19)[0].toFixed(1)} ${proj(-3.5, 37.19)[1].toFixed(1)} L${fmt(outline[13]!)} Z`;
+const corner = (lon: number, lat: number) => `L${fmt(proj(lon, lat))}`;
+const spainPath = 'M' + borderPts.map(fmt).join(' L') + ` ${corner(-8.87, 41.87)} ${corner(-8.9, 42.6)} ${corner(-3.5, 42.6)} ${corner(-3.5, 37.19)} Z`;
 
 const curve = (list: [number, number][]) => {
   const p = pts(list);
@@ -138,31 +145,33 @@ export const MapPage = () => {
 
   return (
     <div class="mx-auto max-w-md">
-      <h1 class="text-3xl font-extrabold">Cesta Portugalskem</h1>
-      <p class="mt-1 text-ink-soft">Každá jednotka je jedno město. Klepni na město a splň test, cesta se otevře dál.</p>
-      <ViewSwitch current="map" />
-
-      <div class="mt-4 flex items-center gap-3">
-        <div class="flex gap-2" role="tablist" aria-label="Úroveň">
-          {LEVEL_TABS.map((l) => (
-            <button key={l} type="button" role="tab" aria-selected={level === l} onClick={() => { setChosen(l); setSelected(null); }}
-              class={`min-h-11 rounded-xl px-5 py-2 font-bold ${level === l ? 'bg-brand-700 text-white shadow-soft' : 'border border-line-strong bg-surface'}`}>
-              {l}
-            </button>
-          ))}
-        </div>
-        <div class="ml-auto text-right text-sm font-bold">
+      <div class="flex items-center justify-between gap-3">
+        <h1 class="text-2xl font-extrabold">Cesta Portugalskem</h1>
+        <div class="text-right text-sm font-bold leading-tight">
           <div>🏁 {done} / {positioned.length}</div>
           <div class="text-amber-700 dark:text-gold-400">⭐ {stars} / {positioned.length * 3}</div>
         </div>
       </div>
 
+      <div class="mt-2 flex items-center gap-2">
+        <ViewSwitch current="map" compact />
+        <div class="ml-auto flex gap-2" role="tablist" aria-label="Úroveň">
+          {LEVEL_TABS.map((l) => (
+            <button key={l} type="button" role="tab" aria-selected={level === l} onClick={() => { setChosen(l); setSelected(null); }}
+              class={`min-h-10 rounded-xl px-4 py-1.5 font-bold ${level === l ? 'bg-brand-700 text-white shadow-soft' : 'border border-line-strong bg-surface'}`}>
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {allDone && (
-        <div class="pop mt-4 rounded-2xl bg-gold-400 p-4 text-center font-extrabold text-brand-950 shadow-lift">🏆 Úroveň {level} dokončena! Parabéns!</div>
+        <div class="pop mt-2 rounded-2xl bg-gold-400 p-2 text-center text-sm font-extrabold text-brand-950 shadow-lift">🏆 Úroveň {level} dokončena! Parabéns!</div>
       )}
 
-      <div class="mt-4 overflow-hidden rounded-3xl border border-line shadow-lift">
-        <svg viewBox="-50 -20 375 590" class="block h-auto w-full" role="group" aria-label={`Herní mapa Portugalska, úroveň ${level}`}>
+      {/* Mapa se vejde na jednu obrazovku: výšku určuje okno, šířku poměr stran obrázku. */}
+      <div class="mt-3 flex justify-center overflow-hidden rounded-3xl border border-line shadow-lift" style={{ height: 'calc(100dvh - 19rem)', minHeight: '20rem' }}>
+        <svg viewBox="-50 -20 375 590" class="block h-full w-auto max-w-full" role="group" aria-label={`Herní mapa Portugalska, úroveň ${level}`}>
           <defs>
             <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: var(--sea-1)" /><stop offset="1" style="stop-color: var(--sea-2)" /></linearGradient>
             <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color: var(--land-1)" /><stop offset="1" style="stop-color: var(--land-2)" /></linearGradient>
@@ -277,7 +286,7 @@ export const MapPage = () => {
                 <a href={href(`/unit/${sel.u.id}`)} class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-5 py-2.5 font-bold text-white shadow-soft hover:bg-brand-600">
                   {selState === 'done' ? 'Opakovat jednotku' : 'Pokračovat'} →
                 </a>
-                <a href={href(`/quiz/${sel.u.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-5 py-2.5 font-bold hover:border-brand-500">🏆 Test jednotky</a>
+                <a href={href(`/quiz/${sel.u.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-5 py-2.5 font-bold hover:border-brand-500">🏆 Dokončit jednotku</a>
               </>
             ) : (
               <>

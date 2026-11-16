@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Loading } from '../components/Loading';
 import { AudioButton } from '../components/AudioButton';
-import { Breadcrumb } from '../components/Breadcrumb';
+import { SessionBar } from '../components/SessionBar';
+import { BottomBar, bigBtn } from '../components/BottomBar';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { unitUnlocked } from '../content';
 import { getScenario } from '../content/roleplay';
@@ -112,7 +113,8 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
 
   return (
     <div class="mx-auto max-w-xl">
-      <Breadcrumb items={[{ label: 'Scénáře', to: '/roleplay' }, { label: scenario.title }]} />
+      <SessionBar exitTo="/roleplay" confirm={!done} note="Rozehraný scénář se nedokončí." />
+      <h1 class="sr-only">{scenario.title}</h1>
       <VoiceWarning />
 
       <div class="mb-4 rounded-2xl bg-brand-50 p-4 text-sm text-brand-900 dark:bg-brand-900 dark:text-brand-100">
@@ -160,9 +162,7 @@ const Session = ({ scenario, progress }: { scenario: Scenario; progress: Progres
       )}
 
       {!done && pending && (
-        <button type="button" onClick={proceed} class="mt-4 w-full rounded-xl bg-brand-700 py-3 font-semibold text-white hover:bg-brand-600">
-          {pending.next === null ? 'Dokončit scénář' : 'Pokračovat'}
-        </button>
+        <BottomBar><button type="button" onClick={proceed} class={bigBtn}>{pending.next === null ? 'Dokončit scénář' : 'Pokračovat'}</button></BottomBar>
       )}
 
       {done && (
