@@ -20,16 +20,11 @@ export const PracticePage = () => (
     <ul class="mt-5 space-y-3">
       <Item primary to="/cards/all" emoji="🃏" title="Karty na dnes" text="Slovíčka, která je právě čas zopakovat" />
       <Item to="/quiz/quick" emoji="⚡" title="Rychlý kvíz" text="10 otázek na tvoje nejslabší slovíčka" />
+      <Item to="/gramatika" emoji="📖" title="Přehled gramatiky" text="Pravidla z odemčených lekcí s vyhledáváním" />
       <Item to="/grammar" emoji="🧩" title="Doplňování vět" text="Gramatika: věty s mezerou z lekcí" />
       <Item to="/roleplay" emoji="🎭" title="Scénáře" text="Rozhovory z reálných situací" />
       <Item to="/speak" emoji="🎤" title="Mluvení" text="Zopakuj větu nahlas a dostaneš zpětnou vazbu" />
       <Item to="/pairs" emoji="👂" title="Minimální páry" text="Rozlišuj podobně znějící slova" />
     </ul>
-
-    <p class="mt-6 flex flex-wrap gap-x-5 gap-y-1 text-sm font-semibold text-ink-soft">
-      <a href={href('/cards')} class="underline">Jiná sada karet</a>
-      <a href={href('/quiz')} class="underline">Testy lekcí a jednotek</a>
-      <a href={href('/gramatika')} class="underline">Přehled gramatiky</a>
-    </p>
   </div>
 );
