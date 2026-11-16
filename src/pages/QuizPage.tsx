@@ -6,7 +6,7 @@ import { AudioButton } from '../components/AudioButton';
 import { BuildQuestion, ChoiceQuestion, MatchQuestion, TypingQuestion, type Answer } from '../components/QuizQuestions';
 import { Celebrate } from '../components/Celebrate';
 import { VoiceWarning } from '../components/VoiceWarning';
-import { allWords, getTestScope, units, unitUnlocked } from '../content';
+import { allWords, dedupeWords, getTestScope, units, unitUnlocked } from '../content';
 import { getVoiceStatus } from '../lib/audio';
 import { saveCard, saveDay, saveTest, type Progress, type TestResult } from '../lib/db';
 import { PASS_RATIO, collectCloze, collectSentences, correctText, generateQuiz, promptText, type Question, type QuestionResult } from '../lib/quiz';
@@ -14,13 +14,14 @@ import { schedule } from '../lib/srs';
 import { playChime, playCorrect, playWrong } from '../lib/sound';
 import { PostcardScreen } from '../components/PostcardScreen';
 import { postcards } from '../content/postcards';
+import { PLACEMENT_COUNT } from '../content/tutorial';
 import { useKeydown } from '../lib/useKeydown';
 import { useStudySettings } from '../lib/settings';
 import { notifyProgress, toast } from '../lib/toast';
 import { XP_GOAL_BONUS, XP_PER_CORRECT_ANSWER, XP_TEST_FIRST_PASS, XP_TEST_PERFECT, XP_TEST_REPASS, awardXp } from '../lib/xp';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
-import type { Lesson, Word } from '../types';
+import type { Lesson, Level, Word } from '../types';
 import { NotFoundPage } from './NotFoundPage';
 
 interface Scope {
@@ -31,6 +32,8 @@ interface Scope {
   /** Splnění odemyká další jednotku (jen test jednotky). */
   unlocks: boolean;
   unitId?: string;
+  /** Zařazovací test: při splnění se přeskočí jednotky dané úrovně (a nižších). */
+  placement?: Level;
   words: Word[];
   lessons: Lesson[];
   count: number;
@@ -46,6 +49,12 @@ const resolveScope = (id: string, progress: Progress): Scope | 'empty' | undefin
     // Nejslabší karty (nízký ease, hodně chyb) mají přednost.
     const weakest = [...seen].sort((a, b) => progress.cards.get(a.id)!.ease - progress.cards.get(b.id)!.ease + (Math.random() - 0.5)).slice(0, 14);
     return { id, title: 'Rychlý kvíz', graded: false, unlocks: false, words: weakest, lessons: allLessons(), count: 10, back: { label: 'Procvičit', to: '/practice' } };
+  }
+  const place = /^placement-(a1|a2)$/.exec(id);
+  if (place) {
+    const level = place[1]!.toUpperCase() as Level;
+    const lessons = units.filter((u) => u.level === level).flatMap((u) => u.lessons);
+    return { id, title: `Zařazovací test ${level}`, graded: false, unlocks: false, placement: level, words: dedupeWords(lessons.flatMap((l) => l.words)), lessons, count: PLACEMENT_COUNT, back: { label: 'Úvodní průvodce', to: '/welcome' } };
   }
   const scope = getTestScope(id);
   if (!scope) return undefined;
@@ -143,6 +152,20 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     if (!finished || saved.current || results.length === 0) return;
     saved.current = true;
     const now = Date.now();
+    if (scope.placement) {
+      const ok = ratio >= PASS_RATIO;
+      if (ok) {
+        for (const u of units.filter((x) => x.level === 'A1' || scope.placement === 'A2')) {
+          if (progress.tests.get(u.id)?.passed) continue;
+          const result: TestResult = { id: u.id, best: 0, passed: true, attempts: 0, last: now, skipped: true };
+          progress.tests.set(u.id, result);
+          void saveTest(result);
+        }
+        notifyProgress();
+      }
+      setOutcome({ passed: ok, newlyUnlocked: null, xp: 0, attempts: 0, postcard: false });
+      return;
+    }
     const missed = new Set(results.flatMap((r) => r.missed));
     for (const wid of missed) {
       const next = schedule(progress.cards.get(wid), wid, 'again', now);
@@ -216,17 +239,17 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
     <div class="mx-auto max-w-xl">
       <SessionBar exitTo={scope.back.to} confirm={!finished} progress={questions.length ? Math.min(1, index / questions.length) : 0}
         counter={!finished && q2 ? `${index + 1} / ${questions.length}` : undefined}
-        note={scope.graded ? 'Rozdělaný test se nezapočítá.' : 'Rozdělaný kvíz se nezapočítá.'} />
+        note={scope.graded || scope.placement ? 'Rozdělaný test se nezapočítá.' : 'Rozdělaný kvíz se nezapočítá.'} />
       <VoiceWarning />
 
       {!finished && q2 && (
         <>
 
           <div key={q2.id}>
-            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} hints />}
-            {(q2.kind === 'typing' || q2.kind === 'dictation') && <TypingQuestion q={q2} answer={answer} onAnswer={setAnswer} hints />}
+            {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
+            {(q2.kind === 'typing' || q2.kind === 'dictation') && <TypingQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
             {q2.kind === 'match' && <MatchQuestion q={q2} answer={answer} onAnswer={setAnswer} />}
-            {q2.kind === 'build' && <BuildQuestion q={q2} answer={answer} onAnswer={setAnswer} hints />}
+            {q2.kind === 'build' && <BuildQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
           </div>
 
           {!answer && (q2.kind === 'listen' || q2.kind === 'dictation') && (
@@ -278,7 +301,13 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
             <div class="text-5xl" aria-hidden="true">{ratio >= PASS_RATIO ? '🎉' : '💪'}</div>
             <h1 class="mt-2 text-3xl font-bold">{Math.round(ratio * 100)} %</h1>
             <p class="text-ink-soft">{correctCount} z {questions.length} správně</p>
-            {scope.graded ? (
+            {scope.placement ? (
+              ratio >= PASS_RATIO ? (
+                <p class="mt-3 font-semibold text-green-700 dark:text-green-400">Skvělé! {scope.placement === 'A1' ? 'Jednotky A1 jsou přeskočené, začínáš na A2.' : 'Jednotky A1 i A2 jsou přeskočené.'}</p>
+              ) : (
+                <p class="mt-3 font-semibold text-amber-700 dark:text-amber-400">Na přeskočení je potřeba aspoň {Math.round(PASS_RATIO * 100)} %. Doporučujeme začít od začátku, půjde to rychle.</p>
+              )
+            ) : scope.graded ? (
               ratio >= PASS_RATIO ? (
                 <p class="mt-3 font-semibold text-green-700 dark:text-green-400">
                   {scope.unlocks ? 'Jednotka dokončena!' : 'Test splněn!'}{outcome?.newlyUnlocked ? ` Odemčena jednotka „${outcome.newlyUnlocked.title}“ 🔓` : ''}
@@ -297,8 +326,22 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
               </div>
             )}
             {skippedNow && nextUnit && <p class="mt-3 text-sm font-semibold text-green-700 dark:text-green-400">Odemčena jednotka „{nextUnit.title}“ 🔓</p>}
-            {outcome && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{outcome.xp} XP ⭐</p>}
+            {outcome && !scope.placement && <p class="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-100">+{outcome.xp} XP ⭐</p>}
           </div>
+          {scope.placement ? (
+            <BottomBar>
+              <div class="grid gap-2">
+                {ratio >= PASS_RATIO ? (
+                  <a href={href('/')} class={bigBtn}>Pokračovat v učení →</a>
+                ) : (
+                  <>
+                    <a href={href('/lesson/a1-u1-l1')} class={bigBtn}>Začít od začátku</a>
+                    <button type="button" onClick={retry} class="min-h-12 rounded-xl border border-line-strong px-4 py-3 font-bold">Zkusit test znovu</button>
+                  </>
+                )}
+              </div>
+            </BottomBar>
+          ) : (
           <BottomBar>
             <div class="grid gap-2">
               {unlockedNext && (
@@ -311,6 +354,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
               </div>
             </div>
           </BottomBar>
+          )}
 
           {results.some((r) => !r.correct) && (
             <section class="mt-8">

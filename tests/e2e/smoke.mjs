@@ -43,11 +43,24 @@ await test('nový uživatel: onboarding → hlavní stránka', async () => {
   const { page, errors, ctx } = await newPage();
   await page.goto(base);
   await page.waitForURL(/#\/welcome/);
-  await page.getByRole('button', { name: 'Dál' }).click();
-  await page.getByRole('button', { name: 'Dál' }).click();
+  await page.getByText('Krok 1 ze 5').waitFor();
+  for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Dál' }).click();
+  await page.getByText('Krok 5 ze 5').waitFor();
   await page.getByText('Jen se porozhlédnout').click();
   await page.waitForURL(/#\/$/);
   await page.getByText('Dnešní plán').waitFor();
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test('průvodce: „Už něco umím“ vede na zařazovací test', async () => {
+  const { page, errors, ctx } = await newPage();
+  await page.goto(base + '#/welcome');
+  for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Dál' }).click();
+  await page.getByText('Už něco umím (A1)').click();
+  await page.waitForURL(/#\/quiz\/placement-a1/);
+  await page.getByText('1 / 12').waitFor();
+  assert.equal(await page.getByRole('button', { name: /nápověd|Vyřadit|Odkrýt|Prozradit/i }).count(), 0, 'v zařazovacím testu nejsou nápovědy');
   assert.deepEqual(errors, []);
   await ctx.close();
 });

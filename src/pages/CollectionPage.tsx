@@ -17,7 +17,7 @@ export const CollectionPage = () => {
   const progress = useProgress();
   const [open, setOpen] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const owned = progress ? units.filter((u) => u.city && postcards[u.id] && progress.tests.get(u.id)?.passed) : [];
+  const owned = progress ? units.filter((u) => u.city && postcards[u.id] && (progress.tests.get(u.id)?.passed && !progress.tests.get(u.id)?.skipped)) : [];
   const idx = owned.findIndex((u) => u.id === open);
   const go = (d: number) => { const n = owned[idx + d]; if (n) setOpen(n.id); };
   useEffect(() => {
@@ -55,7 +55,7 @@ export const CollectionPage = () => {
           <h2 class="mt-7 mb-3 text-sm font-bold uppercase tracking-wider text-muted">{level === 'A1' ? 'A1 — Začátečník' : 'A2 — Základní'}</h2>
           <ul class="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3">
             {rows.filter((u) => u.level === level).map((u) => {
-              const has = progress.tests.get(u.id)?.passed === true;
+              const has = progress.tests.get(u.id)?.passed === true && !progress.tests.get(u.id)?.skipped;
               const [c1, c2] = tone(u.id);
               return (
                 <li key={u.id}>

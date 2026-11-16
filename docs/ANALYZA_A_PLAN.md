@@ -341,7 +341,7 @@ Odhad: M1 S, M2 M, M3 L, M4 podle výběru. Navrhuji začít M1 a M2, pak se roz
 2. Má se B1 vydat hned (s příznakem „neověřeno“), nebo až po revizi A1+A2?
 3. Zahrnout Madeiru a Azory na mapě (ostrovy), nebo zůstat jen na pevnině?
 
-## Plán: vstupní tutoriál a výběr úrovně (zatím jen návrh)
+## Hotovo: vstupní tutoriál a výběr úrovně
 
 Dnes existuje 3krokový úvod (`/welcome`: jak se učíme, denní cíl, kde začít). Navrhuje se ho rozšířit tak, aby vysvětlil celou aplikaci a umožnil zkušenějším uživatelům přeskočit začátek.
 
@@ -378,3 +378,7 @@ Dnes existuje 3krokový úvod (`/welcome`: jak se učíme, denní cíl, kde zač
 - **Příkladové věty:** všech 227 frází, číslovek a citoslovců, které je dosud neměly, dostalo příklad (`src/content/examples.ts`). Dnes má příklad každé z 754 slovíček. Věty jsou krátké, v PT-PT a čekají na revizi rodilým mluvčím.
 - **Nápovědy v testech (M4):** v kvízech a testech jednotek stojí nápověda `HINT_PRICE` (3) mince; v kartičkách a gramatice nejsou. Podle typu otázky: *výběr* vyřadí dvě špatné možnosti, *psaní* odkryje první písmeno a délku slov, *skládání věty* prozradí první slovo. Odpověď s nápovědou se počítá správně, ale slovíčko se ještě vrátí do opakování (stejně jako při chybě), aby nápověda neobešla učení. Cena se zapisuje do stavu obchodu (`hintsBought`), takže zůstatek zůstává odvozený a nikdy záporný. Pokud je zůstatek menší než cena, tlačítko je vypnuté.
 - Mapa a tutoriál musí zmínit nápovědy, až bude tutoriál implementován (kapitola o odměnách).
+
+- **Tutoriál implementován:** `/welcome` je 5krokový průvodce (lekce, procvičování, odměny, denní cíl, výběr úrovně). Texty a čísla jsou v `src/content/tutorial.ts` (hodnoty z konstant `PASS_RATIO`, `COINS_PER_*`, `HINT_PRICE`, `FREEZE_PRICE`, `MAX_FREEZES`), hlídá je `tests/tutorial.test.mts`. Odkaz „Zobrazit úvodního průvodce“ je v Nastavení.
+- **Zařazovací test:** trasa `/quiz/placement-a1` a `/quiz/placement-a2` (12 otázek, bez nápověd). Při splnění `PASS_RATIO` se jednotky A1 (u A2 i A2) uloží jako `skipped`. Žádné XP, mince, hvězdy ani pohlednice. Pohlednice ve sbírce se počítají jen za skutečně splněný test.
+- Nápovědy v testech jsou v tutoriálu zmíněny (kapitola Procvičování).

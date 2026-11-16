@@ -106,6 +106,11 @@ export const SettingsPage = () => {
         <LearningSettings />
       </Card>
 
+      <Card title="Úvodní průvodce">
+        <p class="mb-3 text-sm text-ink-soft">Znovu si projdi, jak aplikace funguje, a případně změň, od které úrovně začínáš.</p>
+        <a href="#/welcome" class={`${btn} inline-block`}>Zobrazit úvodního průvodce</a>
+      </Card>
+
       <Card title="Aplikace a offline">
         <ul class="space-y-1 text-sm">
           <li>{offlineReady ? '✅ Aplikace je připravená pro offline použití.' : 'ℹ️ Offline režim se aktivuje po prvním úplném načtení s připojením.'}</li>
