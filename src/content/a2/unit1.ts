@@ -8,7 +8,7 @@ export const unit1: Unit = {
   emoji: '🕰️',
   title: 'O que fiz?',
   subtitle: 'Minulý čas: pretérito perfeito',
-  city: { name: 'Lagos', lon: -8.67, lat: 37.1 },
+  city: { name: 'Lagos', icon: '🌊', lon: -8.67, lat: 37.1 },
   lessons: [
     {
       id: 'a2-u1-l1',

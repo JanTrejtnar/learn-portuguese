@@ -8,7 +8,7 @@ export const unit6: Unit = {
   emoji: '🚋',
   title: 'Ir e vir',
   subtitle: 'Sloveso ir, doprava a směry',
-  city: { name: 'Braga', lon: -8.43, lat: 41.55 },
+  city: { name: 'Braga', icon: '⛪', lon: -8.43, lat: 41.55 },
   lessons: [
     {
       id: 'a1-u6-l1',

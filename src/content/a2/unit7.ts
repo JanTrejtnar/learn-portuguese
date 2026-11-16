@@ -8,7 +8,7 @@ export const unit7: Unit = {
   emoji: '🏠',
   title: 'Casa e trabalho',
   subtitle: 'Bydlení, pronájem, práce a čas',
-  city: { name: 'Tomar', lon: -8.41, lat: 39.6 },
+  city: { name: 'Tomar', icon: '🗝️', lon: -8.41, lat: 39.6 },
   lessons: [
     {
       id: 'a2-u7-l1',

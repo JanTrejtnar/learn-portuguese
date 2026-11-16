@@ -8,7 +8,7 @@ export const unit2: Unit = {
   emoji: '🧸',
   title: 'Quando era pequeno',
   subtitle: 'Minulý čas: pretérito imperfeito a jeho rozdíl proti perfeitu',
-  city: { name: 'Tavira', lon: -7.65, lat: 37.13 },
+  city: { name: 'Tavira', icon: '🐟', lon: -7.65, lat: 37.13 },
   lessons: [
     {
       id: 'a2-u2-l1',

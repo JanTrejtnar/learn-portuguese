@@ -8,7 +8,7 @@ export const unit6: Unit = {
   emoji: '📅',
   title: 'O que vou fazer?',
   subtitle: 'Budoucnost, plány, pozvání a telefonování',
-  city: { name: 'Viseu', lon: -7.91, lat: 40.66 },
+  city: { name: 'Viseu', icon: '🌿', lon: -7.91, lat: 40.66 },
   lessons: [
     {
       id: 'a2-u6-l1',

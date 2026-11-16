@@ -8,7 +8,7 @@ export const unit4: Unit = {
   emoji: '🩺',
   title: 'Saúde e farmácia',
   subtitle: 'Tělo, bolesti, lékárna, u lékaře a rozkazovací způsob',
-  city: { name: 'Aveiro', lon: -8.65, lat: 40.64 },
+  city: { name: 'Aveiro', icon: '🚣', lon: -8.65, lat: 40.64 },
   lessons: [
     {
       id: 'a2-u4-l1',

@@ -8,7 +8,7 @@ export const unit5: Unit = {
   emoji: '🔗',
   title: 'Vi-o, dei-lhe',
   subtitle: 'Zájmena ve funkci předmětu a jejich poloha (clitika)',
-  city: { name: 'Guimarães', lon: -8.3, lat: 41.44 },
+  city: { name: 'Guimarães', icon: '🛡️', lon: -8.3, lat: 41.44 },
   lessons: [
     {
       id: 'a2-u5-l1',

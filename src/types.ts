@@ -58,6 +58,8 @@ export interface Lesson {
 /** Město na mapě Portugalska, které odpovídá jednotce (zeměpisné souřadnice). */
 export interface City {
   name: string;
+  /** Památka / symbol města (emoji) pro herní mapu. */
+  icon?: string;
   lon: number;
   lat: number;
 }

@@ -8,7 +8,7 @@ export const unit5: Unit = {
   emoji: '⏰',
   title: 'O meu dia',
   subtitle: 'Pravidelná slovesa, hodiny, dny a zvratná slovesa',
-  city: { name: 'Porto', lon: -8.61, lat: 41.15 },
+  city: { name: 'Porto', icon: '🍷', lon: -8.61, lat: 41.15 },
   lessons: [
     {
       id: 'a1-u5-l1',

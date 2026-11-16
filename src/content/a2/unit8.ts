@@ -8,7 +8,7 @@ export const unit8: Unit = {
   emoji: '💬',
   title: 'Opinião e conversa',
   subtitle: 'Názory, důvody, perfeito composto a společenské fráze',
-  city: { name: 'Guarda', lon: -7.27, lat: 40.54 },
+  city: { name: 'Guarda', icon: '⛰️', lon: -7.27, lat: 40.54 },
   lessons: [
     {
       id: 'a2-u8-l1',

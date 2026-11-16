@@ -8,7 +8,7 @@ export const unit3: Unit = {
   emoji: '🧳',
   title: 'Viajar e ficar',
   subtitle: 'Cestování, ubytování, porovnávání a turistika',
-  city: { name: 'Setúbal', lon: -8.89, lat: 38.52 },
+  city: { name: 'Setúbal', icon: '🐬', lon: -8.89, lat: 38.52 },
   lessons: [
     {
       id: 'a2-u3-l1',

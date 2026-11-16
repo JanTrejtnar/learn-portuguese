@@ -8,7 +8,7 @@ export const unit4: Unit = {
   emoji: '☕',
   title: 'Café e pastelaria',
   subtitle: 'Objednávání, jídlo a pití, sloveso ter, čísla do 100',
-  city: { name: 'Coimbra', lon: -8.43, lat: 40.21 },
+  city: { name: 'Coimbra', icon: '🎓', lon: -8.43, lat: 40.21 },
   lessons: [
     {
       id: 'a1-u4-l1',
