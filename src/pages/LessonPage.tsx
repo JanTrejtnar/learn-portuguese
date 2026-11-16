@@ -23,6 +23,9 @@ export const LessonPage = ({ id }: { id: string }) => {
       <a href={href(`/cards/${lesson.id}`)} class="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">
         🃏 Procvičit kartičky
       </a>
+      <a href={href(`/quiz/${lesson.id}`)} class="mt-5 ml-2 inline-flex items-center gap-2 rounded-xl border border-brand-700 px-4 py-2.5 font-semibold text-brand-700 hover:bg-brand-50 dark:text-brand-100">
+        ✅ Test lekce
+      </a>
 
       <h2 class="mt-8 mb-3 text-lg font-semibold">Slovní zásoba</h2>
       <VoiceWarning />

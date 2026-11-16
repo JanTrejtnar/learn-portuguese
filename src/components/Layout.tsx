@@ -13,7 +13,7 @@ interface NavItem {
 const nav: NavItem[] = [
   { label: 'Lekce', icon: '📚', to: '/', active: (p) => p === '/' || p.startsWith('/unit') || p.startsWith('/lesson') },
   { label: 'Karty', icon: '🃏', to: '/cards', active: (p) => p.startsWith('/cards') || p.startsWith('/free') },
-  { label: 'Testy', icon: '✅', to: '/quiz', soon: true, active: (p) => p.startsWith('/quiz') },
+  { label: 'Testy', icon: '✅', to: '/quiz', active: (p) => p.startsWith('/quiz') },
   { label: 'Pokrok', icon: '📈', to: '/stats', active: (p) => p.startsWith('/stats') },
 ];
 

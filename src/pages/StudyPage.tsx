@@ -2,12 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { Flashcard } from '../components/Flashcard';
 import { VoiceWarning } from '../components/VoiceWarning';
-import { getDeck } from '../content';
+import { getDeck, unlockedWords } from '../content';
 import { speak, stopSpeaking } from '../lib/audio';
 import { saveCard, saveDay, type DayStats, type Progress } from '../lib/db';
 import { buildQueue, newIntroducedToday, shuffled } from '../lib/queue';
 import { useStudySettings } from '../lib/settings';
 import { dateKey, previewIntervals, schedule, type Rating } from '../lib/srs';
+import { useKeydown } from '../lib/useKeydown';
 import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
 import type { Word } from '../types';
@@ -32,7 +33,7 @@ export const StudyPage = ({ deckId, mode }: { deckId: string; mode: 'srs' | 'fre
   const progress = useProgress();
   if (!deck) return <NotFoundPage />;
   if (!progress) return <p class="py-16 text-center text-stone-500">Načítám…</p>;
-  return <Session key={`${mode}-${deckId}`} title={deck.title} deckId={deckId} words={deck.words} mode={mode} progress={progress} />;
+  return <Session key={`${mode}-${deckId}`} title={deck.title} deckId={deckId} words={deckId === 'all' ? unlockedWords(progress.tests) : deck.words} mode={mode} progress={progress} />;
 };
 
 interface SessionProps {
@@ -73,8 +74,12 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
   }, [current?.id, flipped, settings.direction, settings.autoplay]);
   useEffect(() => stopSpeaking, []);
 
+  // Pojistka proti dvojímu hodnocení téže karty (dva rychlé stisky před překreslením).
+  const locked = useRef(false);
+  locked.current = false; // při každém překreslení se odemkne
   const rate = (r: Rating) => {
-    if (!current || !flipped) return;
+    if (!current || !flipped || locked.current) return;
+    locked.current = true;
     const now = Date.now();
     if (srs) {
       const prev = cards.current.get(current.id);
@@ -109,17 +114,13 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
     restart(bonus);
   };
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.metaKey || e.ctrlKey) return;
-      if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        setFlipped((f) => (current ? !f : f));
-      } else if (['1', '2', '3', '4'].includes(e.key)) rate(ratings[Number(e.key) - 1]!.id);
-      else if (e.key.toLowerCase() === 'p' && current) speak(current.pt);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+  useKeydown((e) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.metaKey || e.ctrlKey) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      setFlipped((f) => (current ? !f : f));
+    } else if (['1', '2', '3', '4'].includes(e.key)) rate(ratings[Number(e.key) - 1]!.id);
+    else if (e.key.toLowerCase() === 'p' && current) speak(current.pt);
   });
 
   const intervals = current && srs && flipped ? previewIntervals(cards.current.get(current.id), current.id, Date.now()) : null;

@@ -28,6 +28,9 @@ const computeStatus = (): VoiceStatus => {
   return findPtPtVoice() ? 'ready' : 'no-pt-pt';
 };
 
+/** Jednorázový dotaz na stav hlasu (mimo komponenty). */
+export const getVoiceStatus = computeStatus;
+
 /** Reaktivní stav hlasu – hlasy se v prohlížečích načítají asynchronně. */
 export const useVoiceStatus = (): VoiceStatus => {
   const [status, setStatus] = useState<VoiceStatus>(computeStatus);

@@ -3,6 +3,8 @@ import { CardsPage } from './pages/CardsPage';
 import { HomePage } from './pages/HomePage';
 import { LessonPage } from './pages/LessonPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { QuizHubPage } from './pages/QuizHubPage';
+import { QuizPage } from './pages/QuizPage';
 import { StatsPage } from './pages/StatsPage';
 import { StudyPage } from './pages/StudyPage';
 import { UnitPage } from './pages/UnitPage';
@@ -20,6 +22,8 @@ export const App = () => {
       {route.name === 'cards' && <CardsPage />}
       {route.name === 'study' && <StudyPage deckId={route.params.deck!} mode="srs" />}
       {route.name === 'free' && <StudyPage deckId={route.params.deck!} mode="free" />}
+      {route.name === 'quizHub' && <QuizHubPage />}
+      {route.name === 'quiz' && <QuizPage id={route.params.id!} />}
       {route.name === 'stats' && <StatsPage />}
       {route.name === 'notFound' && <NotFoundPage />}
     </Layout>

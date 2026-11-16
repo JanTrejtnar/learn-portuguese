@@ -1,0 +1,55 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { answerVariants, checkTyped, generateQuiz, isTypeable } from '../src/lib/quiz.ts';
+import { isUnitUnlocked } from '../src/lib/unlock.ts';
+
+const W = (id: string, pt: string, cs: string, pos = 'noun') => ({ id, pt, cs, pos }) as any;
+const words = [
+  W('1', 'o pai', 'otec'), W('2', 'a mãe', 'matka'), W('3', 'o irmão', 'bratr'), W('4', 'a irmã', 'sestra'),
+  W('5', 'o avô', 'dědeček'), W('6', 'a avó', 'babička'), W('7', 'Obrigado / Obrigada', 'Děkuji'), W('8', 'Pode repetir, por favor?', 'Můžete to zopakovat?'),
+];
+const sentences = [
+  { pt: 'Este é o meu pai.', cs: 'Tohle je můj otec.', wordId: '1' },
+  { pt: 'Esta é a minha mãe.', cs: 'Tohle je moje matka.', wordId: '2' },
+];
+
+test('psaní: členy, varianty, diakritika', () => {
+  const acc = answerVariants('o primo / a prima');
+  assert.equal(checkTyped('primo', acc), 'exact');
+  assert.equal(checkTyped('A Prima', acc), 'exact');
+  assert.equal(checkTyped('mae', answerVariants('a mãe')), 'diacritics');
+  assert.equal(checkTyped('pai', answerVariants('a mãe')), 'wrong');
+  assert.equal(checkTyped('chamo me', answerVariants('Chamo-me…')), 'exact');
+  assert.equal(checkTyped('', acc), 'wrong');
+  assert.equal(isTypeable(W('x', 'Pode repetir, por favor?', '')), false);
+});
+
+test('generátor: počet, možnosti, správná odpověď', () => {
+  for (let i = 0; i < 50; i++) {
+    const qs = generateQuiz({ words, pool: words, sentences, count: 8, audio: true });
+    assert.ok(qs.length >= 6 && qs.length <= 8, `počet ${qs.length}`);
+    for (const q of qs) {
+      if (q.kind === 'pt-to-cs' || q.kind === 'cs-to-pt' || q.kind === 'listen') {
+        assert.ok(q.options.length >= 2);
+        assert.equal(new Set(q.options).size, q.options.length);
+        assert.ok(q.answer >= 0 && q.answer < q.options.length);
+      }
+      if (q.kind === 'build') assert.deepEqual([...q.bank].sort(), [...q.bank].sort()), assert.ok(q.tokens.every((t) => q.bank.includes(t)));
+    }
+  }
+});
+
+test('bez audia nejsou poslechové otázky', () => {
+  for (let i = 0; i < 30; i++) {
+    const qs = generateQuiz({ words, pool: words, sentences, count: 8, audio: false });
+    assert.ok(qs.every((q) => q.kind !== 'listen' && q.kind !== 'dictation'));
+  }
+});
+
+test('odemykání jednotek', () => {
+  const units = [{ id: 'a' }, { id: 'b' }, { id: 'c' }] as any;
+  const tests = new Map<string, any>([['a', { id: 'a', passed: true }]]);
+  assert.equal(isUnitUnlocked(units, 'a', tests), true);
+  assert.equal(isUnitUnlocked(units, 'b', tests), true);
+  assert.equal(isUnitUnlocked(units, 'c', tests), false);
+});

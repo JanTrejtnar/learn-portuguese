@@ -1,4 +1,5 @@
-import { units } from '../content';
+import { units, unitUnlocked, unlockedWords } from '../content';
+import { useProgress } from '../lib/useProgress';
 import { useStudySettings } from '../lib/settings';
 import { href } from '../router';
 
@@ -17,6 +18,8 @@ const Row = ({ to, title, meta, emoji }: { to: string; title: string; meta: stri
 
 export const CardsPage = () => {
   const [settings, update] = useStudySettings();
+  const progress = useProgress();
+  const open = (id: string) => !progress || unitUnlocked(id, progress.tests);
   return (
   <div>
     <h1 class="text-2xl font-bold">Kartičky</h1>
@@ -35,10 +38,10 @@ export const CardsPage = () => {
     </label>
 
     <div class="mt-6">
-      <Row to="/cards/all" emoji="🌍" title="Všechna slovíčka" meta={`${units.flatMap((u) => u.lessons.flatMap((l) => l.words)).length} karet`} />
+      <Row to="/cards/all" emoji="🌍" title="Všechna odemčená slovíčka" meta={`${progress ? unlockedWords(progress.tests).length : '…'} karet · denní plán`} />
     </div>
 
-    {units.map((u) => (
+    {units.filter((u) => open(u.id)).map((u) => (
       <section key={u.id} class="mt-8">
         <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-stone-500">
           {u.level} · Jednotka {u.order}: {u.title}

@@ -1,11 +1,46 @@
 import { Breadcrumb } from '../components/Breadcrumb';
-import { getUnit } from '../content';
+import { useState } from 'preact/hooks';
+import { getUnit, units, unitUnlocked } from '../content';
+import { saveTest } from '../lib/db';
+import { useProgress } from '../lib/useProgress';
 import { href } from '../router';
 import { NotFoundPage } from './NotFoundPage';
 
 export const UnitPage = ({ id }: { id: string }) => {
   const unit = getUnit(id);
+  const progress = useProgress();
+  const [, force] = useState(0);
   if (!unit) return <NotFoundPage />;
+
+  const idx = units.findIndex((u) => u.id === unit.id);
+  const prev = idx > 0 ? units[idx - 1] : undefined;
+  const locked = !!progress && !unitUnlocked(unit.id, progress.tests);
+
+  if (locked && prev && progress) {
+    const unlock = () => {
+      const old = progress.tests.get(prev.id);
+      const result = { id: prev.id, best: old?.best ?? 0, passed: true, attempts: old?.attempts ?? 0, last: Date.now(), skipped: true };
+      progress.tests.set(prev.id, result);
+      void saveTest(result);
+      force((n) => n + 1);
+    };
+    return (
+      <div>
+        <Breadcrumb items={[{ label: 'Lekce', to: '/' }, { label: unit.title }]} />
+        <div class="py-10 text-center">
+          <div class="text-5xl" aria-hidden="true">🔒</div>
+          <h1 class="mt-3 text-xl font-bold">{unit.title} je zamčená</h1>
+          <p class="mx-auto mt-2 max-w-sm text-stone-600 dark:text-stone-400">
+            Odemkneš ji splněním testu jednotky „{prev.title}“ (aspoň 80 %).
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a href={href(`/quiz/${prev.id}`)} class="rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">Spustit test</a>
+            <button type="button" onClick={unlock} class="rounded-xl border border-stone-300 px-4 py-2.5 font-semibold dark:border-stone-700">Už to umím, odemknout</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -20,6 +55,10 @@ export const UnitPage = ({ id }: { id: string }) => {
 
       <a href={href(`/cards/${unit.id}`)} class="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 font-semibold text-white hover:bg-brand-600">
         🃏 Procvičit celou jednotku
+      </a>
+
+      <a href={href(`/quiz/${unit.id}`)} class="mt-3 ml-2 inline-flex items-center gap-2 rounded-xl border border-brand-700 px-4 py-2.5 font-semibold text-brand-700 hover:bg-brand-50 dark:text-brand-100">
+        🏆 Test jednotky
       </a>
 
       <ol class="mt-6 space-y-3">

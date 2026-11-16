@@ -27,6 +27,6 @@ Vite · Preact · TypeScript · Tailwind CSS 4 · hash router (bez serveru) · o
 1. ✅ Skeleton + data A1 (jednotky 1–2)
 2. ✅ Flashcards + audio (`pt-PT`)
 3. ✅ SRS + IndexedDB
-4. Kvízy a testy
+4. ✅ Kvízy a testy
 5. Zbytek A1 + gramatická cvičení + brazilismo alert
 6. Gamifikace · 7. Roleplay · 8. PWA/offline · 9. A2 · 10. AI konverzace
