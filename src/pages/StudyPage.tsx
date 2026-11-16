@@ -241,7 +241,7 @@ const Session = ({ title, deckId, words, mode, progress }: SessionProps) => {
           <Flashcard key={current.id + (learning ? '-new' : '')} word={current} flipped={flipped || learning} direction={settings.direction} onFlip={() => setFlipped((f) => !f)} />
           {srs && flipped && (cards.current.get(current.id)?.lapses ?? 0) >= LEECH_LAPSES && (
             <div class="mt-3 rounded-xl border border-gold-400/60 bg-gold-400/10 p-3 text-sm">
-              <p><b>Tvrdé slovíčko.</b> Zapomněl(a) ses ho už {cards.current.get(current.id)!.lapses}×. Zkus si ho spojit s obrázkem, vlastní větou nebo podobným českým slovem.</p>
+              <p><b>Těžké slovíčko.</b> Zapomněl(a) ses ho už {cards.current.get(current.id)!.lapses}×. Zkus si ho spojit s obrázkem, vlastní větou nebo podobným českým slovem.</p>
               {hasInfo(current) && <div class="mt-2"><WordInfo word={current} /></div>}
             </div>
           )}

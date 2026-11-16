@@ -22,7 +22,7 @@ Stav k 16. 11. 2026. Doplňuje `docs/IMPROVEMENTS.md` (ten je široký katalog n
 - *L5 Gramatika:* 268 vět s mezerou z 51 lekcí se opakuje plánem SRS na stránce `/grammar` (Karty → Gramatika: doplňování vět). Id karet má předponu `cl:`, takže se nepočítají mezi slovíčka v odznacích; každé sezení přidá až 6 nových vět.
 - Testy: 51 jednotkových, 11 E2E.
 
-**Také hotovo (drobnosti):** L7 (u slovíčka zapomenutého ≥ 4× se po otočení ukáže „Tvrdé slovíčko“ s tipem a vysvětlením; vlastní poznámky jsem neřešil, potřebovaly by nové úložiště), G3 (stránka Praxe → Přehled gramatiky s hledáním, `/gramatika`), N3 („Už to umím, odemknout“ přímo u první zamčené jednotky na úvodní stránce), P3 (karta „Posledních 7 dní“ na stránce Pokrok).
+**Také hotovo (drobnosti):** L7 (u slovíčka zapomenutého ≥ 4× se po otočení ukáže „Těžké slovíčko“ s tipem a vysvětlením; vlastní poznámky jsem neřešil, potřebovaly by nové úložiště), G3 (stránka Praxe → Přehled gramatiky s hledáním, `/gramatika`), N3 („Už to umím, odemknout“ přímo u první zamčené jednotky na úvodní stránce), P3 (karta „Posledních 7 dní“ na stránce Pokrok).
 
 **Zbývá:** M4 (sbírka, bonusové kapitoly, nápovědy v testech – podle zkušeností s mincemi) (nabídka odemknutí po opakovaném neúspěchu), K2 lazy-load, L5/L6 gramatické a psací karty, C1/C3/A1 (revize, příkladové věty, audio). K6 neřeším: aplikace se aktualizuje automaticky (`autoUpdate`).
 
