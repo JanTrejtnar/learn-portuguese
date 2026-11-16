@@ -146,7 +146,7 @@ export const MapPage = () => {
         </div>
         <div class="ml-auto text-right text-sm font-bold">
           <div>🏁 {done} / {positioned.length}</div>
-          <div class="text-gold-600 dark:text-gold-400">⭐ {stars} / {positioned.length * 3}</div>
+          <div class="text-amber-700 dark:text-gold-400">⭐ {stars} / {positioned.length * 3}</div>
         </div>
       </div>
 
@@ -257,7 +257,7 @@ export const MapPage = () => {
             {selState === 'done' && selResult && (
               <span class="rounded-full bg-brand-100 px-3 py-1 font-bold text-brand-800 dark:bg-brand-900 dark:text-brand-100">✓ splněno{selResult.best > 0 ? ` · ${Math.round(selResult.best * 100)} %` : ''}</span>
             )}
-            {selState === 'done' && selStars > 0 && <span class="font-bold text-gold-600 dark:text-gold-400">{'⭐'.repeat(selStars)}</span>}
+            {selState === 'done' && selStars > 0 && <span class="font-bold text-amber-700 dark:text-gold-400">{'⭐'.repeat(selStars)}</span>}
             {selState === 'current' && <span class="rounded-full bg-flag-600 px-3 py-1 font-bold text-white">další krok</span>}
             {selState === 'locked' && <span class="rounded-full bg-surface-2 px-3 py-1 font-bold text-muted">🔒 zamčeno</span>}
           </div>

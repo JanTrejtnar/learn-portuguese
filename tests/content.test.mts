@@ -91,3 +91,36 @@ test('vysvětlení (usage) míří na existující slovíčka a nemá brazilismy
     assert.ok(!/\b(você|ônibus|trem|celular)\b/i.test(`${u.usage ?? ''}${u.literal ?? ''}`.replace(/„vocês?“/gi, '')), `brazilismus v ${id}`);
   }
 });
+
+test('příkladové věty: klíče odpovídají slovíčkům a věty nejsou prázdné', async () => {
+  const { examples } = await import('../src/content/examples.ts');
+  const ids = new Set(allWords().map((w) => w.id));
+  for (const [id, [pt, cs]] of Object.entries(examples)) {
+    assert.ok(ids.has(id), `příklad pro neexistující slovíčko ${id}`);
+    assert.ok(pt.trim() && cs.trim(), `prázdný příklad ${id}`);
+  }
+});
+
+test('PT-PT: žádná typicky brazilská slova ani tvary v obsahu, scénářích, párech a vysvětleních', async () => {
+  const { scenarios } = await import('../src/content/roleplay.ts');
+  const { usage } = await import('../src/content/usage.ts');
+  const { examples } = await import('../src/content/examples.ts');
+  const { minimalPairs } = await import('../src/content/pairs.ts');
+  // „vocês“ (množné vy) je v pořádku; gramatika smí varovat před slovem „você“ (výslovně vysvětleno jako nevhodné).
+  const corpus = JSON.stringify([units, scenarios, usage, examples, minimalPairs])
+    .toLowerCase()
+    .replace(/vocês/g, '')
+    .replace(/slovo „você“/g, '');
+  const banned = [
+    'você', 'ônibus', 'onibus', 'trem', 'celular', 'café da manhã', 'geladeira', 'sorvete', 'suco', 'banheiro', 'açougue', 'xícara',
+    'cadê', 'valeu', 'bacana', 'bebê', 'pedágio', 'garçom', 'moço', 'tela cheia', 'time de', 'carteira de motorista', 'ponto de ônibus',
+    'brasil', // jen „brasileiro/a“ jako národnost je dovolené
+  ];
+  const text = corpus.replace(/brasileir[oa]/g, '');
+  for (const b of banned) {
+    const re = new RegExp(`(^|[^\\p{L}])${b}([^\\p{L}]|$)`, 'u');
+    assert.ok(!re.test(text), `brazilismus v obsahu: „${b}“`);
+  }
+  // gerundium po estar (v PT-PT: estar a + infinitiv)
+  assert.ok(!/\b(estou|estás|está|estamos|estão|estava|estavam)\s+\w+ndo\b/.test(corpus), 'gerundium po estar');
+});

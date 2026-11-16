@@ -150,11 +150,11 @@ export const StatsPage = () => {
         {BADGES.map((b) => {
           const got = earned.has(b.id);
           return (
-            <li key={b.id} class={`rounded-2xl border p-3 text-center ${got ? 'border-brand-500 bg-surface' : 'border-line opacity-50'}`} title={b.desc}>
+            <li key={b.id} class={`rounded-2xl border p-3 text-center ${got ? 'border-brand-500 bg-surface' : 'border-dashed border-line-strong'}`} title={b.desc}>
               <div class={`text-3xl ${got ? '' : 'grayscale'}`} aria-hidden="true">{got ? b.emoji : '🔒'}</div>
               <div class="mt-1 text-sm font-semibold">{b.title}</div>
               <div class="text-xs text-muted">{b.desc}</div>
-              <div class={`mt-1.5 inline-flex items-center gap-1 text-xs font-bold ${got ? 'text-muted' : 'text-gold-600 dark:text-gold-400'}`}>
+              <div class={`mt-1.5 inline-flex items-center gap-1 text-xs font-bold ${got ? 'text-muted' : 'text-amber-700 dark:text-gold-400'}`}>
                 <Coin class="h-3.5 w-3.5" />+{BADGE_COINS[b.id] ?? 10}
               </div>
             </li>

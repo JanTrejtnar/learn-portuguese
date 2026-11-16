@@ -96,7 +96,7 @@ export const HomePage = () => {
               <li key={u.id}>
                 <a
                   href={href(`/unit/${u.id}`)}
-                  class={`flex h-full items-center gap-4 rounded-2xl border bg-surface p-4 shadow-soft hover:shadow-lift ${current?.id === u.id ? 'border-brand-600 ring-2 ring-brand-600/30' : 'border-line hover:border-brand-500'} ${locked ? 'opacity-70' : ''}`}
+                  class={`flex h-full items-center gap-4 rounded-2xl border bg-surface p-4 shadow-soft hover:shadow-lift ${current?.id === u.id ? 'border-brand-600 ring-2 ring-brand-600/30' : 'border-line hover:border-brand-500'} ${locked ? 'border-dashed' : ''}`}
                 >
                   <span class={`text-3xl ${locked ? 'opacity-40 grayscale' : ''}`} aria-hidden="true">{u.emoji}</span>
                   <span class="min-w-0">

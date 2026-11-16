@@ -25,9 +25,6 @@ export const Flashcard = ({ word, flipped, direction, onFlip }: Props) => {
 
   return (
     <div
-      role="button"
-      tabIndex={0}
-      aria-label={flipped ? 'Karta otočená' : 'Otočit kartu'}
       onClick={onFlip}
       class="relative flex min-h-80 cursor-pointer select-none flex-col items-center justify-center gap-4 rounded-3xl border border-line bg-surface p-6 text-center shadow-sm transition"
     >

@@ -3,6 +3,9 @@
 import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
+import { createRequire } from 'node:module';
+
+const axePath = createRequire(import.meta.url).resolve('axe-core');
 
 const PORT = 4179;
 const base = `http://localhost:${PORT}/`;
@@ -203,6 +206,29 @@ await test('všechny hlavní stránky se načtou bez chyby', async () => {
   }
   assert.deepEqual(errors, []);
   await ctx.close();
+});
+
+const axeViolations = async (page) => {
+  await page.addScriptTag({ path: axePath });
+  const res = await page.evaluate(() => window.axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa'] }));
+  return res.violations.map((v) => `${v.id}: ${v.nodes.slice(0, 2).map((n) => n.target.join(' ')).join(' | ')}`);
+};
+
+await test('přístupnost (axe, WCAG AA): hlavní stránky ve světlém i tmavém režimu', async () => {
+  const routes = ['/', '/practice', '/stats', '/settings', '/shop', '/gramatika', '/cards', '/quiz', '/roleplay', '/pairs', '/map', '/unit/a1-u1', '/lesson/a1-u1-l1', '/cards/a1-u1-l1', '/quiz/a1-u1-l1', '/roleplay/hotel'];
+  const bad = [];
+  for (const dark of [false, true]) {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+    await ctx.addInitScript((d) => { localStorage.setItem('ap:onboarded', '1'); localStorage.setItem('ap:theme', d ? 'dark' : 'light'); }, dark);
+    const page = await ctx.newPage();
+    for (const r of routes) {
+      await page.goto(base + '#' + r);
+      await page.waitForTimeout(300);
+      for (const v of await axeViolations(page)) bad.push(`${dark ? 'tmavý' : 'světlý'} ${r}: ${v}`);
+    }
+    await ctx.close();
+  }
+  assert.deepEqual(bad, []);
 });
 
 await browser.close();

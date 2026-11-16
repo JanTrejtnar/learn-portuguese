@@ -36,7 +36,7 @@ export const RoleplayHubPage = () => {
               {open ? (
                 <a href={href(`/roleplay/${s.id}`)} class="flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 hover:border-brand-500">{body}</a>
               ) : (
-                <div class="flex items-center gap-4 rounded-2xl border border-dashed border-line-strong p-4 opacity-70">{body}</div>
+                <div class="flex items-center gap-4 rounded-2xl border border-dashed border-line-strong p-4">{body}</div>
               )}
             </li>
           );

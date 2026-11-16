@@ -28,7 +28,7 @@ export const PlayerStrip = ({ progress, goal }: { progress: Progress; goal: numb
 
   return (
     <a href={href('/stats')} class="flex items-center gap-4 rounded-3xl border border-line bg-surface p-4 shadow-soft hover:shadow-lift">
-      <div class={done ? 'text-brand-600' : 'text-gold-600 dark:text-gold-400'}>
+      <div class={done ? 'text-brand-600' : 'text-amber-700 dark:text-gold-400'}>
         <ProgressRing value={today} max={goal} size={68}>
           <span class="text-ink">{done ? '✓' : Math.min(today, goal)}</span>
         </ProgressRing>
