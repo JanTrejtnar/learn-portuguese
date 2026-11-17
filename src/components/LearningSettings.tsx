@@ -1,7 +1,7 @@
 import { useStudySettings } from '../lib/settings';
 import { GOAL_OPTIONS } from '../lib/xp';
 
-const chip = (on: boolean) => `rounded-xl border-2 px-3 py-2 text-left text-sm ${on ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-line'}`;
+const chip = (on: boolean) => `rounded-xl border-2 px-2 py-2 text-center text-sm ${on ? 'border-brand-600 bg-brand-50 dark:bg-brand-900' : 'border-line'}`;
 
 /** Všechna nastavení učení na jednom místě (stránka Nastavení). */
 export const LearningSettings = () => {
@@ -10,17 +10,17 @@ export const LearningSettings = () => {
     <div class="space-y-5 text-sm">
       <div>
         <div class="mb-2 font-semibold">Denní cíl</div>
-        <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Denní cíl">
+        <div class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Denní cíl">
           {GOAL_OPTIONS.map((g) => (
             <button key={g.xp} type="button" role="radio" aria-checked={s.dailyGoal === g.xp} onClick={() => update({ dailyGoal: g.xp })} class={chip(s.dailyGoal === g.xp)}>
-              <b>{g.label}</b> · {g.xp} XP<span class="block text-xs text-muted">{g.hint}</span>
+              <b>{g.label}</b><span class="block">{g.xp} XP</span><span class="block text-xs text-muted">{g.hint}</span>
             </button>
           ))}
         </div>
       </div>
       <div>
         <div class="mb-2 font-semibold">Psaní při opakování</div>
-        <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Psaní při opakování">
+        <div class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Psaní při opakování">
           {([['off', 'Vypnuto', 'Jen otáčení karet'], ['sometimes', 'Někdy', 'Občas napíšeš slovo'], ['often', 'Často', 'Většinu známých slov napíšeš']] as const).map(([id, label, hint]) => (
             <button key={id} type="button" role="radio" aria-checked={s.recall === id} onClick={() => update({ recall: id })} class={chip(s.recall === id)}><b>{label}</b><span class="block text-xs text-muted">{hint}</span></button>
           ))}
@@ -29,7 +29,7 @@ export const LearningSettings = () => {
       </div>
       <div>
         <div class="mb-2 font-semibold">Směr karet</div>
-        <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Směr karet">
+        <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Směr karet">
           <button type="button" role="radio" aria-checked={s.direction === 'pt-cs'} onClick={() => update({ direction: 'pt-cs' })} class={chip(s.direction === 'pt-cs')}>Portugalsky → česky</button>
           <button type="button" role="radio" aria-checked={s.direction === 'cs-pt'} onClick={() => update({ direction: 'cs-pt' })} class={chip(s.direction === 'cs-pt')}>Česky → portugalsky</button>
         </div>

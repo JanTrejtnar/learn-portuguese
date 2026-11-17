@@ -30,7 +30,10 @@ export const PlayerStrip = ({ progress, goal }: { progress: Progress; goal: numb
     <a href={href('/stats')} class="flex items-center gap-4 rounded-3xl border border-line bg-surface p-4 shadow-soft hover:shadow-lift">
       <div class={done ? 'text-brand-600' : 'text-amber-700 dark:text-gold-400'}>
         <ProgressRing value={today} max={goal} size={68}>
-          <span class="text-ink">{done ? '✓' : Math.min(today, goal)}</span>
+          <span class="flex flex-col items-center leading-none text-ink">
+            <span class="text-base">{done ? '✓' : Math.min(today, goal)}</span>
+            <span class="mt-0.5 text-[10px] font-semibold text-muted">{done ? 'dnes' : `z ${goal}`}</span>
+          </span>
         </ProgressRing>
       </div>
       <div class="min-w-0 flex-1">
@@ -49,7 +52,7 @@ export const PlayerStrip = ({ progress, goal }: { progress: Progress; goal: numb
           <div class="h-full rounded-full bg-gold-400 transition-all" style={{ width: `${(lvl.into / lvl.span) * 100}%` }} />
         </div>
         <div class="mt-1.5 text-xs text-muted">
-          {xp} XP · <span title="Mince"><Coin class="h-3.5 w-3.5" /> {coins}</span> · denní cíl {done ? 'splněn 🎯' : `${today} / ${goal} XP`}
+          {xp} XP · <span title="Mince"><Coin class="h-3.5 w-3.5" /> {coins}</span> {done ? ' · denní cíl splněn 🎯' : ` · cíl dne ${goal} XP`}
         </div>
         {risk && <div class="mt-1 text-xs font-semibold text-flag-700 dark:text-flag-100">Série je v ohrožení: dnes ještě něco procvič.</div>}
       </div>

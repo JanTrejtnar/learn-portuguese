@@ -3,6 +3,7 @@ import { AudioButton } from '../components/AudioButton';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { VoiceWarning } from '../components/VoiceWarning';
 import { GrammarBlockView } from '../components/GrammarBlockView';
+import { Icon } from '../components/Icon';
 import { WordRow } from '../components/WordRow';
 import { getLesson } from '../content';
 import { useProgress } from '../lib/useProgress';
@@ -33,17 +34,23 @@ export const LessonPage = ({ id }: { id: string }) => {
       <h1 class="text-2xl font-bold" lang="pt-PT">{lesson.title}</h1>
       <p class="text-ink-soft">{lesson.subtitle}</p>
 
-      <div class="mt-4 flex flex-wrap gap-2">
-        <a href={href(`/learn/${lesson.id}`)} class="inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-4 py-2 font-semibold text-white hover:bg-brand-600">▶ Projít lekci</a>
-        <a href={href(`/cards/${lesson.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-brand-700 px-4 py-2 font-semibold text-brand-700 dark:text-brand-100">🃏 Kartičky</a>
-        <a href={href(`/quiz/${lesson.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-brand-700 px-4 py-2 font-semibold text-brand-700 dark:text-brand-100">Test lekce</a>
-        {nextLesson
-          ? <a href={href(`/lesson/${nextLesson.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 py-2 font-semibold">Další →</a>
-          : progress?.tests.get(unit.id)?.passed
-            ? <a href={href(`/unit/${unit.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 py-2 font-semibold">Zpět na jednotku</a>
-            : <a href={href(`/quiz/${unit.id}`)} class="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 py-2 font-semibold">🏆 Dokončit jednotku →</a>}
+      <div class="md:mt-4 md:grid md:grid-cols-[minmax(0,1fr)_15rem] md:items-start md:gap-8">
+      <aside class="md:order-2 md:sticky md:top-8">
+      <div class="mt-4 md:mt-0">
+        <a href={href(`/learn/${lesson.id}`)} class="flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-700 px-4 py-3 text-base font-bold text-white shadow-soft hover:bg-brand-600"><Icon name="play" class="mr-2 h-4 w-4" filled />Projít lekci</a>
+        <div class="mt-2 grid grid-cols-3 gap-2 md:grid-cols-1 text-center text-sm">
+          <a href={href(`/cards/${lesson.id}`)} class="flex min-h-11 items-center justify-center rounded-xl border border-brand-700 px-2 py-2 font-semibold text-brand-700 dark:text-brand-100">Kartičky</a>
+          <a href={href(`/quiz/${lesson.id}`)} class="flex min-h-11 items-center justify-center rounded-xl border border-brand-700 px-2 py-2 font-semibold text-brand-700 dark:text-brand-100">Test lekce</a>
+          {nextLesson
+            ? <a href={href(`/lesson/${nextLesson.id}`)} class="flex min-h-11 items-center justify-center rounded-xl border border-line-strong px-2 py-2 font-semibold">Další lekce →</a>
+            : progress?.tests.get(unit.id)?.passed
+              ? <a href={href(`/unit/${unit.id}`)} class="flex min-h-11 items-center justify-center rounded-xl border border-line-strong px-2 py-2 font-semibold">Zpět na jednotku</a>
+              : <a href={href(`/quiz/${unit.id}`)} class="flex min-h-11 items-center justify-center rounded-xl border border-line-strong px-2 py-2 font-semibold">Dokončit jednotku</a>}
+        </div>
       </div>
 
+      </aside>
+      <div class="md:order-1">
       {tabs.length > 1 && (
         <div class="mt-5 flex gap-2" role="tablist" aria-label="Části lekce">
           {tabs.map((t) => (
@@ -92,6 +99,8 @@ export const LessonPage = ({ id }: { id: string }) => {
           </ul>
         </section>
       )}
+      </div>
+      </div>
     </div>
   );
 };

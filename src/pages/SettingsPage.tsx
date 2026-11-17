@@ -21,7 +21,12 @@ const themes: { id: Theme; label: string }[] = [
   { id: 'dark', label: 'Tmavý' },
 ];
 
-const Card = ({ title, children }: { title: string; children: preact.ComponentChildren }) => (
+const Card = ({ title, children, fold = false }: { title: string; children: preact.ComponentChildren; fold?: boolean }) => fold ? (
+  <details class="group mt-3 rounded-2xl border border-line bg-surface p-4">
+    <summary class="flex min-h-8 cursor-pointer list-none items-center justify-between font-semibold">{title}<span class="text-muted transition-transform group-open:rotate-90" aria-hidden="true">›</span></summary>
+    <div class="mt-3">{children}</div>
+  </details>
+) : (
   <section class="mt-5 rounded-2xl border border-line bg-surface p-4">
     <h2 class="mb-2 font-semibold">{title}</h2>
     {children}
@@ -117,12 +122,12 @@ export const SettingsPage = () => {
         <LearningSettings />
       </Card>
 
-      <Card title="Úvodní průvodce">
+      <Card fold title="Úvodní průvodce">
         <p class="mb-3 text-sm text-ink-soft">Znovu si projdi, jak aplikace funguje, a případně změň, od které úrovně začínáš.</p>
         <a href="#/welcome" class={`${btn} inline-block`}>Zobrazit úvodního průvodce</a>
       </Card>
 
-      <Card title="Aplikace a offline">
+      <Card fold title="Aplikace a offline">
         <ul class="space-y-1 text-sm">
           <li>{offlineReady ? '✅ Aplikace je připravená pro offline použití.' : 'ℹ️ Offline režim se aktivuje po prvním úplném načtení s připojením.'}</li>
           <li>
@@ -142,7 +147,7 @@ export const SettingsPage = () => {
         </div>
       </Card>
 
-      <Card title="Denní připomínka">
+      <Card fold title="Denní připomínka">
         <p class="text-sm text-ink-soft">Aplikace ti nemůže poslat upozornění sama (nemá server). Stáhni si denní událost do kalendáře a telefon ti připomene, že je čas se učit.</p>
         <div class="mt-3 flex flex-wrap items-center gap-2">
           <label class="text-sm font-semibold" for="remind-time">Čas</label>
@@ -164,7 +169,7 @@ export const SettingsPage = () => {
         </div>
       </Card>
 
-      <Card title="O aplikaci a soukromí">
+      <Card fold title="O aplikaci a soukromí">
         <p class="text-sm text-ink-soft">Co je v aplikaci neověřené, jaká data se ukládají a jak nahlásit chybu.</p>
         <a href="#/about" class={`${btn} mt-3 inline-block`}>O aplikaci a soukromí</a>
       </Card>

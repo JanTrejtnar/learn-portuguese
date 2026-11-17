@@ -24,3 +24,12 @@ Podklad: snímky mobilu (390×844, světlý) a desktopu (1280×800, tmavý) pro 
 
 ## Doporučené pořadí
 1) body 1–3 a 4 (rychlé, velký vliv), 2) 5–7 a 8, 3) 9–10, 4) 11–13.
+
+## Hotovo (zapracováno všech 13 bodů)
+- Domů: aktuální jednotka zeleně se štítkem „Tady jsi“ (bez druhého tlačítka), kompaktní pozdrav, kruh denního cíle s popiskem, přepínač Seznam/Mapa v záhlaví sekce „Lekce“.
+- Lekce: jedna velká primární akce, tři sekundární (Kartičky, Test lekce, Další lekce), na desktopu postranní sloupec s akcemi; slovíčka mají jedno tlačítko zvuku, příklad se rozbalí, ⓘ je decentní.
+- Představení slov: větší slovo, karta vystředěná.
+- Procvičit: tři skupiny, počet karet k opakování, jednotné SVG ikony; přepínač Seznam/Mapa s SVG ikonami.
+- Nastavení: volby v mřížce stejných sloupců, méně důležité karty sbalené.
+- Mapa: větší popisky měst (12), legenda ikon. Pokrok: prázdný stav pro nového uživatele. Navigace 12 px, plynulý přechod otázek ve cvičení.
+- Tutoriál nemění pravidla ani konstanty (změna je jen vzhled), proto zůstal beze změny; E2E testy upraveny (prázdný stav pokroku, sbalená připomínka).

@@ -282,7 +282,7 @@ await test('opakování: známé slovo se píše, špatná odpověď se vrátí'
   await ctx.close();
 });
 
-await test('přehled gramatiky: hledání najde lekci a týdenní souhrn je vidět', async () => {
+await test('přehled gramatiky: hledání najde lekci a prázdný stav pokroku je vidět', async () => {
   const { page, errors, ctx } = await newPage(true);
   await page.goto(base + '#/gramatika');
   await page.getByRole('heading', { name: 'Přehled gramatiky' }).waitFor();
@@ -291,7 +291,7 @@ await test('přehled gramatiky: hledání najde lekci a týdenní souhrn je vid�
   await page.getByLabel('Hledat v gramatice').fill('zzzneexistuje');
   await page.getByText('Nic nenalezeno.').waitFor();
   await page.goto(base + '#/stats');
-  await page.getByText('Posledních 7 dní').waitFor();
+  await page.getByText('Tady uvidíš svůj pokrok').waitFor();
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -330,6 +330,7 @@ await test('O aplikaci: upozornění na neověřený obsah a soukromí; záloha 
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Stáhnout zálohu/ }).click()]);
   assert.match(download.suggestedFilename(), /zaloha/);
   await page.getByTestId('last-backup').getByText(/Poslední záloha:/).waitFor();
+  await page.getByText('Denní připomínka').click();
   const [ics] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Stáhnout připomínku/ }).click()]);
   assert.match(ics.suggestedFilename(), /\.ics$/);
   assert.deepEqual(errors, []);

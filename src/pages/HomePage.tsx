@@ -47,8 +47,8 @@ const TodayCard = ({ progress }: { progress: Progress }) => {
         <div class="mt-1 text-2xl font-extrabold">{heading}</div>
         {target?.kind === 'learn' && due > 0 && <div class="mt-1 text-sm text-brand-100">{due} slov čeká na opakování</div>}
         <div class="mt-4 flex flex-wrap gap-3">
-          {target?.kind === 'learn' && <a href={href(`/learn/${target.lessonId}`)} class={btn}>▶ Pokračovat<Icon name="arrow" class="h-5 w-5" /></a>}
-          {target?.kind === 'test' && <a href={href(`/quiz/${target.unitId}`)} class={btn}>🏆 Dokončit jednotku<Icon name="arrow" class="h-5 w-5" /></a>}
+          {target?.kind === 'learn' && <a href={href(`/learn/${target.lessonId}`)} class={btn}><Icon name="play" class="h-4 w-4" filled />Pokračovat<Icon name="arrow" class="h-5 w-5" /></a>}
+          {target?.kind === 'test' && <a href={href(`/quiz/${target.unitId}`)} class={btn}><Icon name="trophy" class="h-5 w-5" />Dokončit jednotku<Icon name="arrow" class="h-5 w-5" /></a>}
           {due > 0 && <a href={href('/cards/all')} class={target ? btn2 : btn}>🃏 Opakovat ({due})</a>}
           {!target && due === 0 && goalMissing && <a href={href('/quiz/quick')} class={btn}>⚡ Rychlý kvíz za XP</a>}
           {!target && due === 0 && !goalMissing && <a href={href('/roleplay')} class={btn}>🎭 Zkus scénář<Icon name="arrow" class="h-5 w-5" /></a>}
@@ -89,18 +89,20 @@ export const HomePage = () => {
   const current = progress ? units.find((u) => unitUnlocked(u.id, progress.tests) && !progress.tests.get(u.id)?.passed) : undefined;
   return (
   <div>
-    <p class="text-sm font-semibold text-muted">{g.cs}</p>
-    <h1 class="text-3xl font-extrabold md:text-4xl">{g.pt}</h1>
+    <h1 class="flex flex-wrap items-baseline gap-x-3 text-2xl font-extrabold md:text-3xl">{g.pt}<span class="text-sm font-semibold text-muted">{g.cs}</span></h1>
 
-    <div class="mt-5">{progress ? <PlayerStripWithSettings progress={progress} /> : <div class="skeleton h-24" />}</div>
+    <div class="mt-3">{progress ? <PlayerStripWithSettings progress={progress} /> : <div class="skeleton h-24" />}</div>
     {progress && <TodayCard progress={progress} />}
     {progress && <BackupReminder progress={progress} />}
 
-    <ViewSwitch current="list" />
+    <div class="mt-8 flex items-center justify-between gap-3">
+      <h2 class="text-xl font-extrabold">Lekce</h2>
+      <ViewSwitch current="list" compact />
+    </div>
 
     {LEVELS.map(({ level, title }) => (
       <section key={level}>
-        <h2 class="mt-9 mb-3 text-sm font-bold uppercase tracking-wider text-muted">{title}</h2>
+        <h3 class="mt-6 mb-3 text-sm font-bold uppercase tracking-wider text-muted">{title}</h3>
         <ul class="grid gap-3 sm:grid-cols-2">
           {units.filter((u) => u.level === level).map((u) => {
             const locked = progress ? !unitUnlocked(u.id, progress.tests) : false;
@@ -110,7 +112,7 @@ export const HomePage = () => {
                 <a
                   href={href(`/unit/${u.id}`)}
                   class={`flex flex-1 items-center gap-4 rounded-2xl border p-4 hover:shadow-lift ${
-                    current?.id === u.id ? 'unit-current border-2 border-flag-600 bg-flag-50 shadow-lift dark:bg-flag-900/30'
+                    current?.id === u.id ? 'unit-current border-2 border-brand-600 bg-brand-50 shadow-lift dark:bg-brand-950'
                     : t?.passed ? 'border-2 border-brand-600 bg-brand-50 shadow-soft dark:bg-brand-950'
                     : locked ? 'border-dashed border-line-strong bg-surface-2'
                     : 'border-line bg-surface shadow-soft hover:border-brand-500'}`}
@@ -122,7 +124,7 @@ export const HomePage = () => {
                     <span class="block text-sm text-ink-soft">{u.subtitle}</span>
                   </span>
                   {t?.passed && <span class="ml-auto shrink-0 rounded-full bg-brand-700 px-2.5 py-1 text-xs font-bold text-white">✓ splněno</span>}
-                  {current?.id === u.id && <span class="ml-auto shrink-0 rounded-full bg-flag-600 px-3 py-1.5 text-sm font-extrabold text-white shadow-soft">▶ další krok</span>}
+                  {current?.id === u.id && <span class="ml-auto shrink-0 rounded-full bg-gold-400 px-2.5 py-1 text-xs font-extrabold text-brand-950">Tady jsi</span>}
                   {locked && <span class="ml-auto shrink-0 text-muted"><Icon name="lock" class="h-5 w-5" /></span>}
                 </a>
               </li>

@@ -11,14 +11,14 @@ export const LearnIntro = ({ words, onDone }: { words: Word[]; onDone: () => voi
   if (!w) return null;
   const last = i === words.length - 1;
   return (
-    <div>
+    <div class="flex min-h-[calc(100vh-14rem)] flex-col justify-center">
       <p class="mt-2 text-center text-sm font-semibold text-muted">Nová slova {i + 1} / {words.length}</p>
-      <div key={w.id} class="mt-3 rounded-3xl border border-line bg-surface p-6 text-center shadow-soft">
+      <div key={w.id} class="mt-3 rounded-3xl border border-line bg-surface p-7 text-center shadow-soft">
         <div class="flex items-center justify-center gap-3">
-          <h1 class="text-3xl font-extrabold" lang="pt-PT">{w.pt}</h1>
+          <h1 class="text-4xl font-extrabold" lang="pt-PT">{w.pt}</h1>
           <AudioButton text={oneVariant(w.pt)} size="md" withSlow />
         </div>
-        <p class="mt-2 text-xl text-ink-soft">{w.cs}</p>
+        <p class="mt-3 text-2xl font-semibold text-ink-soft">{w.cs}</p>
         {w.literal && <p class="mt-1 text-sm text-muted">doslova: {w.literal}</p>}
         {w.example && (
           <div class="mt-5 rounded-2xl bg-surface-2 p-3 text-left text-sm">

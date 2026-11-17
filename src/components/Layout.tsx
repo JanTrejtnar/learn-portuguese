@@ -34,7 +34,7 @@ const SideLink = ({ item, path }: { item: NavItem; path: string }) => {
 const TabLink = ({ item, path }: { item: NavItem; path: string }) => {
   const on = item.active(path);
   return (
-    <a href={href(item.to)} aria-current={on ? 'page' : undefined} class="flex flex-1 flex-col items-center gap-0.5 pt-2 pb-1.5 text-[11px] font-semibold">
+    <a href={href(item.to)} aria-current={on ? 'page' : undefined} class="flex flex-1 flex-col items-center gap-0.5 pt-2 pb-1.5 text-xs font-semibold">
       <span class={`flex h-8 w-14 items-center justify-center rounded-full ${on ? 'bg-brand-700 text-white' : 'text-muted'}`}>
         <Icon name={item.icon} class="h-5 w-5" />
       </span>

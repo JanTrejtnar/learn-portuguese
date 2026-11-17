@@ -292,7 +292,7 @@ const Session = ({ scope, progress }: { scope: Scope; progress: Progress }) => {
       {!finished && q2 && introDone && (
         <>
 
-          <div key={q2.id}>
+          <div key={q2.id} class="page-in">
             {(q2.kind === 'pt-to-cs' || q2.kind === 'cs-to-pt' || q2.kind === 'listen' || q2.kind === 'cloze' || q2.kind === 'dlg-listen' || q2.kind === 'dlg-reply') && <ChoiceQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
             {(q2.kind === 'typing' || q2.kind === 'dictation') && <TypingQuestion q={q2} answer={answer} onAnswer={setAnswer} hints={!scope.placement} />}
             {q2.kind === 'match' && <MatchQuestion q={q2} answer={answer} onAnswer={setAnswer} />}

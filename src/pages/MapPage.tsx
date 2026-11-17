@@ -195,8 +195,8 @@ export const MapPage = () => {
       <div class="flex items-center justify-between gap-3">
         <h1 class="text-2xl font-extrabold">Cesta Portugalskem</h1>
         <div class="text-right text-sm font-bold leading-tight">
-          <div>🏁 {done} / {positioned.length}</div>
-          <div class="text-amber-700 dark:text-gold-400">⭐ {stars} / {positioned.length * 3}</div>
+          <div title="Splněné jednotky">🏁 {done} / {positioned.length}</div>
+          <div class="text-amber-700 dark:text-gold-400" title="Hvězdy za testy">⭐ {stars} / {positioned.length * 3}</div>
         </div>
       </div>
 
@@ -211,6 +211,8 @@ export const MapPage = () => {
           ))}
         </div>
       </div>
+
+      <p class="mt-2 text-xs text-muted">🏁 splněné jednotky · ⭐ hvězdy za testy (max 3 na jednotku) · 🔒 zamčeno, odemkni testem předchozí</p>
 
       {allDone && (
         <div class="pop mt-2 rounded-2xl bg-gold-400 p-2 text-center text-sm font-extrabold text-brand-950 shadow-lift">🏆 Úroveň {level} dokončena! Parabéns!</div>
@@ -266,7 +268,7 @@ export const MapPage = () => {
           {positioned.map(({ u, p, st }) => {
             const left = LABEL_LEFT.has(u.city!.name);
             const name = u.city!.name;
-            const w = name.length * 5.8 + 14;
+            const w = name.length * 7 + 16;
             const off = st === 'current' ? 30 : 20;
             const f = fills[st];
             const isSel = sel?.u.id === u.id;
@@ -303,9 +305,9 @@ export const MapPage = () => {
                   </g>
                 )}
                 {st === 'done' && <g transform="translate(0 26)"><Stars n={starsForResult(result)} size={1} /></g>}
-                <g transform={`translate(${left ? -(w + off) : off} -9)`} aria-hidden="true">
-                  <rect width={w} height="18" rx="9" fill={st === 'done' ? '#ffe900' : st === 'current' ? 'var(--color-flag-600)' : 'var(--surface)'} stroke={st === 'done' ? '#046a38' : st === 'current' ? '#fff' : 'var(--line)'} stroke-width={st === 'locked' ? 1 : 1.6} opacity={st === 'locked' ? 0.75 : 1} />
-                  <text x={w / 2} y="12.5" font-size="10" font-weight="800" text-anchor="middle" fill={st === 'done' ? '#14221a' : st === 'current' ? '#fff' : st === 'locked' ? 'var(--muted)' : 'var(--map-ink)'}>{name}</text>
+                <g transform={`translate(${left ? -(w + off) : off} -10.5)`} aria-hidden="true">
+                  <rect width={w} height="21" rx="10.5" fill={st === 'done' ? '#ffe900' : st === 'current' ? 'var(--color-flag-600)' : 'var(--surface)'} stroke={st === 'done' ? '#046a38' : st === 'current' ? '#fff' : 'var(--line)'} stroke-width={st === 'locked' ? 1 : 1.6} opacity={st === 'locked' ? 0.75 : 1} />
+                  <text x={w / 2} y="14.5" font-size="12" font-weight="800" text-anchor="middle" fill={st === 'done' ? '#14221a' : st === 'current' ? '#fff' : st === 'locked' ? 'var(--muted)' : 'var(--map-ink)'}>{name}</text>
                 </g>
                 {st === 'current' && !traveling && (
                   <g transform="translate(0 -42)" aria-hidden="true"><FlagMarker /></g>

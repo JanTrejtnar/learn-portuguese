@@ -63,9 +63,9 @@ export const StatsPage = () => {
     .slice(0, 5);
   const wd = ['Dnes', 'Zítra', ...Array.from({ length: 5 }, (_, i) => new Date(dayStart(now) + (i + 2) * DAY).toLocaleDateString('cs-CZ', { weekday: 'short' }))];
 
+  const fresh = progress.days.size === 0 && progress.cards.size === 0;
   return (
     <div>
-      
       <h1 class="text-2xl font-bold">Můj pokrok</h1>
 
       <div class="mt-5 rounded-2xl bg-brand-700 p-5 text-white">
@@ -91,6 +91,15 @@ export const StatsPage = () => {
         <a href="#/settings" class="mt-1 inline-block text-sm font-semibold text-brand-700 hover:underline dark:text-brand-200">Změnit v Nastavení →</a>
       </div>
 
+      {fresh ? (
+        <div class="mt-5 rounded-2xl border border-dashed border-line-strong bg-surface p-6 text-center">
+          <div class="text-4xl" aria-hidden="true">🌱</div>
+          <p class="mt-2 font-semibold">Tady uvidíš svůj pokrok</p>
+          <p class="mt-1 text-sm text-ink-soft">Série, úspěšnost, slovní zásobu i předpověď opakování. Začni první lekcí a statistiky se samy zaplní.</p>
+          <a href="#/" class="mt-4 inline-flex min-h-11 items-center rounded-xl bg-brand-700 px-5 py-2 font-bold text-white">Jít na lekce</a>
+        </div>
+      ) : (
+      <>
       <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile label="Série dní 🔥" value={streakOf(progress.days, now, new Set(loadShop().frozen))} />
         <Tile label="Dnes opakováno" value={today?.reviews ?? 0} hint={`nových: ${today?.newCards ?? 0}`} />
@@ -148,6 +157,9 @@ export const StatsPage = () => {
           </div>
         ))}
       </div>
+
+      </>
+      )}
 
       <h2 class="mt-8 mb-3 text-lg font-semibold">Odznaky ({earned.size} / {BADGES.length})</h2>
       <ul class="grid grid-cols-2 gap-2 sm:grid-cols-4">
